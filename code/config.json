@@ -1,0 +1,7 @@
+{
+  "codeQLExecutable": "/persistent/codeql/codeql",
+  "codeQLSourcesRoot": "/home/diegog/repos/microsoft/MSR-collab2020/tsm-js/ql",  
+  "workingDirectory": "/mnt",
+  "resultsDirectory": "/persistent/experiments/results",
+  "searchPath": "/home/diegog/repos/microsoft/MSR-collab2020/tsm-js/lib-worse/codeql/"
+}
