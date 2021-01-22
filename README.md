@@ -6,7 +6,7 @@ Taint Specification Mining for javascript. A tool to mine likely specification f
 The tool takes a codeql query and boost it but infering new sinks candidates.  
 In order to work properly the tool must point to a properly codeql library containing the libraries to boost. 
 They should be installed (or linked) under the folder `lib-worse/codeql` of the root folder.
-Current version of libraries to boost is: commit `e277a2ef6c9998c927cb6e4b277a0ac51fd6b9dd`
+Current version of libraries to boost is: commit `e277a2ef6c9998c927cb6e4b277a0ac51fd6b9dd` from [CodeQl repo](https://github.com/github/codeql)
 
 ## Installing dependencies
 
