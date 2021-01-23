@@ -119,10 +119,8 @@ class DataGenerator:
 
     def _get_tsm_query_file(self, query_type: str, filename: str) -> str:
         if query_type is None:
-            # return os.path.join(global_config.sources_root, "javascript", "ql", "src", "TSM", filename)
             return os.path.join(global_config.sources_root, "tsm", filename)
         else: 
-            # return os.path.join(global_config.sources_root, "javascript", "ql", "src", "TSM", query_type, filename)
             return os.path.join(global_config.sources_root, "tsm", query_type, filename)
 
     def _get_tsm_bqrs_file_for_entity(self, queried_entity: str, query_type: str) -> str:
@@ -133,7 +131,6 @@ class DataGenerator:
         
 
     def _get_tsm_bqrs_file(self, filename: str) -> str:
-        # return os.path.join(constaintssolving_dir, self.project_dir, "results", "codeql-javascript", "TSM", filename)
         return os.path.join(constaintssolving_dir, self.project_dir, "results", "js-propagation-graphs", "tsm", filename)
 
     def generate_scores(self, query_type: str, combinedScore: bool, kind = "snk") -> Tuple[str, ...]:
