@@ -47,7 +47,7 @@ class AllPackagesAreInteresting extends InterestingPackageForSources,Interesting
 } 
 
 // class PathIsInteresting extends InterestingPackageForSinks {
-//   PathIsInteresting() { this = packageListFromFrecuency() }
+//   PathIsInteresting() { this = targetLibraries() }
 // }
 
 class PathSourceCandidate extends AdditionalSourceCandidate {
