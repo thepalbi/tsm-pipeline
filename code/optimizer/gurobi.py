@@ -292,7 +292,8 @@ class OptimizeStep(OrchestrationStep):
         #solve_constraints(config, ctx)
 
         # Compute metrics
-        getallmetrics(config, ctx)
+        # TO-DO: remover as we are no longer using it
+        # getallmetrics(config, ctx)
 
         return ctx
 

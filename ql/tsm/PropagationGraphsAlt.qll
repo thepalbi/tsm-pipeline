@@ -204,7 +204,7 @@ module PropagationGraph {
 
   /**
    * Returns one `canonical` representation for a node
-   * For sinks it prioritizes paterns like `parameter x (return member fun )
+   * For sinks it prioritizes paterns like `parameter x (member fun )
    * and the use of external functions, penalizes the receiver as parameter
    */
   string chooseBestRep(DataFlow::Node sink, boolean asRhs) {

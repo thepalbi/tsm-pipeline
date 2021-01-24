@@ -193,7 +193,7 @@ def getallmetrics(config: SolverConfig, ctx):
             metricsfile.write(snkstr+"\\\\\n")
 
 def createReprPredicate(ctx, project_name:str, query_type:str, reprScoresFiles = "reprScores.txt"):
-    tsm_query_folder = os.path.join(global_config.sources_root, "javascript", "ql", "src", "TSM", "query")
+    tsm_query_folder = os.path.join(global_config.sources_root, "tsm", "query")
     tsm_repr_pred_file = os.path.join(tsm_query_folder, "tsm_repr_pred.qll")
     repr_scores_path = os.path.join(ctx[RESULTS_DIR_KEY], reprScoresFiles)
 
@@ -219,7 +219,7 @@ def createReprPredicate(ctx, project_name:str, query_type:str, reprScoresFiles =
         print(e)
 
 def createTSMQuery(ctx, project_name: str, query_type: str):
-    tsm_folder = os.path.join(global_config.sources_root, "javascript", "ql", "src", "TSM")
+    tsm_folder = os.path.join(global_config.sources_root, "tsm")
     tsm_query_folder = os.path.join(tsm_folder, "query")
     tsm_repr_pred_file = os.path.join(tsm_query_folder, "tsm_repr_pred.qll")
     tsm_query_qll = os.path.join(tsm_query_folder, "tsm.qll")
