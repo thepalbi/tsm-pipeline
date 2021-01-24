@@ -21,10 +21,10 @@ class XssSinkCandidate extends AdditionalSinkCandidate {
 predicate targetLibraries = allLibraries/0;
 
 private string npmLibraries() { 
-  // result = "jquery" 
-  // or result = "angular"
-  // or result = "XRegExp"
-  // or result = "fs"
+  result = "jquery" 
+  or result = "angular"
+  or result = "XRegExp"
+  or result = "fs"
 }
 
 private string allLibraries() {
@@ -33,13 +33,13 @@ private string allLibraries() {
   )
 }
 
-class AllPackagesAreInteresting extends InterestingPackageForSources {
+class AllPackagesAreInteresting extends InterestingPackageForSources,InterestingPackageForSinks {
   AllPackagesAreInteresting() { exists(API::moduleImport(this)) }
 } 
 
-class XssIsInteresting extends InterestingPackageForSinks {
-  XssIsInteresting() { this = targetLibraries() }
-}
+// class XssIsInteresting extends InterestingPackageForSinks {
+//   XssIsInteresting() { this = targetLibraries() }
+// }
 
 predicate isSourceWorse(DataFlow::Node source) {
   source instanceof DomBasedXssWorse::Source

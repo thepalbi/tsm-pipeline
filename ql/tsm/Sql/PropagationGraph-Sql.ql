@@ -39,12 +39,12 @@ private string targetLibraryWorse() {
             "body-parser"]
 }
 
-class AllPackagesAreInteresting extends InterestingPackageForSources, InterestingPackageForSinks {
+class AllPackagesAreInteresting extends InterestingPackageForSources {
   AllPackagesAreInteresting() { exists(API::moduleImport(this)) }
 } 
-// class SqlIsInteresting extends InterestingPackageForSinks {
-//   SqlIsInteresting() { this = targetLibraryWorse()}
-// }
+class SqlIsInteresting extends InterestingPackageForSinks {
+  SqlIsInteresting() { this = targetLibraries()}
+}
 
 class SqlSourceCandidate extends AdditionalSourceCandidate {
   SqlSourceCandidate() { none() }

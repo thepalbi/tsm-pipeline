@@ -171,7 +171,7 @@ module PropagationGraph {
         //plus1 = scoreForCanonicalRep(rep, sink, depth) and
         (
           isPreferedStructForRep(cm, cr, cp, cpr, croot) and
-          plus2 = 80 - 7 * (cp-1) - 7 * (cm-1) - cmw - 40 * croot
+          plus2 = 80 - 7 * (cp-1) - 7 * (cm-1) - cmw - 40 * croot- 3*cr
           or
           not isPreferedStructForRep(cm, cr, cp, cpr, croot) and
           plus2 = 0
@@ -212,7 +212,7 @@ module PropagationGraph {
       max(string rep, int depth, int score |
         isRepWithScore(rep, sink, depth, asRhs, score)
       |
-        rep order by score /*desc, depth desc, rep*/
+        rep order by score, depth, rep /*desc, depth desc, rep*/
       )
   }
 
