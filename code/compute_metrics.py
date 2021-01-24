@@ -148,6 +148,9 @@ def printmetrics(trainingsize, config: SolverConfig, ctx):
         
         repr_scores_file_path = os.path.join(ctx[RESULTS_DIR_KEY], "reprScores.txt")
         logging.info("Writing reprScores: {0}".format(repr_scores_file_path))
+        if not os.path.exists(ctx[RESULTS_DIR_KEY]):
+            logging.info("Creating folder: {0}".format(ctx[RESULTS_DIR_KEY]))
+            os.mkdir(ctx[RESULTS_DIR_KEY])
 
         with open(repr_scores_file_path, "w", encoding='utf-8') as reprscores:
             sizeReprSet = len(repConstraints) 
