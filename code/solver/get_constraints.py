@@ -399,6 +399,9 @@ class ConstraintBuilder:
         source_sanit = dict()
         source_sink = dict()
 
+        srcNotFound = 0
+        sanNotFound = 0
+        snkNotFound = 0
 
         for san in san_snk_map.keys():
             # sanit_sink will contain for every pair of sanit -> sink, the possible
@@ -416,7 +419,8 @@ class ConstraintBuilder:
                         if src in self.events:
                             sanit_sink[sanit_sink_tuple].append(self.events[src])
                         else:
-                            print("Src not found!", src)
+                            srcNotFound = srcNotFound +1
+                            # print("Src not found!", src)
                             # sys.exit()
 
                     for src in sources:
@@ -446,16 +450,22 @@ class ConstraintBuilder:
                             source_sanit_list.append(self.events[snk])
                         else:
                             if snk not in self.events:
-                                print("Sink not found!", snk)
-                            # sys.exit()
+                                snkNotFound = snkNotFound +1
+                                # print("Sink not found!", snk)
+                                # sys.exit()
                 else:
                     if  san not in self.events:
-                        print("Sanitizer not found!", san)
+                        sanNotFound = sanNotFound + 1
+                        # print("Sanitizer not found!", san)
                     if  snk not in self.events:
-                        print("Snk not found!", snk)
+                        snkNotFound = snkNotFound +1
+                        # print("Snk not found!", snk)
                     # sys.exit()
 
 
+        print("Sinks not found", snkNotFound)
+        print("Sources not found", srcNotFound)
+        print("Sanitizers not found", sanNotFound)
 
         return source_sanit, source_sink, sanit_sink
 
