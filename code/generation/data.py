@@ -233,6 +233,9 @@ class DataGenerator:
             self.logger.info("Error Analyzing PropagationGraph.ql")
             raise(e)
 
+        # removes temporary progatation graph query
+        os.remove(new_propgraph_path)
+
         self.logger.info("Generating propagation graph data")
         # bqrs_propgraph = self._get_tsm_bqrs_file_for_entity("PropagationGraph", query_type)
         bqrs_propgraph = self._get_tsm_bqrs_file_for_entity(f"PropagationGraph-{self.project_name}", query_type)
