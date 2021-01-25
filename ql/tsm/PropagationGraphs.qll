@@ -244,6 +244,8 @@ predicate step(DataFlow::Node pred, DataFlow::Node succ) {
   or
   succ.(DataFlow::CallNode).getAnArgument() = pred
   or
+  succ.(DataFlow::MethodCallNode).getReceiver() = pred
+  or
   guard(pred, succ)
 }
 
@@ -266,10 +268,10 @@ DataFlow::Node reachableFromSourceCandidate(DataFlow::Node src, DataFlow::TypeTr
  */
 DataFlow::Node reachableFromSanitizerCandidate(DataFlow::Node san, DataFlow::TypeTracker t) {
   isSanitizerCandidate(san) and
-  exists(DataFlow::Node src |
-    san = reachableFromSourceCandidate(src, DataFlow::TypeTracker::end()) and
-    src != san
-  ) and
+  // exists(DataFlow::Node src |
+  //   san = reachableFromSourceCandidate(src, DataFlow::TypeTracker::end()) and
+  //   src != san
+  // ) and
   result = san and
   t.start()
   or
