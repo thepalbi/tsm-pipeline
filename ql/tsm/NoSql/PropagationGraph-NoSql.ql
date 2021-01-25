@@ -5,9 +5,6 @@
 
 import javascript
 import tsm.PropagationGraphsAlt
-// In this version we use older verisions of standard libraries as Worse versions 
-import semmle.javascript.security.dataflow.NosqlInjectionCustomizations as NosqlInjectionCustomizationsWorse
-module NosqlInjectionWorse = NosqlInjectionCustomizationsWorse::NosqlInjection;
 
 predicate targetLibraries = npmLibraries/0;
 
@@ -26,12 +23,12 @@ private string allLibraries() {
 private string targetLibraryWorse() {
   result in ["mongodb", "mongoose"]
 }
-class AllPackagesAreInteresting extends InterestingPackageForSources, InterestingPackageForSinks {
+class AllPackagesAreInteresting extends InterestingPackageForSources {
    AllPackagesAreInteresting() { exists(API::moduleImport(this)) }
 } 
-// class NoSqlIsInteresting extends InterestingPackageForSinks {
-//   NoSqlIsInteresting() { this = targetLibraryWorse() }
-// }
+class NoSqlIsInteresting extends InterestingPackageForSinks {
+  NoSqlIsInteresting() { this = targetLibraries() }
+}
 
 // No adding extra sources to the propagation graph
 class NoSqlSourceCandidate extends AdditionalSourceCandidate {
@@ -43,10 +40,16 @@ class NoSqlSinkCandidate extends AdditionalSinkCandidate {
   NoSqlSinkCandidate() { none() }
 }
 
+predicate isSourceWorse = PropagationGraph::isSourceWorse/1;
+
+predicate isSinkWorse = PropagationGraph::isSinkWorse/1;
+
+predicate isSanitizerWorse = PropagationGraph::isSanitizerWorse/1;
+
 class FilterWorse extends PropagationGraph::NodeFilter {
   FilterWorse() { this = "SrcWorse" } 
   // We consider triples starting from known sources only
-  override predicate filterSource(DataFlow::Node src) { src instanceof NosqlInjectionWorse::Source  }
+  override predicate filterSource(DataFlow::Node src) { isSourceWorse(src) }
   // Important: NoSql V0 and VWorse consider as sinks the object used as argument to NoSql functions
   // and not the properties within the object. Considering that as sink lead to find actual issues
   // but they are considered as false positive because VWorse/V0 do not contain them.

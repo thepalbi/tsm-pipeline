@@ -5,10 +5,6 @@
 
 import javascript
 import tsm.PropagationGraphsAlt
-// In this version we use older verisions of standard libraries as Worse versions
-import semmle.javascript.security.dataflow.SqlInjectionCustomizations as SqlInjectionCustomizationsWorse
-// For backward compatiblity
-module SqlInjectionWorse = SqlInjectionCustomizationsWorse::SqlInjection;
 
 predicate targetLibraries = npmLibraries/0;
 
@@ -55,10 +51,17 @@ class SqlSinkCandidate extends AdditionalSinkCandidate {
   SqlSinkCandidate() { none() }
 }
 
+predicate isSourceWorse = PropagationGraph::isSourceWorse/1;
+
+predicate isSinkWorse = PropagationGraph::isSinkWorse/1;
+
+predicate isSanitizerWorse = PropagationGraph::isSanitizerWorse/1;
+
+
 class FilterWorse extends PropagationGraph::NodeFilter {
   FilterWorse() { this = "SrcWorse" } 
   // We consider triples starting from known sources only
-  override predicate filterSource(DataFlow::Node src) { src instanceof SqlInjectionWorse::Source }
+  override predicate filterSource(DataFlow::Node src) { isSourceWorse(src) }
   override predicate filterSink(DataFlow::Node snk) { any() }
   override predicate filterSanitizer(DataFlow::Node san) { any() }
 }

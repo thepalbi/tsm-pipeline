@@ -5,10 +5,6 @@
 
 import javascript
 import tsm.PropagationGraphsAlt
-// In this version we use older verisions of standard libraries as Worse versions 
-import semmle.javascript.security.dataflow.DomBasedXssCustomizations as DomBasedXssCustomizationsWorse
-
-module DomBasedXssWorse=DomBasedXssCustomizationsWorse::DomBasedXss;
 
 class XssSourceCandidate extends AdditionalSourceCandidate {
   XssSourceCandidate() { isSourceWorse(this) } 
@@ -18,7 +14,7 @@ class XssSinkCandidate extends AdditionalSinkCandidate {
 }
 
 
-predicate targetLibraries = allLibraries/0;
+predicate targetLibraries = packageListFromFrecuency/0;
 
 private string npmLibraries() { 
   result = "jquery" 
@@ -26,6 +22,17 @@ private string npmLibraries() {
   or result = "XRegExp"
   or result = "fs"
 }
+
+private string packageListFromFrecuency() {
+  result in [
+    "fs","path","process","jquery","express",
+    "http","gulp","crypto","socket.io","child_process",
+    "react-dom","body-parser","util","react","moment",
+    "lodash","laravel-mix","gulp-rename",
+    "axios","shelljs","url","https","glob","webpack"
+  ]
+} 
+
 
 private string allLibraries() {
   exists(API::Node imp | 
@@ -41,13 +48,11 @@ class AllPackagesAreInteresting extends InterestingPackageForSources,Interesting
 //   XssIsInteresting() { this = targetLibraries() }
 // }
 
-predicate isSourceWorse(DataFlow::Node source) {
-  source instanceof DomBasedXssWorse::Source
-}
+predicate isSourceWorse = PropagationGraph::isSourceWorse/1;
 
-predicate isSinkWorse(DataFlow::Node sink) {
-  sink instanceof DomBasedXssWorse::Sink
-}
+predicate isSinkWorse = PropagationGraph::isSinkWorse/1;
+
+predicate isSanitizerWorse = PropagationGraph::isSanitizerWorse/1;
 
 class FilterWorse extends PropagationGraph::NodeFilter {
   FilterWorse() { this = "SrcWorse" } 

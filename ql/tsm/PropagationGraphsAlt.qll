@@ -6,6 +6,9 @@ import PropagationGraphs
 // predicate repGenerator = oldCandidateRep/3;
 predicate repGenerator = candidateRep/3;
 
+
+
+
 string test(DataFlow::Node sink, int score, int i) {
   i in [1 .. 3] and
   result = PropagationGraph::chooseBestReps(sink, true, i) and
@@ -15,6 +18,36 @@ string test(DataFlow::Node sink, int score, int i) {
 }
 
 module PropagationGraph {
+
+  predicate isSourceWorse(DataFlow::Node source) 
+  {
+    exists(string repr |
+      repr = any(KnownRepr k).getReprScore("sources") and
+      repr = candidateRep(source, false) 
+    )
+  }
+
+  predicate isSinkWorse(DataFlow::Node sink) 
+  {
+    exists(string repr |
+      repr = any(KnownRepr k).getReprScore("sinks") and
+      repr = candidateRep(sink, true) 
+    )
+  }
+
+  predicate isSanitizerWorse(DataFlow::Node sanitizer) {
+    // sanitizer instanceof TaintedPathWorse::Sanitizer
+    // or sanitizer instanceof TaintedPathWorse::BarrierGuardNode
+    exists(string repr |
+      repr = any(KnownRepr k).getReprScore("sanitizers") and
+      repr = candidateRep(sanitizer, false) 
+    )
+  }
+  class KnownRepr extends string {
+    bindingset[this]
+    KnownRepr() { any()}
+    abstract string getReprScore(string t);
+  }
   abstract class NodeFilter extends string {
     bindingset[this]
     NodeFilter() { any() }
