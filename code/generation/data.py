@@ -8,7 +8,7 @@ from orchestration.steps import SOURCE_ENTITIES, SINK_ENTITIES, SANITIZER_ENTITI
     SRC_SAN_TUPLES_ENTITIES, SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES, RESULTS_DIR_KEY
 from orchestration import global_config
 from .wrapper import CodeQLWrapper
-from compute_metrics import createReprPredicate
+from compute_metrics import createReprPredicate, createReprKnownPredicates
 from orchestration import global_config
 
 # constaintssolving_dir = os.path.join(
@@ -178,32 +178,65 @@ class DataGenerator:
         if not query_type in SUPPORTED_QUERY_TYPES:
             raise Exception(
                 "{0} is not a supported query type. Currently supports {1}".format(query_type, SUPPORTED_QUERY_TYPES))
+        # For KnownSource  we use current version of CodeQl Libraries  
         # sources
         self._generate_for_entity(
-            query_type, SOURCES, f"source{query_type}Classes", ctx[SOURCE_ENTITIES])
+            query_type, SOURCES, f"source{query_type}Classes", ctx[SOURCE_ENTITIES], True,
+            global_config.worse_lib_search_path)
         # sinks
         self._generate_for_entity(
-            query_type, SINKS, f"sink{query_type}Classes", ctx[SINK_ENTITIES], False)
+            query_type, SINKS, f"sink{query_type}Classes", ctx[SINK_ENTITIES], False,
+            global_config.worse_lib_search_path)
         # sanitizers
         self._generate_for_entity(
-            query_type, SANITIZERS, f"sanitizer{query_type}Classes", ctx[SANITIZER_ENTITIES], False)
+            query_type, SANITIZERS, f"sanitizer{query_type}Classes", ctx[SANITIZER_ENTITIES], False,
+            global_config.worse_lib_search_path)
+        
+        # Creates a codeql predicate with repr for the known nodes
+        # This is to decouple the computation os known nodes, using worse libraries
+        # from the analysis that uses the most current library
+        known_predicates_files = createReprKnownPredicates(ctx, self.project_dir, query_type)
 
         # running propagation graph queries
         try:
+            propgraph_path = self._get_tsm_query_file(query_type, f"PropagationGraph-{query_type}.ql")
+            tmp_propgraph_name = f"PropagationGraph-{self.project_name}-{query_type}.ql"
+            new_propgraph_path = os.path.join(os.path.dirname(propgraph_path), tmp_propgraph_name )
+            
+            # print(known_predicates_files)
+            # print(new_propgraph_path)
+
+            # creates a PG query that includes the reprs from known nodes
+            with open(new_propgraph_path , "w", encoding='utf-8') as new_pg_file: 
+                with open(propgraph_path, "r", encoding='utf-8') as pg_file:
+                    with open(known_predicates_files, "r", encoding='utf-8') as known_file:
+                        pg_lines = pg_file.readlines()
+                        kn_lines = known_file.readlines()
+                new_pg_file.writelines(pg_lines)
+                new_pg_file.writelines(["\n","\n"])
+                new_pg_file.writelines(kn_lines)
+
+            # For Progapation graphs we use current version of CodeQl Libraries  
             self.codeql.database_analyze(
                 self.project_dir,
-                self._get_tsm_query_file(query_type, f"PropagationGraph-{query_type}.ql"),
-                f"{logs_folder}/js-results.csv")
+                new_propgraph_path,
+                # self._get_tsm_query_file(query_type, f"PropagationGraph-{query_type}.ql"),
+                f"{logs_folder}/js-results.csv",
+                global_config.search_path
+                )
             # FIX self.codeql.database_query(
             #     self.project_dir,
             #     self._get_tsm_query_file(query_type, f"PropagationGraph-{query_type}.ql")
             # )
 
-        except Exception:
+        except Exception as e:
             self.logger.info("Error Analyzing PropagationGraph.ql")
+            raise(e)
 
         self.logger.info("Generating propagation graph data")
-        bqrs_propgraph = self._get_tsm_bqrs_file_for_entity("PropagationGraph", query_type)
+        # bqrs_propgraph = self._get_tsm_bqrs_file_for_entity("PropagationGraph", query_type)
+        bqrs_propgraph = self._get_tsm_bqrs_file_for_entity(f"PropagationGraph-{self.project_name}", query_type)
+        # bqrs_propgraph = self._get_tsm_bqrs_file( os.path.splitext(tmp_propgraph_name)[0]+".bqrs")
         # data/1046224544_fontend_19c10c3/1046224544_fontend_19c10c3-src-san.prop.csv
         self.codeql.bqrs_decode(
             bqrs_propgraph,
@@ -252,13 +285,14 @@ class DataGenerator:
         )
 
     def _generate_for_entity(self, query_type: str, entity_type: str, result_set: str, output_file: str, 
-                             force_query: bool = True):
+                            force_query: bool = True,
+                            search_path:str = global_config.worse_lib_search_path):
         """Runs the query for a given entity, and extracts the results into a csv file."""
         self.logger.info(
             "Generating %s data in file=[%s]", entity_type, output_file)
         query_path = self._get_tsm_query_file_for_entity(
                 entity_type,
-                query_type) 
+                query_type)
         bqrs_file = self._get_tsm_bqrs_file_for_entity(entity_type, query_type)
         # print(query_path)
         # print(bqrs_file)
@@ -266,7 +300,8 @@ class DataGenerator:
             self.codeql.database_analyze(
                 self.project_dir,
                 query_path,
-                f"{logs_folder}/js-results.csv")
+                f"{logs_folder}/js-results.csv",
+                search_path)
             # FIX self.codeql.database_query(
             #     self.project_dir,
             #     query_path)

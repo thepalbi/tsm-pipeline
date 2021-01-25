@@ -24,7 +24,8 @@ class CodeQLWrapper:
     """Runs codeql running a query against the given database, and then interprets the results."""
     def database_query(self,
                          project: str,
-                         query_file: str):
+                         query_file: str,
+                         search_path: str = global_config.search_path):
         query_file_name = os.path.basename(query_file)
         output_file = os.path.join(project, "results", "js-propagation-graphs", "tsm", os.path.splitext(query_file_name)[0])+'.bqrs'
         command_and_arguments = [
@@ -35,7 +36,7 @@ class CodeQLWrapper:
             f"--output={output_file}",
             "--threads=-1",
             "--timeout=3600",
-            f"--search-path={global_config.search_path}"
+            f"--search-path={search_path}"
         ]
         self._logger.info(
             "Running 'query run' for project=[%s] and query_file=[%s]", project, query_file)
@@ -47,6 +48,7 @@ class CodeQLWrapper:
                          project: str,
                          query_file: str,
                          output_file: str, 
+                         search_path: str = global_config.search_path,
                          output_format="csv"):
         command_and_arguments = [
             self._code_ql_binary_path,
@@ -56,7 +58,7 @@ class CodeQLWrapper:
             f"--format={output_format}",
             f"--logdir={self._logs_directory}",
             f"--output={output_file}",
-            f"--search-path={global_config.search_path}",
+            f"--search-path={search_path}",
             "--timeout=3600",
             "--ram=64536",
             "--threads=-1"

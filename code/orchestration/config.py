@@ -5,6 +5,7 @@ CODEQL_EXECUTABLE_KEY = "codeQLExecutable"
 WORKING_DIRECTORY_KEY = "workingDirectory"
 RESULTS_DIRECTORY_KEY = "resultsDirectory"
 SEARCH_PATH_KEY = "searchPath"
+SEARCH_WORSE_LIB_PATH_KEY = "worseLibSearchPath"
 
 class Configuration:
     def __init__(self, config_file_path="config.json"):
@@ -30,6 +31,10 @@ class Configuration:
     @property
     def search_path(self):
         return self.config[SEARCH_PATH_KEY]
+
+    @property
+    def worse_lib_search_path(self):
+        return self.config[SEARCH_WORSE_LIB_PATH_KEY]
 
     def __getattr__(self, item):
         return self.config[item]

@@ -42,13 +42,13 @@ private string packageListFromFrecuency() {
   ]
 } 
 
-class AllPackagesAreInteresting extends InterestingPackageForSources,InterestingPackageForSinks {
+class AllPackagesAreInteresting extends InterestingPackageForSources {
   AllPackagesAreInteresting() { exists(API::moduleImport(this)) }
 } 
 
-// class PathIsInteresting extends InterestingPackageForSinks {
-//   PathIsInteresting() { this = targetLibraries() }
-// }
+class PathIsInteresting extends InterestingPackageForSinks {
+  PathIsInteresting() { this = targetLibraries() }
+}
 
 class PathSourceCandidate extends AdditionalSourceCandidate {
   PathSourceCandidate() { none() }

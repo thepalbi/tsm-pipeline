@@ -4,7 +4,7 @@ from DataParser import readKnown
 # dirprefix="C:/Users/saika/projects/ql/constraintsolving/databases/eclipse_orion.client_js_srcVersion_9ef167/eclipse_orion.client_9ef1675/src/"
 from solver.config import SolverConfig
 from orchestration import global_config
-from orchestration.steps import RESULTS_DIR_KEY, CONSTRAINTS_DIR_KEY, MODELS_DIR_KEY, RESULTS_DIR_KEY
+from orchestration.steps import RESULTS_DIR_KEY, CONSTRAINTS_DIR_KEY, MODELS_DIR_KEY, RESULTS_DIR_KEY, SOURCE_ENTITIES, SANITIZER_ENTITIES, SINK_ENTITIES
 import os
 import logging
 import shutil
@@ -220,6 +220,37 @@ def createReprPredicate(ctx, project_name:str, query_type:str, reprScoresFiles =
         createTSMQuery(ctx, project_name, query_type)
     except Exception as e:
         print(e)
+
+
+def createReprKnownPredicates(ctx, project_name:str, query_type:str):
+    tsm_query_folder = os.path.join(global_config.sources_root, "tsm", "query", query_type, project_name)
+    tsm_known_pred_path = os.path.join(tsm_query_folder, "known.qll")
+    print(tsm_known_pred_path)
+    known_dict = { 
+                "sources": ctx[SOURCE_ENTITIES],
+                "sanitizers": ctx[SANITIZER_ENTITIES],
+                "sinks": ctx[SINK_ENTITIES], 
+                }
+    try:
+        with open(tsm_known_pred_path , "w", encoding='utf-8') as tsm_known_pred_file:
+            logging.info("Writing: {0}".format(tsm_known_pred_file))
+            tsm_known_pred_file.writelines([
+                "class KnownReprDB extends PropagationGraph::KnownRepr {\n",
+                "\t KnownReprDB() { this =  \"KnownReprDB\" }\n", 
+                "\t\t override string getReprScore(string t){"
+                ])
+                
+            for known_kind in ["sources", "sinks", "sanitizers"]:
+                known_nodes = readKnown(known_dict[known_kind], known_kind, None)
+                
+                for repr in known_nodes:
+                    reprToWrite = "\tresult = \"{0}\" and t = \"{1}\" or \n".format(repr, known_kind)
+                    tsm_known_pred_file.writelines([reprToWrite])
+            tsm_known_pred_file.writelines(["\t\t none()\n"])    
+            tsm_known_pred_file.writelines(["\t}\n","}\n"])
+    except Exception as e:
+        raise(e)
+    return tsm_known_pred_path
 
 def createTSMQuery(ctx, project_name: str, query_type: str):
     tsm_folder = os.path.join(global_config.sources_root, "tsm")
