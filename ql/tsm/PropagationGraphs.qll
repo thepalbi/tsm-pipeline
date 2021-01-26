@@ -268,10 +268,10 @@ DataFlow::Node reachableFromSourceCandidate(DataFlow::Node src, DataFlow::TypeTr
  */
 DataFlow::Node reachableFromSanitizerCandidate(DataFlow::Node san, DataFlow::TypeTracker t) {
   isSanitizerCandidate(san) and
-  // exists(DataFlow::Node src |
-  //   san = reachableFromSourceCandidate(src, DataFlow::TypeTracker::end()) and
-  //   src != san
-  // ) and
+  exists(DataFlow::Node src |
+    san = reachableFromSourceCandidate(src, DataFlow::TypeTracker::end()) and
+    src != san
+  ) and
   result = san and
   t.start()
   or

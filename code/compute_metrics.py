@@ -237,7 +237,7 @@ def createReprKnownPredicates(ctx, project_name:str, query_type:str):
             tsm_known_pred_file.writelines([
                 "class KnownReprDB extends PropagationGraph::KnownRepr {\n",
                 "\t KnownReprDB() { this =  \"KnownReprDB\" }\n", 
-                "\t\t override string getReprScore(string t){"
+                "\t\t override string getRepr(string t){"
                 ])
                 
             for known_kind in ["sources", "sinks", "sanitizers"]:

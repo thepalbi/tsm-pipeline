@@ -22,7 +22,7 @@ module PropagationGraph {
   predicate isSourceWorse(DataFlow::Node source) 
   {
     exists(string repr |
-      repr = any(KnownRepr k).getReprScore("sources") and
+      repr = any(KnownRepr k).getRepr("sources") and
       repr = candidateRep(source, false) 
     )
   }
@@ -30,7 +30,7 @@ module PropagationGraph {
   predicate isSinkWorse(DataFlow::Node sink) 
   {
     exists(string repr |
-      repr = any(KnownRepr k).getReprScore("sinks") and
+      repr = any(KnownRepr k).getRepr("sinks") and
       repr = candidateRep(sink, true) 
     )
   }
@@ -39,14 +39,14 @@ module PropagationGraph {
     // sanitizer instanceof TaintedPathWorse::Sanitizer
     // or sanitizer instanceof TaintedPathWorse::BarrierGuardNode
     exists(string repr |
-      repr = any(KnownRepr k).getReprScore("sanitizers") and
+      repr = any(KnownRepr k).getRepr("sanitizers") and
       repr = candidateRep(sanitizer, false) 
     )
   }
   class KnownRepr extends string {
     bindingset[this]
     KnownRepr() { any()}
-    abstract string getReprScore(string t);
+    abstract string getRepr(string t);
   }
   abstract class NodeFilter extends string {
     bindingset[this]
