@@ -46,8 +46,14 @@ class AllPackagesAreInteresting extends InterestingPackageForSources, Interestin
 //   PathIsInteresting() { this = targetLibraries() }
 // }
 
+// Known sources should be included in the triples
 class PathSourceCandidate extends AdditionalSourceCandidate {
-  PathSourceCandidate() { none() }
+  PathSourceCandidate() { isSourceWorse(this) }
+}
+
+// Known sanitizers should be included in the triples
+class PathSanitizerCandidate extends AdditionalSanitizerCandidate {
+  PathSanitizerCandidate() { isSanitizerWorse(this) }
 }
 
 // No adding sinks to the propagation graph
@@ -67,7 +73,7 @@ class FilterWorse extends PropagationGraph::NodeFilter {
   // We consider triples starting from known sources only
   override predicate filterSource(DataFlow::Node src) { isSourceWorse(src)}
   override predicate filterSink(DataFlow::Node snk) { any() }
-  override predicate filterSanitizer(DataFlow::Node san) { isSanitizerWorse(san) }
+  override predicate filterSanitizer(DataFlow::Node san) { any() }
 }
 
 query predicate pairSanSnk=PropagationGraph::pairSanSnk/2;
