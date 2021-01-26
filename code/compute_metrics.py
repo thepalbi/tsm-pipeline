@@ -233,21 +233,21 @@ def createReprKnownPredicates(ctx, project_name:str, query_type:str):
                 }
     try:
         with open(tsm_known_pred_path , "w", encoding='utf-8') as tsm_known_pred_file:
-            logging.info("Writing: {0}".format(tsm_known_pred_file))
+            logging.info("Writing: {0}".format(tsm_known_pred_path))
             tsm_known_pred_file.writelines([
                 "class KnownReprDB extends PropagationGraph::KnownRepr {\n",
-                "\t KnownReprDB() { this =  \"KnownReprDB\" }\n", 
-                "\t\t override string getRepr(string t){"
+                "  KnownReprDB() { this =  \"KnownReprDB\" }\n", 
+                "  override string getRepr(string t){\n"
                 ])
                 
             for known_kind in ["sources", "sinks", "sanitizers"]:
                 known_nodes = readKnown(known_dict[known_kind], known_kind, None)
                 
                 for repr in known_nodes:
-                    reprToWrite = "\tresult = \"{0}\" and t = \"{1}\" or \n".format(repr, known_kind)
+                    reprToWrite = "    result = \"{0}\" and t = \"{1}\" or \n".format(repr, known_kind)
                     tsm_known_pred_file.writelines([reprToWrite])
-            tsm_known_pred_file.writelines(["\t\t none()\n"])    
-            tsm_known_pred_file.writelines(["\t}\n","}\n"])
+            tsm_known_pred_file.writelines(["    none()\n"])    
+            tsm_known_pred_file.writelines(["  }\n","}\n"])
     except Exception as e:
         raise(e)
     return tsm_known_pred_path
