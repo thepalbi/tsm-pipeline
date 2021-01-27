@@ -77,10 +77,7 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
       (
         baserep = candidateRep(base, depth - 1, false)
         or
-        exists(DataFlow::Node rhs |
-          baserep = candidateRep(rhs, depth - 1, true) and
-          base = rhs.getALocalSource()
-        )
+        baserep = baseCandidateRep(base, depth - 1, true)
       ) and
       // bound maximum depth of candidate representation
       depth <= maxdepth()
@@ -178,5 +175,13 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
   exists(DataFlow::SourceNode base |
     base.flowsToExpr(nd.asExpr().(AwaitExpr).getOperand()) and
     result = candidateRep(base, depth, asRhs)
+  )
+}
+
+pragma[noinline]
+string baseCandidateRep(DataFlow::SourceNode base, int depth, boolean asRhs) {
+  exists(DataFlow::Node nd |
+    result = candidateRep(nd, depth, asRhs) and
+    base = nd.getALocalSource()
   )
 }
