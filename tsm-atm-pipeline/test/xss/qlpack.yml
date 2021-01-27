@@ -1,0 +1,7 @@
+name: tsm-test
+version: 0.0.0
+libraryPathDependencies:
+  - codeql-javascript
+  - codeql-javascript-tests
+  - tsm-pipeline
+extractor: javascript
