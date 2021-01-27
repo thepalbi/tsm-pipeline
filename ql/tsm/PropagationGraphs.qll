@@ -135,6 +135,24 @@ private predicate guard(DataFlow::CallNode pred, DataFlow::Node succ) {
 }
 
 /**
+ * Holds if `pred` -> `succ` is a known flow step for which we have a model.
+ */
+predicate knownStep(DataFlow::Node pred, DataFlow::Node succ) {
+  // exclude known flow/taint step, except for the step from `x` to `x.p` (since otherwise
+  // property reads will never be considered sources)
+  any(TaintTracking::AdditionalTaintStep s).step(pred, succ) and
+  not succ instanceof DataFlow::PropRead
+  or
+  exists(DataFlow::AdditionalFlowStep s |
+    s.step(pred, succ) or
+    s.step(pred, succ, _, _) or
+    s.loadStep(pred, succ, _) or
+    s.storeStep(pred, succ, _) or
+    s.loadStoreStep(pred, succ, _)
+  )
+}
+
+/**
  * Gets a candidate representation for `nd`, filtering out very general representations.
  */
 string candidateRep(DataFlow::Node nd, boolean asRhs) {
@@ -194,6 +212,7 @@ predicate isSinkCandidate(DataFlow::Node d) {
     mayEscapeToLibrary(nd, any(InterestingPackageForSinks pkg)) and
     d = nd.getARhs() and
     exists(rep(d, true)) and
+    not knownStep(d, _) and
     (
       d = any(ReturnStmt ret).getExpr().flow()
       or
