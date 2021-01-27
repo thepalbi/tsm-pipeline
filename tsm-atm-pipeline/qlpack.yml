@@ -1,4 +1,4 @@
-name: tsm-js
+name: tsm-atm-pipeline
 version: 0.0.0
 libraryPathDependencies:
   - codeql-javascript
