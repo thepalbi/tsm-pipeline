@@ -6,9 +6,6 @@ import PropagationGraphs
 // predicate repGenerator = oldCandidateRep/3;
 predicate repGenerator = candidateRep/3;
 
-
-
-
 string test(DataFlow::Node sink, int score, int i) {
   i in [1 .. 3] and
   result = PropagationGraph::chooseBestReps(sink, true, i) and
@@ -75,9 +72,6 @@ module PropagationGraph {
       san = reachableFromSourceCandidate(src, DataFlow::TypeTracker::end()) and
       src.getEnclosingExpr() != san.getEnclosingExpr() and
       snk = reachableFromSanitizerCandidate(san, DataFlow::TypeTracker::end()) and
-      // We keep only sinks that are candidates
-      // (parameters of library functions)
-      // isCandidateSink(snk, targetLibrary()) and
       isSinkCandidate(snk) and
       exists(getconcatrep(src, false)) and
       ssan = getconcatrep(san, false) and
@@ -88,13 +82,9 @@ module PropagationGraph {
 
   predicate pairSrcSan(string ssrc, string ssan) {
     exists(DataFlow::Node src, DataFlow::Node san, DataFlow::Node snk |
-      // isSourceWorse(src) and
       san = reachableFromSourceCandidate(src, DataFlow::TypeTracker::end()) and
       src.getEnclosingExpr() != san.getEnclosingExpr() and
       snk = reachableFromSanitizerCandidate(san, DataFlow::TypeTracker::end()) and
-      // We keep only sinks that are candidates
-      // (parameters of library functions)
-      // isCandidateSink(snk, targetLibrary())  and
       isSinkCandidate(snk) and
       exists(getconcatrep(snk, true)) and
       ssan = getconcatrep(san, false) and
@@ -136,46 +126,44 @@ module PropagationGraph {
     count(DataFlow::Node nd2 | result = candidateRepFiltered(nd2, depth, asRhs)) >= minOcurrences()
   }
 
+  // Canonical representation prioritized for sinks
   private string regExp1() { result = "\\(parameter \\w+ \\(member (\\w+|\\*) .*\\)\\)" }
 
+  // Representation not considered canonical
   private string regExp2() {
     result =
       ".*\\(parameter \\w+ \\(member (\\*|\\w+) \\((member|parameter|return|instance) .*\\)\\)\\)"
   }
 
   /**
-   *  Prioritizes paterns like `[member _] parameter x (return member fun )
+   *  Prioritizes paterns like `[member _] parameter x ( member fun )
    *  by giving an additional score
    */
-  int scoreForCanonicalRep(string rep, DataFlow::Node nd, int depth) {
-    // rep in ["(parameter 0 (member find (return (member * (member db *)))))",
-    // "(parameter 0 (member find *))",
-    // "(member * (parameter 0 (member find *)))",
-    // "(member x1 (parameter 0 (member find *)))",
-    // "(parameter 0 (member find (return (member model *))))",
-    // "(member * (parameter 1 (member findOneAndUpdate (return (member model *)))))",
-    // "(parameter 0 (member find (return (member * (member db *)))))"
-    // ]
-    // and
-    rep = rep(nd, depth, true) and
-    (
+  int scoreForCanonicalRep(string repr, DataFlow::Node nd, int depth) {
+    exists(string rep | 
+      rep = rep(nd, depth, true) and
       (
-        rep.regexpMatch(regExp1()) and result = 100
+        (
+          // Preferred repr
+          rep.regexpMatch(regExp1()) and result = 100
+          or
+          // member X (preferred rep) 
+          rep.regexpMatch("\\(member \\w+ " + regExp1() + "\\)") and
+          result = 75
+          or
+          // member * (preferred rep)
+          rep.regexpMatch("\\(member \\* " + regExp1() + "\\)") and
+          result = 50
+        ) and
+        not rep.regexpMatch(regExp2())
         or
-        // not rep.regexpMatch(regExp1()) and
-        rep.regexpMatch("\\(member \\w+ " + regExp1() + "\\)") and
-        result = 80
-        or
-        // not rep.regexpMatch(regExp1()) and not rep.regexpMatch("\\(member \\w+ " + regExp1() + "\\)") and
-        rep.regexpMatch("\\(member \\* " + regExp1() + "\\)") and
-        result = 50
-      ) and
-      not rep.regexpMatch(regExp2())
-      or
-      result = 0
+        result = 0
+      ) and repr = rep
     )
   }
 
+  // Prefers an small number of member and parameters for canonical representation
+  // To-Do: Maybe is easier to define whole canonicalRep with a regular expresion:
   predicate isPreferedStructForRep(int cm, int cr, int cp, int cpr, int croot) {
     cm in [1 .. 2] and
     cp in [1 .. 2] and
@@ -197,24 +185,40 @@ module PropagationGraph {
       cp = count(rep.indexOf("parameter")) and
       cpr = count(rep.indexOf("parameter -1")) and
       croot = count(rep.indexOf("(root ")) and
-      plus1 = 0 and
       (
         asRhs = true and
-        // plus1 = 1 and
-        //plus1 = scoreForCanonicalRep(rep, sink, depth) and
+        plus1 = scoreForCanonicalRep(rep, sink, depth) and
         (
           isPreferedStructForRep(cm, cr, cp, cpr, croot) and
-          plus2 = 80 - 7 * (cp-1) - 7 * (cm-1) - cmw - 40 * croot- 3*cr
+          // Once it has the preferred structure we penalizes having 
+          // more parameters, members, including a root, etc
+          plus2 = 20 - 2 * (cp-1) - 2* ((cm-cmw)-1) - cr - 10 * croot
           or
           not isPreferedStructForRep(cm, cr, cp, cpr, croot) and
           plus2 = 0
         )
+        // Penalizes the receivers againts members and roots
+        and score = plus1 + plus2  - (2*cpr + 2* cmw)
         or
-        asRhs = false and plus1 = 0 and plus2 = 0
-      ) and
-      // Penalizes the receivers againts members and roots
-      score = plus1 + plus2 + cm* 4 + cr * 3 + cp * 5 - cpr * 8 - cmw*7
+        asRhs = false and plus1 = 0 and plus2 = 0 and 
+        // Penalizes the receivers againts members and roots
+        score = cm* 4 + cr * 3 + cp * 5 - (cpr * 2 + cmw*2)
+      ) 
     )
+  }
+  
+  /**
+   * Returns one `canonical` representation for a node
+   * For sinks it prioritizes paterns like `parameter x (member fun )
+   * and the use of external functions, penalizes the receiver as parameter
+   */
+  string chooseBestRep(DataFlow::Node sink, boolean asRhs) {
+    result =
+      max(string rep, int depth, int score |
+        isRepWithScore(rep, sink, depth, asRhs, score)
+      |
+        rep order by score, depth, rep /*desc, depth desc, rep*/
+      )
   }
 
   /**
@@ -235,19 +239,6 @@ module PropagationGraph {
       )
   }
 
-  /**
-   * Returns one `canonical` representation for a node
-   * For sinks it prioritizes paterns like `parameter x (member fun )
-   * and the use of external functions, penalizes the receiver as parameter
-   */
-  string chooseBestRep(DataFlow::Node sink, boolean asRhs) {
-    result =
-      max(string rep, int depth, int score |
-        isRepWithScore(rep, sink, depth, asRhs, score)
-      |
-        rep order by score, depth, rep /*desc, depth desc, rep*/
-      )
-  }
 
   string chooseBestRepOld(DataFlow::Node sink, boolean asRhs) {
     exists(int i | i in [1 .. 3] |
