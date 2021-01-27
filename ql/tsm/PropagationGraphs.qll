@@ -15,12 +15,11 @@
  */
 
 import javascript
-// import ApiGraphs
 import NodeRepresentation
 
 /**
  * The name of an npm package that should be considered when building the propagation graph.
- * The filter is applied to sink and source candidates 
+ * The filter is applied to sink and source candidates
  *
  * To customize, implement concrete subclasses of this class.
  *
@@ -31,15 +30,15 @@ import NodeRepresentation
  *   MongoDbIsInteresting() { this = "mongodb" }
  * }
  * ```
- * 
+ *
  * To do the same with sources:
  * ```ql
  * class MongoDbIsInteresting extends InterestingPackageForSources {
  *   MongoDbIsInteresting() { this = "mongodb" }
  * }
  * ```
-
- * 
+ *
+ *
  *
  * To consider all imports interesting, both for sorces and sinks use
  *
@@ -60,24 +59,21 @@ abstract class InterestingPackageForSources extends string {
 }
 
 /**
- * Allows to include additional source/sinks/sanitizers as candidates 
- * 
- * For example, to add additional sinks 
- * 
- * ```ql 
+ * Allows to include additional source/sinks/sanitizers as candidates
+ *
+ * For example, to add additional sinks
+ *
+ * ```ql
  * class MoreSinks extends SinkCandidate {
  *    MoreSinks() { this = any(API::moduleImport(_)).getAnArgument() }
  * }
  * ```
  */
-abstract class AdditionalSourceCandidate extends DataFlow::Node {
-}
+abstract class AdditionalSourceCandidate extends DataFlow::Node { }
 
-abstract class AdditionalSinkCandidate extends DataFlow::Node {
-}
+abstract class AdditionalSinkCandidate extends DataFlow::Node { }
 
-abstract class AdditionalSanitizerCandidate extends DataFlow::Node {
-}
+abstract class AdditionalSanitizerCandidate extends DataFlow::Node { }
 
 /**
  * Gets the minimum number of ocurrences of a candidate representation.
@@ -86,7 +82,6 @@ abstract class AdditionalSanitizerCandidate extends DataFlow::Node {
  * will generally negatively affect performance.
  */
 int minOcurrences() { result = 1 }
-
 
 /** Holds if data read from a use of `f` may originate from package `pkg`. */
 predicate mayComeFromLibrary(API::Node f, string pkg) {
@@ -186,7 +181,6 @@ predicate isSourceCandidate(DataFlow::Node u) {
     not nd = API::moduleImport(_) and
     u = nd.getAnImmediateUse() and
     exists(rep(u, false)) and
-    not knownStep(_, u) and
     (
       u instanceof DataFlow::CallNode and
       not u = any(Import i).getImportedModuleNode()
@@ -196,7 +190,7 @@ predicate isSourceCandidate(DataFlow::Node u) {
       u instanceof DataFlow::PropRead
     )
   )
-  or 
+  or
   u instanceof AdditionalSourceCandidate
 }
 
@@ -206,7 +200,7 @@ predicate isSourceCandidate(DataFlow::Node u) {
 predicate isSanitizerCandidate(DataFlow::CallNode u) {
   exists(rep(u, false)) and
   not u = any(Import i).getImportedModuleNode()
-  or 
+  or
   u instanceof AdditionalSanitizerCandidate
 }
 
@@ -230,7 +224,7 @@ predicate isSinkCandidate(DataFlow::Node d) {
       d = any(DataFlow::PropWrite pw).getRhs()
     )
   )
-  or 
+  or
   d instanceof AdditionalSinkCandidate
 }
 
@@ -243,8 +237,6 @@ predicate step(DataFlow::Node pred, DataFlow::Node succ) {
   succ.(DataFlow::SourceNode).hasPropertyWrite(_, pred)
   or
   succ.(DataFlow::CallNode).getAnArgument() = pred
-  or
-  succ.(DataFlow::MethodCallNode).getReceiver() = pred
   or
   guard(pred, succ)
 }
