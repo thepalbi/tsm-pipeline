@@ -190,7 +190,7 @@ module PropagationGraph {
         plus1 = scoreForCanonicalRep(rep, sink, depth) and
         (
           isPreferedStructForRep(cm, cr, cp, cpr, croot) and
-          // Once it has the preferred structure we penalizes having 
+          // Once it has the preferred structure we penalize having 
           // more parameters, members, including a root, etc
           plus2 = 20 - 2 * (cp-1) - 2* ((cm-cmw)-1) - cr - 10 * croot
           or
@@ -206,7 +206,7 @@ module PropagationGraph {
       ) 
     )
   }
-  
+
   /**
    * Returns one `canonical` representation for a node
    * For sinks it prioritizes paterns like `parameter x (member fun )
@@ -221,24 +221,95 @@ module PropagationGraph {
       )
   }
 
+
+   /**
+   *  Prioritizes paterns like `[member _] parameter x ( member fun )
+   *  by giving an additional score
+   */
+  predicate isBetterRep(string rep, DataFlow::Node nd, int depth) {
+      rep = rep(nd, depth, true) and
+      (
+        (
+          // Preferred repr
+          rep.regexpMatch(regExp1())
+          or
+          // member X (preferred rep) 
+          rep.regexpMatch("\\(member \\w+ " + regExp1() + "\\)") 
+          or
+          // member * (preferred rep)
+          rep.regexpMatch("\\(member \\* " + regExp1() + "\\)")
+        ) 
+        // and
+        // not rep.regexpMatch(regExp2())
+      ) 
+  }
+
+  /**
+   *  For sinks prioritizes paterns like `parameter x (return member fun )
+   *  by penalizing more occurences of (pamerameter|member)
+   */
+  int rankRepr(string rep, DataFlow::Node sink, int depth, boolean asRhs) {
+    rep = rep(sink, depth, asRhs) and
+    exists(int cm, int cmw, int cr, int cp, int cpr, int croot, int plus1, int plus2 |
+      cm = count(rep.indexOf("member")) and
+      cmw = count(rep.indexOf("member *")) and
+      cr = count(rep.indexOf("return")) and
+      cp = count(rep.indexOf("parameter")) and
+      cpr = count(rep.indexOf("parameter -1")) and
+      croot = count(rep.indexOf("(root ")) and
+      (
+        asRhs = true and
+        // (isBetterRep(rep, sink, depth) and plus1 = 20 
+        // or
+        // not isBetterRep(rep, sink, depth) and plus1 = 0) and 
+        // (
+        //   isPreferedStructForRep(cm, cr, cp, cpr, croot) and plus2 = 5
+        //   or
+        //   not isPreferedStructForRep(cm, cr, cp, cpr, croot) and plus2 = 0
+        // )
+        plus1 = 0 and plus2 = (cm-cmw)*3 + (cp-cpr)*3 + 2*cr 
+        // Penalizes the receivers againts members and roots
+        and result = plus1 + plus2 + depth  - (cpr + cmw + croot)
+        or
+        asRhs = false and plus1 = 0 and plus2 = 0 and 
+        // Penalizes the receivers againts members and roots
+        result = depth  - (cpr + cmw)
+      ) 
+    )
+  }
+
   /**
    * Returns several `canonical` representation for a node
    * For sinks it prioritizes paterns like `[member _] parameter x (return member fun )
    * and the use of external functions, penalizes the receiver as parameter
    */
   string chooseBestReps(DataFlow::Node sink, boolean asRhs) {
-    exists(int i | i in [1 .. 2] | result = chooseBestReps(sink, asRhs, i))
+    exists(int i | i in [1 .. 4] | result = chooseBestReps(sink, asRhs, i))
   }
 
   string chooseBestReps(DataFlow::Node sink, boolean asRhs, int i) {
     result =
       rank[i](string rep, int depth, int score |
-        isRepWithScore(rep, sink, depth, asRhs, score)
+        score  = rankRepr(rep, sink, depth, asRhs)
       |
         rep order by score desc, depth desc, rep
       )
   }
 
+  string chooseBestRepsScore(DataFlow::Node sink, boolean asRhs, 
+    int i) {
+    result =
+      rank[i](string rep, int depth, int score |
+        rep = candidateRep(sink, depth, asRhs) and
+        (
+        score = rankRepr(rep, sink, depth, asRhs)  
+        )
+      |
+        rep order by score + depth desc, rep
+      ) 
+      and asRhs = true and i in [1..6]
+      or asRhs = false and result = chooseBestRep(sink, false) and i = 1
+  }
 
   string chooseBestRepOld(DataFlow::Node sink, boolean asRhs) {
     exists(int i | i in [1 .. 3] |
