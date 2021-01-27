@@ -211,8 +211,8 @@ predicate isSinkCandidate(DataFlow::Node d) {
   exists(API::Node nd |
     mayEscapeToLibrary(nd, any(InterestingPackageForSinks pkg)) and
     d = nd.getARhs() and
-    exists(rep(d, true)) and
     not knownStep(d, _) and
+    exists(rep(d, true)) and
     (
       d = any(ReturnStmt ret).getExpr().flow()
       or
