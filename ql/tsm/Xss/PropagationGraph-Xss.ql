@@ -25,7 +25,7 @@ private string npmLibraries() {
 
 private string packageListFromFrecuency() {
   result in [
-    "fs","path","process","jquery","express",
+    "fs","path","process","jquery","express", "angular",
     "http","gulp","crypto","socket.io","child_process",
     "react-dom","body-parser","util","react","moment",
     "lodash","laravel-mix","gulp-rename",
@@ -40,13 +40,13 @@ private string allLibraries() {
   )
 }
 
-class AllPackagesAreInteresting extends InterestingPackageForSources,InterestingPackageForSinks {
+class AllPackagesAreInteresting extends InterestingPackageForSources {
   AllPackagesAreInteresting() { exists(API::moduleImport(this)) }
 } 
 
-// class XssIsInteresting extends InterestingPackageForSinks {
-//   XssIsInteresting() { this = targetLibraries() }
-// }
+class XssIsInteresting extends InterestingPackageForSinks {
+  XssIsInteresting() { this = targetLibraries() }
+}
 
 predicate isSourceWorse = PropagationGraph::isSourceWorse/1;
 
