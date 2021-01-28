@@ -97,8 +97,8 @@ module PropagationGraph {
   string getconcatrep(DataFlow::Node n, boolean asRhs) {
     result =
       strictconcat(string r |
-        // r = chooseBestRep(n, asRhs) and
-        r = chooseBestReps(n, asRhs) and
+        r = chooseBestRep(n, asRhs) and
+        // r = chooseBestReps(n, asRhs) and
         count(DataFlow::Node nd2 | r = repGenerator(nd2, _, asRhs)) >= minOcurrences()
       |
         // and
@@ -168,10 +168,11 @@ module PropagationGraph {
   // To-Do: Maybe is easier to define whole canonicalRep with a regular expresion:
   predicate isPreferedStructForRep(int cm, int cr, int cp, int cpr, int croot) {
     cm in [1 .. 2] and
-    cp in [1 .. 2] and
+    cp in [0 .. 2] and
     cr in [0 .. 2] and
     cpr = 0 and
-    croot in [0 .. 1]
+    croot in [0 .. 1] and
+    cm + cp + cr in [2..4]
   }
 
   /**
@@ -223,8 +224,11 @@ module PropagationGraph {
       )
   }
 
-  string chooseBestReps(DataFlow::Node sink, boolean asRhs) {
-    exists(int i | i in [1 .. maxReprPerSink()] | result = chooseBestReps(sink, asRhs, i))
+  string chooseBestReps(DataFlow::Node node, boolean asRhs) {
+    asRhs = true and
+    exists(int i | i in [1 .. maxReprPerSink()] | result = chooseBestReps(node, asRhs, i))
+    or
+    asRhs = false and result = chooseBestRep(node, false)
   }
 }
 
