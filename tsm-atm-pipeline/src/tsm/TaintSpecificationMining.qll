@@ -24,16 +24,36 @@ module TSM {
   string getRepr(DataFlow::Node node, boolean asRhs) { result = candidateRep(node, _, asRhs) }
 
   /**
+   * Returns a possible representation for a node in order of detail.
+   * For a `canonical` representation replace for `chooseBestRep`
+   */
+  string getRepr(DataFlow::Node node, boolean asRhs, int i) {
+    result = chooseBestReps(node, asRhs, i)
+  }
+
+  /**
    * Gets a possible score for node `nd`, considered as a source, sanitizer, or sink, depending
    * on `reprType`.
    */
   float getAReprScore(DataFlow::Node nd, string reprType) {
+    result = max(int i, float score | score = getAReprScore(nd, reprType, i, _) | score)
+  }
+
+  /**
+   * Gets a possible score for node `nd`, considered as a source, sanitizer, or sink, depending
+   * on `reprType`.
+   */
+  float getAReprScore(DataFlow::Node nd, string reprType, int i, string rep) {
     exists(Representations repr, boolean asRhs |
       reprType in ["src", "san"] and asRhs = false
       or
       reprType = "snk" and asRhs = true
     |
-      result = repr.getReprScore(getRepr(nd, asRhs), reprType)
+      exists(float score |
+        rep = getRepr(nd, asRhs, i) and
+        score = repr.getReprScore(rep, reprType) and
+        result = score * 0.5.pow(i - 1)
+      )
     )
   }
 
