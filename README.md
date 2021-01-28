@@ -10,11 +10,11 @@ Current version of libraries to boost is: commit `e277a2ef6c9998c927cb6e4b277a0a
 
 ## Installing dependencies
 
-`python3 -m pip install -r requirements.txt`
+Execute: `python3 -m pip install -r requirements.txt`
 
-Then try `python3 -m pip gurobipy` to install python support for the `gurobi` solver.  
+Then try `python -m pip install -i https://pypi.gurobi.com gurobipy` to install python support for the `gurobi` solver.   
 
-In OSX you may need to install `girubi` support for python manualy by executing this command: `python3 /Library/gurobiXXX/mac64/setup.py install`, where `XXX` is the version installed in your computer.
+In OSX you may need to install `girubi` support for python manualy by executing this command: `python3 /Library/gurobiXXX/mac64/setup.py install`, where `XXX` is the version installed in your computer. Recall that you need a license to run gurobi. Academic licences are available [here](https://www.gurobi.com/academia/academic-program-and-licenses/). 
 
 ## Downloading databases from LGTM
 
