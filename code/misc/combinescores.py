@@ -72,20 +72,29 @@ def combine_scores(query, \
 
     print(len(src_dict), len(snk_dict), len(san_dict))
     with open("allscores_{0}_avg.txt".format(query), "w") as scoresfile:
+        scoresfile.writelines([
+            "module TsmRepr {\n",""
+            "  float getReprScore(string repr, string t){\n"
+            ])
+    # Skppiing to print sources and sanitizers while boosting sinks
     #     if len(src_dict)>0:
     #         scoresfile.write(" or\n".join(["repr = \"{0}\" and t = \"{1}\" and result = {2}".format(k, "src",  "%.10f" 
     # % np.mean(src_dict[k])) for k in src_dict.keys()]))
     #     if len(snk_dict)>0:            
     #         if len(src_dict)>0:
     #             scoresfile.write("\nor\n")
-            scoresfile.write(" or\n".join(["repr = \"{0}\" and t = \"{1}\" and result = {2}".format(k, "snk",  "%.10f" 
+        scoresfile.write(" or\n".join(["   repr = \"{0}\" and t = \"{1}\" and result = {2}".format(k, "snk",  "%.10f" 
     % np.mean(snk_dict[k])) for k in snk_dict.keys()]))
     #     if len(san_dict)>0:
     #         if len(src_dict)>0 or len(snk_dict)>0:
     #             scoresfile.write("\nor\n")
     #         scoresfile.write(" or\n".join(["repr = \"{0}\" and t = \"{1}\" and result = {2}".format(k, "san",  "%.10f" 
     # % np.mean(san_dict[k])) for k in san_dict.keys()]))
-
+        scoresfile.writelines([
+        "\n",
+        "   } \n",""
+        "}\n"
+        ])
 
 
 
