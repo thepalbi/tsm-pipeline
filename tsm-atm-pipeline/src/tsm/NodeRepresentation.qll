@@ -23,7 +23,7 @@ predicate isRelevant(DataFlow::Node nd) {
  * are filtered out above, so increasing the bound beyond a certain threshold may
  * not actually yield new candidates.
  */
-private int maxdepth() { result = 5 }
+private int maxdepth() { result = 4 }
 
 /** Gets a node that the main module of package `pkgName` exports. */
 private DataFlow::Node getAnExport(string pkgName) {
@@ -119,6 +119,7 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
     exists(string p |
       exists(int i |
         nd = base.(DataFlow::FunctionNode).getParameter(i) and
+        not exists(nd.(DataFlow::ParameterNode).getName()) and
         asRhs = false
         or
         nd = base.getAnInvocation().getArgument(i) and
@@ -139,7 +140,7 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
       nd = base.(DataFlow::FunctionNode).getAReturn() and
       asRhs = true
       or
-      nd = base.getAnInvocation() and
+      nd = base.getACall() and
       asRhs = false
     ) and
     step = "return"
@@ -184,43 +185,4 @@ string baseCandidateRep(DataFlow::SourceNode base, int depth, boolean asRhs) {
     result = candidateRep(nd, depth, asRhs) and
     base = nd.getALocalSource()
   )
-}
-
-/**
- *  For sinks prioritizes paterns like `parameter x (return member fun )
- *  by penalizing more occurences of (pamerameter|member)
- */
-int rankRepr(string rep, DataFlow::Node sink, int depth, boolean asRhs) {
-  rep = candidateRep(sink, depth, asRhs) and
-  exists(int cm, int cmw, int cr, int cp, int cpr, int croot |
-    cm = count(rep.indexOf("member")) and
-    cmw = count(rep.indexOf("member *")) and
-    cr = count(rep.indexOf("return")) and
-    cp = count(rep.indexOf("parameter")) and
-    cpr = count(rep.indexOf("parameter -1")) and
-    croot = count(rep.indexOf("(root ")) and
-    (
-      asRhs = true and
-      // Penalizes the receivers againts members and roots
-      result = depth - (cpr + cmw + croot)
-      or
-      asRhs = false and
-      // Penalizes the receivers againts members and roots
-      result = depth - (cpr + cmw + croot)
-    )
-  )
-}
-
-string chooseBestReps(DataFlow::Node sink, boolean asRhs, int i) {
-  result =
-    rank[i](string rep, int depth, int score |
-      rep = candidateRep(sink, depth, asRhs) and
-      score = rankRepr(rep, sink, depth, asRhs)
-    |
-      rep order by score desc, rep
-    ) and
-  asRhs = true and
-  i in [1 .. 6]
-  or
-  asRhs = false and result = candidateRep(sink, _, false) and i = 1
 }
