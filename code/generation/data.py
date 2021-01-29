@@ -131,7 +131,7 @@ class DataGenerator:
         
 
     def _get_tsm_bqrs_file(self, filename: str) -> str:
-        return os.path.join(constaintssolving_dir, self.project_dir, "results", "js-propagation-graphs", "tsm", filename)
+        return os.path.join(constaintssolving_dir, self.project_dir, "results", "tsm-js", "tsm", filename)
 
     def generate_scores(self, query_type: str, combinedScore: bool, kind = "snk") -> Tuple[str, ...]:
         # Run metrics-snk query

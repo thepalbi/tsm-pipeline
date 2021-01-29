@@ -23,7 +23,7 @@ predicate isRelevant(DataFlow::Node nd) {
  * are filtered out above, so increasing the bound beyond a certain threshold may
  * not actually yield new candidates.
  */
-private int maxdepth() { result = 5 }
+private int maxdepth() { result = 4 }
 
 /** Gets a node that the main module of package `pkgName` exports. */
 private DataFlow::Node getAnExport(string pkgName) {
@@ -119,6 +119,7 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
     exists(string p |
       exists(int i |
         nd = base.(DataFlow::FunctionNode).getParameter(i) and
+        not exists(nd.(DataFlow::ParameterNode).getName()) and
         asRhs = false
         or
         nd = base.getAnInvocation().getArgument(i) and
@@ -139,7 +140,7 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
       nd = base.(DataFlow::FunctionNode).getAReturn() and
       asRhs = true
       or
-      nd = base.getAnInvocation() and
+      nd = base.getACall() and
       asRhs = false
     ) and
     step = "return"

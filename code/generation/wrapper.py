@@ -27,7 +27,7 @@ class CodeQLWrapper:
                          query_file: str,
                          search_path: str = global_config.search_path):
         query_file_name = os.path.basename(query_file)
-        output_file = os.path.join(project, "results", "js-propagation-graphs", "tsm", os.path.splitext(query_file_name)[0])+'.bqrs'
+        output_file = os.path.join(project, "results", "tsm-js", "tsm", os.path.splitext(query_file_name)[0])+'.bqrs'
         command_and_arguments = [
             self._code_ql_binary_path,
             "query", "run",

@@ -6,7 +6,7 @@
 import javascript
 import tsm.PropagationGraphsAlt
 
-predicate targetLibraries = npmLibraries/0;
+predicate targetLibraries = packageListFromFrecuency/0;
 
 private string npmLibraries() { 
   result = "fs" 
@@ -25,6 +25,7 @@ private string npmLibraries() {
   or result = "path-exists"
   or result = "vinyl-fs"
   or result = "sane"
+  or result = "express"
   // exists(API::Node imp | 
   //     imp = API::moduleImport(result)
   // )
@@ -38,13 +39,13 @@ private string packageListFromFrecuency() {
   ]
 } 
 
-class AllPackagesAreInteresting extends InterestingPackageForSources, InterestingPackageForSinks {
+class AllPackagesAreInteresting extends InterestingPackageForSources { // , InterestingPackageForSinks {
   AllPackagesAreInteresting() { exists(API::moduleImport(this)) }
 } 
 
-// class PathIsInteresting extends InterestingPackageForSinks {
-//   PathIsInteresting() { this = targetLibraries() }
-// }
+class PathIsInteresting extends InterestingPackageForSinks {
+  PathIsInteresting() { this = targetLibraries() }
+}
 
 // Known sources should be included in the triples
 class PathSourceCandidate extends AdditionalSourceCandidate {
@@ -90,7 +91,6 @@ predicate test(DataFlow::Node n, string ssrc, string ssan, string ssnk)
     DataFlow::Node src, DataFlow::Node san, 
     DataFlow::Node snk
     |
-    // isSinkCandidate(snk) and
     PropagationGraph::tripleSrcSanSnk(src, san, snk) and 
     ssrc = PropagationGraph::getconcatrep(src, false) and
     ssan = PropagationGraph::getconcatrep(san, false) and 
