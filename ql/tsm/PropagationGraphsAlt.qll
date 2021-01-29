@@ -3,17 +3,8 @@
 import javascript
 import PropagationGraphs
 
-// predicate repGenerator = oldCandidateRep/3;
 predicate repGenerator = candidateRep/3;
 int maxReprPerSink() { result = 5 }
-
-string test(DataFlow::Node sink, int score, int i) {
-  i in [1 .. 3] and
-  result = chooseBestReps(sink, true, i) and
-  PropagationGraph::isRepWithScore(result, sink, _, true, score) and
-  sink.getFile().getBaseName() = "admin.js" and
-  sink.getStartLine() = 214
-}
 
 module PropagationGraph {
 
@@ -98,30 +89,27 @@ module PropagationGraph {
     result =
       strictconcat(string r |
         r = chooseBestRep(n, asRhs) and
-        // r = chooseBestReps(n, asRhs) and
         count(DataFlow::Node nd2 | r = repGenerator(nd2, _, asRhs)) >= minOcurrences()
       |
-        // and
-        // exists(DataFlow::Node n2 | candidateRep2(n2, asRhs) = r)
         r, "::"
       )
   }
 
   /**
    * Gets a candidate representation for `nd`, filtering out very general representations.
+   * 
    */
   string candidateRepFiltered(DataFlow::Node nd, int depth, boolean asRhs) {
     result = repGenerator(nd, depth, asRhs) and
     // exclude some overly general representations like `(member data *)` or
     // `(parameter 0 (member exports *))`
-    not result.regexpMatch("\\((parameter|member) \\w+ (\\*|.*\\(member exports \\*\\))\\)") and
-    not result.regexpMatch("\\(root .*\\)") and
-    not result.regexpMatch("\\(member \\w+ \\*\\)")
+    not result.regexpMatch("\\(parameter \\d+ (\\*|\\(member exports \\*\\))\\)") and
+    not result.regexpMatch("\\(root .*\\)")  
   }
 
   /**
    * Gets a representation for `nd` that is not extremely rare, that is, it occurs at least five
-   * times.
+   * times. Similar to rep in the PropagationGraph but with the deptn parameter
    */
   string rep(DataFlow::Node nd, int depth, boolean asRhs) {
     result = candidateRepFiltered(nd, depth, asRhs) and
@@ -141,38 +129,45 @@ module PropagationGraph {
    *  Prioritizes paterns like `[member _] parameter x ( member fun )
    *  by giving an additional score
    */
-  int scoreForCanonicalRep(string repr, DataFlow::Node nd, int depth) {
-    exists(string rep | 
-      rep = rep(nd, depth, true) and
+  int plusForCanonicalRep(string rep, DataFlow::Node nd, int depth) {
+    rep = rep(nd, depth, true) and
+    (
       (
-        (
-          // Preferred repr
-          rep.regexpMatch(regExp1()) and result = 100
-          or
-          // member X (preferred rep) 
-          rep.regexpMatch("\\(member \\w+ " + regExp1() + "\\)") and
-          result = 75
-          or
-          // member * (preferred rep)
-          rep.regexpMatch("\\(member \\* " + regExp1() + "\\)") and
-          result = 50
-        ) and
-        not rep.regexpMatch(regExp2())
+        // Preferred repr
+        rep.regexpMatch(regExp1()) and result = 100
         or
-        result = 0
-      ) and repr = rep
-    )
+        // member X (preferred rep) 
+        rep.regexpMatch("\\(member \\w+ " + regExp1() + "\\)") and
+        result = 75
+        or
+        // member * (preferred rep)
+        rep.regexpMatch("\\(member \\* " + regExp1() + "\\)") and
+        result = 50
+      ) and
+      not rep.regexpMatch(regExp2())
+      or
+      result = 0
+    ) 
   }
 
-  // Prefers an small number of member and parameters for canonical representation
+  /***
+   * This should be the maxdepth() from NodeRepresentations, but is currently private
+   */
+  int pgmaxdepth() {result = 5}
+
+  // Prefers a small number of member and parameters for canonical representation
   // To-Do: Maybe is easier to define whole canonicalRep with a regular expresion:
-  predicate isPreferedStructForRep(int cm, int cr, int cp, int cpr, int croot) {
-    cm in [1 .. 2] and
-    cp in [0 .. 2] and
-    cr in [0 .. 2] and
-    cpr = 0 and
-    croot in [0 .. 1] and
-    cm + cp + cr in [2..4]
+  int plusForPreferedStructForRep(int cm, int cmw, int cr, int cp, int cpr,  int croot) {
+    cm in [0 .. pgmaxdepth()] and cmw in [0 .. pgmaxdepth()] and cr in [0 .. pgmaxdepth()] and 
+    cp in [0 .. pgmaxdepth()] and cpr in [0 .. pgmaxdepth()] and croot in [0 .. pgmaxdepth()] and
+    (   
+      cm in [1 .. 2] and  cp in [0 .. 2] and cr in [0 .. 2] and cmw in [0..3] 
+      and cpr = 0 and croot in [0 .. 1] 
+      and cm + cp + cr in [2..4] 
+      and result = 20  - 2 * (cp-1) - 2* ((cm-cmw)-1) - cr - 10 * croot
+      or 
+      result = 0
+    ) 
   }
 
   /**
@@ -181,7 +176,7 @@ module PropagationGraph {
    */
   predicate isRepWithScore(string rep, DataFlow::Node sink, int depth, boolean asRhs, int score) {
     rep = rep(sink, depth, asRhs) and
-    exists(int cm, int cmw, int cr, int cp, int cpr, int croot, int plus1, int plus2 |
+    exists(int cm, int cmw, int cr, int cp, int cpr, int croot |
       cm = count(rep.indexOf("member")) and
       cmw = count(rep.indexOf("member *")) and
       cr = count(rep.indexOf("return")) and
@@ -190,20 +185,12 @@ module PropagationGraph {
       croot = count(rep.indexOf("(root ")) and
       (
         asRhs = true and
-        plus1 = scoreForCanonicalRep(rep, sink, depth) and
-        (
-          isPreferedStructForRep(cm, cr, cp, cpr, croot) and
-          // Once it has the preferred structure we penalize having 
-          // more parameters, members, including a root, etc
-          plus2 = 20 - 2 * (cp-1) - 2* ((cm-cmw)-1) - cr - 10 * croot
-          or
-          not isPreferedStructForRep(cm, cr, cp, cpr, croot) and
-          plus2 = 0
-        )
         // Penalizes the receivers againts members and roots
-        and score = plus1 + plus2  - (2*cpr + 2* cmw)
+        score = plusForCanonicalRep(rep, sink, depth) 
+                + plusForPreferedStructForRep(cm,  cmw, cr, cp, cpr, croot)  
+                - (2*cpr + 2* cmw)
         or
-        asRhs = false and plus1 = 0 and plus2 = 0 and 
+        asRhs = false and        
         // Penalizes the receivers againts members and roots
         score = cm* 4 + cr * 3 + cp * 5 - (cpr * 2 + cmw*2)
       ) 
@@ -223,12 +210,4 @@ module PropagationGraph {
         rep order by score, depth, rep /*desc, depth desc, rep*/
       )
   }
-
-  string chooseBestReps(DataFlow::Node node, boolean asRhs) {
-    asRhs = true and
-    exists(int i | i in [1 .. maxReprPerSink()] | result = chooseBestReps(node, asRhs, i))
-    or
-    asRhs = false and result = chooseBestRep(node, false)
-  }
 }
-

@@ -159,7 +159,7 @@ string candidateRep(DataFlow::Node nd, boolean asRhs) {
   result = candidateRep(nd, _, asRhs) and
   // exclude some overly general representations like `(member data *)` or
   // `(parameter 0 (member exports *))`
-  not result.regexpMatch("\\((parameter|member) \\w+ (\\*|\\(member exports \\*\\))\\)") and
+  not result.regexpMatch("\\(parameter \\d+ (\\*|\\(member exports \\*\\))\\)") and
   not result.regexpMatch("\\(root .*\\)")
 }
 

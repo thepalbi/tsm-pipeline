@@ -119,6 +119,7 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
     exists(string p |
       exists(int i |
         nd = base.(DataFlow::FunctionNode).getParameter(i) and
+        not exists(nd.(DataFlow::ParameterNode).getName()) and
         asRhs = false
         or
         nd = base.getAnInvocation().getArgument(i) and
@@ -139,7 +140,7 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
       nd = base.(DataFlow::FunctionNode).getAReturn() and
       asRhs = true
       or
-      nd = base.getAnInvocation() and
+      nd = base.getACall() and
       asRhs = false
     ) and
     step = "return"
@@ -193,35 +194,34 @@ string baseCandidateRep(DataFlow::SourceNode base, int depth, boolean asRhs) {
  */
 int rankRepr(string rep, DataFlow::Node sink, int depth, boolean asRhs) {
   rep = candidateRep(sink, depth, asRhs) and
-  exists(int cm, int cmw, int cr, int cp, int cpr, int croot |
-    cm = count(rep.indexOf("member")) and
+  exists(int cmw, int cpw, int croot |
     cmw = count(rep.indexOf("member *")) and
-    cr = count(rep.indexOf("return")) and
-    cp = count(rep.indexOf("parameter")) and
-    cpr = count(rep.indexOf("parameter -1")) and
+    cpw = count(rep.indexOf("parameter *")) and
     croot = count(rep.indexOf("(root ")) and
     (
-      asRhs = true and
-      // Penalizes the receivers againts members and roots
-      result = depth - (cpr + cmw + croot)
-      or
-      asRhs = false and
-      // Penalizes the receivers againts members and roots
-      result = depth - (cpr + cmw + croot)
+      asRhs in [true, false]  and
+      // Wilcards will lay on the middle
+      // root are discouraged
+      result = 2 * depth - (cpw + cmw) - croot*3
     )
   )
 }
 
-string chooseBestReps(DataFlow::Node sink, boolean asRhs, int i) {
+/**
+ * Return a representation for sorted by a rank given by the depth and the 
+ * use of wilcards
+ */
+string chooseBestReps(DataFlow::Node nd, boolean asRhs, int i) {
+
+  asRhs = true and
   result =
     rank[i](string rep, int depth, int score |
-      rep = candidateRep(sink, depth, asRhs) and
-      score = rankRepr(rep, sink, depth, asRhs)
+      rep = candidateRep( nd, depth, asRhs) and
+      score = rankRepr(rep, nd, depth, asRhs)
     |
       rep order by score desc, rep
-    ) and
-  asRhs = true and
-  i in [1 .. 6]
+    ) 
+  // For sources and sanitizer we currently don't rank 
   or
-  asRhs = false and result = candidateRep(sink, _, false) and i = 1
+  asRhs = false and result = candidateRep(nd, _, false) and i = 1
 }
