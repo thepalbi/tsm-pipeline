@@ -178,6 +178,7 @@ class DataGenerator:
         if not query_type in SUPPORTED_QUERY_TYPES:
             raise Exception(
                 "{0} is not a supported query type. Currently supports {1}".format(query_type, SUPPORTED_QUERY_TYPES))
+
         # For KnownSource  we use current version of CodeQl Libraries  
         # sources
         self._generate_for_entity(
@@ -241,6 +242,15 @@ class DataGenerator:
         bqrs_propgraph = self._get_tsm_bqrs_file_for_entity(f"PropagationGraph-{self.project_name}", query_type)
         # bqrs_propgraph = self._get_tsm_bqrs_file( os.path.splitext(tmp_propgraph_name)[0]+".bqrs")
         # data/1046224544_fontend_19c10c3/1046224544_fontend_19c10c3-src-san.prop.csv
+        
+        # We remove the entities to make sure we use updated versions
+        if os.path.exists(ctx[SRC_SAN_TUPLES_ENTITIES]):
+            os.remove(ctx[SRC_SAN_TUPLES_ENTITIES])
+        if os.path.exists(ctx[SAN_SNK_TUPLES_ENTITIES]): 
+            os.remove(ctx[SAN_SNK_TUPLES_ENTITIES])
+        if os.path.exists(ctx[REPR_MAP_ENTITIES]):
+            os.remove(ctx[REPR_MAP_ENTITIES])
+
         self.codeql.bqrs_decode(
             bqrs_propgraph,
             # self._get_tsm_bqrs_file("PropagationGraph.bqrs"),
@@ -299,6 +309,11 @@ class DataGenerator:
         bqrs_file = self._get_tsm_bqrs_file_for_entity(entity_type, query_type)
         # print(query_path)
         # print(bqrs_file)
+        
+        # We remove the entity to make sure is using a new one
+        if os.path.exists(output_file):
+            os.remove(output_file)
+
         if not os.path.exists(bqrs_file) or force_query: 
             self.codeql.database_analyze(
                 self.project_dir,
