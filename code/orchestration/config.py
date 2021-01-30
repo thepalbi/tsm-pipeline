@@ -6,6 +6,7 @@ WORKING_DIRECTORY_KEY = "workingDirectory"
 RESULTS_DIRECTORY_KEY = "resultsDirectory"
 SEARCH_PATH_KEY = "searchPath"
 SEARCH_WORSE_LIB_PATH_KEY = "worseLibSearchPath"
+LOGS_DIRECTORY_KEY = "logsDirectory"
 
 class Configuration:
     def __init__(self, config_file_path="config.json"):
@@ -35,6 +36,10 @@ class Configuration:
     @property
     def worse_lib_search_path(self):
         return self.config[SEARCH_WORSE_LIB_PATH_KEY]
+
+    @property
+    def logs_directory(self):
+        return self.config[LOGS_DIRECTORY_KEY]
 
     def __getattr__(self, item):
         return self.config[item]

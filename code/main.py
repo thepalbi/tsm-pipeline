@@ -3,6 +3,7 @@ import logging
 import os
 import glob
 import traceback
+import datetime
 
 from orchestration.orchestrator import Orchestrator
 from orchestration import global_config
@@ -33,7 +34,12 @@ all_steps = "ALL"
 run_separate_on_multiple_projects = False
 
 parser = argparse.ArgumentParser()
-logging.basicConfig(level=logging.INFO, format="[%(levelname)s\t%(asctime)s] %(name)s\t%(message)s")
+
+logging_format = "[%(levelname)s\t%(asctime)s] %(name)s\t%(message)s"
+logging.basicConfig(level=logging.INFO, format=logging_format)
+
+# Add file handler to basic logger
+logging.getLogger().addHandler(create_logging_file_appender())
 
 parser.add_argument("--single-step", dest="single_step", type=str, default=all_steps, metavar="STEP",
                     help="DEPRECATED. USE --steps. Runs a single step of the orchestrator named STEP")
@@ -149,3 +155,10 @@ if __name__ == '__main__':
 
         elif parsed_arguments.command == "clean":
             orchestrator.clean()
+
+def create_logging_file_appender():
+    new_log_file = os.path.join(global_config.logs_directory, f"tsm_log_{int(datetime.datetime.now().timestamp())}.log")
+    file_appender = logging.FileHandler(new_log_file)
+    file_appender.setFormatter(logging.Formatter(logging_format))
+    file_appender.setLevel(logging.DEBUG)
+    return file_appender
