@@ -14,7 +14,12 @@ class CodeQLWrapper:
         try:
             # TODO: Check that file exists, and it's codeql?
             self._code_ql_binary_path = global_config.codeql_executable
-            self._logs_directory = "/persistent2/logs/"
+
+            # Make wrapper logs directory if not existent
+            wrapper_logs_directory = os.path.join(global_config.logs_directory, "wrapper_logs")
+            os.makedirs(wrapper_logs_directory, exist_ok=True)
+
+            self._logs_directory = wrapper_logs_directory
             self._logger = logging.getLogger(self.__class__.__name__)
         except KeyError:
             raise Exception(

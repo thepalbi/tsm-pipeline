@@ -115,7 +115,8 @@ class GenerateModelStep(OrchestrationStep):
             shutil.rmtree(dir_to_remove, onerror=self.clean_error_callback)
 
     def should_use_existing_model_dirs(self, ctx):
-        """This step should use existing model_dirs in the following cases:
+        """
+        This step should use existing model_dirs in the following cases:
         1. Just running optimize step, should use existing model dirs
         2. When cleaning, delete the existing model dirs
         3. If running multiple steps, but this step is not included, reuse existing model dirs
@@ -124,8 +125,6 @@ class GenerateModelStep(OrchestrationStep):
             (SINGLE_STEP_NAME in ctx) and ctx[SINGLE_STEP_NAME] == "optimize" or \
             (COMMAND_NAME in ctx) and ctx[COMMAND_NAME] == "clean" or \
             (STEP_NAMES in ctx) and not self.name() in ctx[STEP_NAMES]
-            
-
 
     def run(self, ctx: Context) -> Context:
         # TODO: Implement --mode=combined model generation

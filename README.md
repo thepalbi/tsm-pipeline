@@ -47,7 +47,8 @@ First, configure the `config.json` file, which has to be located at the `constra
   "workingDirectory": "absolute path to the working directory",
   "resultsDirectory": "absolute path to the results dir",
   "searchPath": "absolute path where the CodeQL libraries resides",
-  "worseLibSearchPath": "absolute path where the CodeQL libraries (containing the worse version) resides"
+  "worseLibSearchPath": "absolute path where the CodeQL libraries (containing the worse version) resides",
+  "logsDirectory": "absolute path. Orchestrator's logging directory"
 }
 ```
 
@@ -106,3 +107,13 @@ This can be done with the command:
 This command will recompute the queries on *all* the projects contained in the list `xss_projects.txt` using the the combined score `allscores_DomBasedXssWorse_avg.txt` intead of the individual `reprScores.txt` of each individual project.
 
 You can also include the option `--multiple` in `main.py` to build a model for all projects together. This will generate one `reprScores.txt` in a special folder named `multiple`.
+
+# Troubleshooting
+
+The CodeQL runtime uses java.nio for file handlings. A not so rare error, is `/some_disk/lost+found` having the incorrect permissions, `root` for example, and not letting the CodeQL process write to it. The error looks as follows:
+
+```
+A fatal error occurred: Could not list directory /persistent/lost+found: java.nio.file.AccessDeniedException: /persistent/lost+found
+```
+
+In that scenario, change the owner of that directory to your own, or change the group to one containing your user, and give the necessary permissions.
