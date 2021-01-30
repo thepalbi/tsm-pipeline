@@ -48,7 +48,7 @@ First, configure the `config.json` file, which has to be located at the `constra
   "resultsDirectory": "absolute path to the results dir",
   "searchPath": "absolute path where the CodeQL libraries resides",
   "worseLibSearchPath": "absolute path where the CodeQL libraries (containing the worse version) resides",
-  "logsDirectory": "absolute path. Orchestrator's logging directory",
+  "logsDirectory": "absolute path. Orchestrator's logging directory"
 }
 ```
 
