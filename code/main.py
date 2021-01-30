@@ -8,6 +8,13 @@ import datetime
 from orchestration.orchestrator import Orchestrator
 from orchestration import global_config
 
+def create_logging_file_appender():
+    new_log_file = os.path.join(global_config.logs_directory, f"tsm_log_{int(datetime.datetime.now().timestamp())}.log")
+    file_appender = logging.FileHandler(new_log_file)
+    file_appender.setFormatter(logging.Formatter(logging_format))
+    file_appender.setLevel(logging.DEBUG)
+    return file_appender
+
 def create_project_list(projectListFile):
     projectList = open(projectListFile).readlines()
     resultingProjects = [] 
@@ -148,17 +155,9 @@ if __name__ == '__main__':
                     orchestrator.run_step(parsed_arguments.single_step)
                 hasExecuted = True
             except Exception as inst:
-                logging.info(f"Error running  project: {project}, {inst}")
-                traceback.print_exc()
-                #raise
+                logging.error(f"Error running  project: {project}, {inst}")
+                logging.exception("Fatal error occured in orchestrator execution")
 
 
         elif parsed_arguments.command == "clean":
             orchestrator.clean()
-
-def create_logging_file_appender():
-    new_log_file = os.path.join(global_config.logs_directory, f"tsm_log_{int(datetime.datetime.now().timestamp())}.log")
-    file_appender = logging.FileHandler(new_log_file)
-    file_appender.setFormatter(logging.Formatter(logging_format))
-    file_appender.setLevel(logging.DEBUG)
-    return file_appender
