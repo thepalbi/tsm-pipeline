@@ -20,11 +20,9 @@ class TaintSpecConstraints(tfco.ConstrainedMinimizationProblem):
         self.numconstraints = len([k for k in open("constraints_var.txt").readlines() if len(k) > 0] +
                                   [k for k in open("constraints_known.txt").readlines() if len(k) > 0] +
                                   [k for k in open("constraints_flow.txt").readlines() if len(k) > 0])
-        #self.numconstraints = len([k for k in open("constraints_var.txt").readlines() if len(k) > 0])
         self.lambda_const = 0.1
         self._constraints=[]
         self.cache=dict()
-        #self._set_constraints()
 
     def constraints(self):
         c = []
@@ -46,23 +44,14 @@ class TaintSpecConstraints(tfco.ConstrainedMinimizationProblem):
                 res = self.exprToVal(line)
                 c.append(res)
 
-        #self._constraints = tf.stack(c)
         return tf.stack(c)
 
     def clear_cache(self):
         self.cache = dict()
 
     def objective(self):
-
-        # self.clear_cache()
-        # print("Computing objective...")
-        # with open("constraints_flow.txt") as constraintsfile:
-        #     for line in constraintsfile.readlines():
-        #         c.append(max(self.exprToVal(line), tf.constant(0.0, dtype=tf.float32)))
-        #         #c.append(self.exprToVal(line))
         c = [self.vars[v] for v in self.vars.keys() if v.startswith("eps")]
         c2 = [self.vars[v] for v in self.vars.keys() if not v.startswith("eps")]
-        # loss = gp.quicksum(c) + self.lambda_const * gp.quicksum(c2)
         loss = tf.reduce_sum(c) + self.lambda_const * tf.reduce_sum(c2)
         print("Loss: {0}".format(loss.numpy()))
         return loss
@@ -95,8 +84,6 @@ class TaintSpecConstraints(tfco.ConstrainedMinimizationProblem):
                 return res
             elif isinstance(constraint, str):
                 tokens = self.exprParser.parse(constraint)
-                # res=self.exprToVal(tuple(tokens[0]))
-                # self.cache[constraint] = res
                 if isinstance(tokens[0], str):
                     res = self.exprToVal(tokens[0])
                 else:
@@ -104,18 +91,6 @@ class TaintSpecConstraints(tfco.ConstrainedMinimizationProblem):
                 return res
             else:
                 tokens = constraint
-                # if str(tokens) in self.cache:
-                #     #print("cache hit")
-                #     return self.cache[str(tokens)]
-
-                # if tokens[1] == '+':
-                #     result = self.exprToVal(tokens[0]) + self.exprToVal(tokens[2])
-                # elif tokens[1] == '-':
-                #     result = self.exprToVal(tokens[0]) - self.exprToVal(tokens[2])
-                # elif tokens[1] == '*':
-                #     result = self.exprToVal(tokens[0]) * self.exprToVal(tokens[2])
-                # elif tokens[1] == '/':
-                #     result = self.exprToVal(tokens[0]) / self.exprToVal(tokens[2])
                 result = self.exprToVal(tokens[0])
                 i = 1
                 while i < len(tokens):
@@ -137,12 +112,6 @@ class TaintSpecConstraints(tfco.ConstrainedMinimizationProblem):
             print(constraint)
 
     def constraints2(self):
-        # c=[]
-        # print("Computing constraints...")
-        # self.clear_cache()
-        # with open("constraints_var.txt") as constraintsfile:
-        #     for line in constraintsfile.readlines():
-        #         c.append(self.exprToVal(line))
         return self._constraints
 
     def proxy_constraints(self):
@@ -159,9 +128,6 @@ class GBTaintSpecConstraints:
         self.known_samples_ratio = config.known_samples_ratio
         self.exprParser = ConstraintParser()
         self.exprParser2 = ParseExpression(self.vars, format='gb')
-        # self.numconstraints = len([k for k in open("constraints_var.txt").readlines() if len(k) > 0] +
-        #                           [k for k in open("constraints_known.txt").readlines() if len(k) > 0] +
-        #                           [k for k in open("constraints_flow.txt").readlines() if len(k) > 0])
         self.constraintsdir = constraintsdir
         self.lambda_const = config.lambda_const
         self.skip_flow_constraints = config.no_flow_constraints
@@ -174,11 +140,6 @@ class GBTaintSpecConstraints:
         c = []
         self.clear_cache()
         print("Computing objective...")
-        # with open("constraints_flow.txt") as constraintsfile:
-        #     for line in constraintsfile.readlines():
-        #         res=self.exprToVal(line)
-        #         self.model.addConstr(res >= 0)
-        #         c.append(res)
         c = [self.vars[v] for v in self.vars.keys() if v.startswith("eps")]
         c2 = [self.vars[v] for v in self.vars.keys() if not v.startswith("eps")]
         loss = gp.quicksum(c) + self.lambda_const * gp.quicksum(c2)
@@ -233,14 +194,6 @@ class GBTaintSpecConstraints:
                     elif tokens[i] == '/':
                         result = result / self.exprToVal(tokens[i + 1])
                     i += 2
-                # if tokens[1] == '+':
-                #     result = self.exprToVal(tokens[0]) + self.exprToVal(tokens[2])
-                # elif tokens[1] == '-':
-                #     result = self.exprToVal(tokens[0]) - self.exprToVal(tokens[2])
-                # elif tokens[1] == '*':
-                #     result = self.exprToVal(tokens[0]) * self.exprToVal(tokens[2])
-                # elif tokens[1] == '/':
-                #     result = self.exprToVal(tokens[0]) / self.exprToVal(tokens[2])
 
                 self.cache[str(tokens)] = result
                 return result
@@ -258,7 +211,6 @@ class GBTaintSpecConstraints:
                 for line in constraintsfile.readlines():
                     res = self.exprToVal(line)
                     self.model.addConstr(res <= 0)
-                    # print("{0}".format(c), end=',')
                     c += 1
         else:
             print("Skipping flow constraints")
@@ -276,7 +228,6 @@ class GBTaintSpecConstraints:
                             continue
                         res = self.exprToVal(line_part)
                         self.model.addConstr(res <= 0)
-                        # print("{0}-known".format(c), end=',')
                         c += 1
         except:
             print("No sources")
@@ -293,7 +244,6 @@ class GBTaintSpecConstraints:
                             continue
                         res = self.exprToVal(line_part)
                         self.model.addConstr(res <= 0)
-                        # print("{0}-known".format(c), end=',')
                         c += 1
         except:
             print("No sanitizers")
@@ -312,26 +262,6 @@ class GBTaintSpecConstraints:
                         c += 1
         except:
             print("No sinks")
-
-        # with open("{0}/constraints_candidate.txt".format(self.constraintsdir)) as constraintsfile:
-        #     for line in constraintsfile.readlines():
-        #         res=self.exprToVal(line)
-        #         self.model.addConstr(res<=0)
-        #         c += 1
-
-        # with open("{0}/constraints_known.txt".format(self.constraintsdir)) as constraintsfile:
-        #     constraints = constraintsfile.readlines()
-        #     total_constraints = len(constraints)
-        #     sampled = int(self.known_samples_ratio * (total_constraints / 6))
-        #     indices = np.random.choice([k for k in range(len(constraints)) if k % 6 == 0], sampled)
-        #     print("Sampling %g constraints out of %g" % (len(indices), total_constraints))
-        #     for i in indices:
-        #         for line in constraints[i:i+6]:
-        #             res = self.exprToVal(line)
-        #             self.model.addConstr(res <= 0)
-        #             # print("{0}-known".format(c), end=',')
-        #             c += 1
-
 
     def proxy_constraints(self):
         pass

@@ -1,4 +1,5 @@
 #! /usr/bin/env python3
+# TODO: Should we delete this?
 tokens = {
     "github" : ("saikatg", "710179b0946569a104bd5c662dac854759bea3f5"),
     "lgtm" : "62a92b7d201c7def5c1ae347e254cc35345f8a24e7db0a19744b0d4d7193c5ad",

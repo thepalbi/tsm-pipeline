@@ -54,8 +54,6 @@ def combine_scores(query, \
                 repr=re.findall("repr = \"([^\"]+)\"", reprScopeLine)[0]
                 t=re.findall("t = \"([^\"]+)\"", reprScopeLine)[0]
                 res=float(re.findall("result = ([0-9.]+)", reprScopeLine)[0])
-                #print(l.strip())
-                #print(repr, t, res)
                 if t == "src":
                     src_dict[repr] = src_dict.get(repr, []) + [res]
                     file_src_reprs[reprScoreFile] = file_src_reprs.get(reprScoreFile, []) + [repr]
@@ -76,20 +74,8 @@ def combine_scores(query, \
             "module TsmRepr {\n",""
             "  float getReprScore(string repr, string t){\n"
             ])
-    # Skppiing to print sources and sanitizers while boosting sinks
-    #     if len(src_dict)>0:
-    #         scoresfile.write(" or\n".join(["repr = \"{0}\" and t = \"{1}\" and result = {2}".format(k, "src",  "%.10f" 
-    # % np.mean(src_dict[k])) for k in src_dict.keys()]))
-    #     if len(snk_dict)>0:            
-    #         if len(src_dict)>0:
-    #             scoresfile.write("\nor\n")
         scoresfile.write(" or\n".join(["   repr = \"{0}\" and t = \"{1}\" and result = {2}".format(k, "snk",  "%.10f" 
     % np.mean(snk_dict[k])) for k in snk_dict.keys()]))
-    #     if len(san_dict)>0:
-    #         if len(src_dict)>0 or len(snk_dict)>0:
-    #             scoresfile.write("\nor\n")
-    #         scoresfile.write(" or\n".join(["repr = \"{0}\" and t = \"{1}\" and result = {2}".format(k, "san",  "%.10f" 
-    # % np.mean(san_dict[k])) for k in san_dict.keys()]))
         scoresfile.writelines([
         "\n",
         "   } \n",""
@@ -113,9 +99,6 @@ parser.add_argument("--query-name", dest="query_name", required=True, type=str,
 parser.add_argument("--multiple", dest="multiple", action='store_true', help='Use the result of a run of one combined result')
 
 parsed_arguments = parser.parse_args()
-#project_dir = os.path.normpath(parsed_arguments.project_dir)
-#project_name = os.path.basename(project_dir)
-#query = os.environ["QUERY_NAME"]
 query_name = parsed_arguments.query_name
 working_dir = parsed_arguments.project_dir
 

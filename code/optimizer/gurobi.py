@@ -37,8 +37,6 @@ class CountRepsStep(OrchestrationStep):
             (COMMAND_NAME in ctx) and ctx[COMMAND_NAME] == "clean" or \
             (STEP_NAMES in ctx) and not self.name() in ctx[STEP_NAMES]
             
-
-
     def run(self, ctx: Context) -> Context:
         if self.orchestrator.hasExecuted:
             return "EXITING...."
@@ -53,7 +51,6 @@ class CountRepsStep(OrchestrationStep):
 
         projects_folder = os.path.join(working_dir, "data")
         projects_path = [ ps for p in self.orchestrator.project_list for ps in glob(os.path.join(projects_folder, p)) ]    
-        # projects_path = glob(os.path.join(projects_folder, self.orchestrator.project_name))
 
         projects = [os.path.basename(k) for k in projects_path]
         self.logger.info("Collected {0} projects".format(len(projects)))
@@ -68,7 +65,6 @@ class CountRepsStep(OrchestrationStep):
                 self.logger.info("Analizing project: %s", project)
 
                 # hack -> refactor using populate
-                # if not self.orchestrator.run_single:
                 dataGenerator = DataGenerator(project_dir, project, 
                                             self.orchestrator.data_generator.working_dir, 
                                             self.orchestrator.data_generator.results_dir)
@@ -86,9 +82,7 @@ class CountRepsStep(OrchestrationStep):
             
             except Exception as e:
                 self.logger.info("There was a problem reading events!")
-                stkTrace = traceback.extract_stack()
-                self.logger.info(stkTrace)
-                #traceback.self.logger.info_exc(file=sys.stdout)
+                self.logger.exception(f"Ignoring fatal error running {self.name()} for {project_path}")
                 pass
         
         return ctx
@@ -144,20 +138,6 @@ class GenerateModelStep(OrchestrationStep):
             projects_path = glob(os.path.join(projects_folder, self.orchestrator.project_name))
         else:
             projects_path = [ ps for p in self.orchestrator.project_list for ps in glob(os.path.join(projects_folder, p)) ]    
-            # constraints_dir = os.path.join(projects_folder, "multiple")
-
-        # self.logger.info("Generating models for projects: %s", projects)
-
-        # timestamp = str(int(time.mktime(datetime.datetime.now().timetuple())))
-        # optimizer_run_name = f"{config.query_name}-{timestamp}"
-        # project_name = self.orchestrator.project_name
-        # self.logger.info(f"Project dir: {project_name}/{optimizer_run_name}")
-
-        # constraints_dir = os.path.join(config.working_dir, "constraints", project_name, optimizer_run_name)
-        # models_dir = os.path.join(config.working_dir, "models", project_name, optimizer_run_name)
-        # logs_dir = os.path.join(config.working_dir, "logs", project_name, optimizer_run_name)
-        #results_dir = os.path.join(config.results_dir, project_name, optimizer_run_name)
-        #ctx[RESULTS_DIR_KEY] = results_dir
 
         # Create directories if needed
         for directory in [constraints_dir, models_dir, logs_dir]: # results_dir]:
@@ -204,11 +184,8 @@ class GenerateModelStep(OrchestrationStep):
                                                 config.use_all_sanitizers, ctx)
             except Exception as e:
                 self.logger.info("There was a problem reading events!")
-                stkTrace = traceback.extract_stack()
-                self.logger.info(stkTrace)
-                #traceback.self.logger.info_exc(file=sys.stdout)
+                self.logger.exception()
                 raise
-        # exit(1)
         # if we run multiple projects we allow some filtering
         if not self.orchestrator.run_single:
             # remove events with no min reps
@@ -222,7 +199,6 @@ class GenerateModelStep(OrchestrationStep):
         self.logger.info("Adding constraints")
         for project_path in projects_path:
             project = os.path.basename(project_path)
-        # for project in projects:
             self.logger.info(">>>>>>>>>>>>>Executing project %s" % project)
             # hack -> refactor using populate
             if not self.orchestrator.run_single:
@@ -239,7 +215,6 @@ class GenerateModelStep(OrchestrationStep):
                 ctx[REPR_MAP_ENTITIES]) = dataGenerator.get_entity_files(self.orchestrator.query_type)
             try:
                 # Write flow constraints, as in Seldon 4.2
-                #constraint_builder.generate_flow_constraints(project, config.constraints_constant_C, config.query_name)
                 constraint_builder.generate_flow_constraints_from_pairs(project, config.constraints_constant_C, query=config.query_name, ctx=ctx)
                 pass
             except:
@@ -287,8 +262,6 @@ class OptimizeStep(OrchestrationStep):
         config.no_flow_constraints = self.orchestrator.no_flow
         # Run solver
         solve_constraints_combine_model(config, ctx)
-        # this looks like a more engineered version but didn't work for me
-        #solve_constraints(config, ctx)
 
         # Compute metrics
         getallmetrics(config, ctx)

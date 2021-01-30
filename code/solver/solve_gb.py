@@ -28,8 +28,6 @@ def solve_constraints_combine_model(config: SolverConfig, ctx):
         use_flow_constraints= not config.no_flow_constraints
         if use_flow_constraints:
             for l in open(os.path.join(constraintsdir, "constraints_flow.txt")).readlines():
-                #parts = l.split("<=")
-                #modelfile.write("R{0}: {1} - {2} <= 0\n".format(i, parts[0], parts[1].replace("+", "-").rstrip()))
                 modelfile.write("R{0}: {1}\n".format(i,l.strip()))
                 i += 1
             modelfile.flush()
@@ -67,18 +65,12 @@ def solve_constraints_combine_model(config: SolverConfig, ctx):
 
         modelfile.write("\n")
 
-    # shutil.copyfileobj(open(constraintsdir + "/constraints_flow.txt"), open(modelfile_path, "a"))
-    # shutil.copyfileobj(open(constraintsdir + "/constraints_known_src.txt"), open(modelfile_path, "a"))
-    # shutil.copyfileobj(open(constraintsdir + "/constraints_known_san.txt"), open(modelfile_path, "a"))
-    # shutil.copyfileobj(open(constraintsdir + "/constraints_known_snk.txt"), open(modelfile_path, "a"))
-
     print("Writing Bounds")
     with open(modelfile_path, "a") as modelfile:
         modelfile.write("Bounds\n")
         for line in open(os.path.join(constraintsdir, "constraints_var.txt"), encoding='utf-8').readlines():
             if not line.startswith("0 "):
                 modelfile.write("{0}\n".format(line.strip()))
-    #shutil.copyfileobj(open(constraintsdir + "/constraints_var.txt"), open(modelfile_path, "a"))
 
     with open(modelfile_path, "a") as modelfile:
         modelfile.write("End")
@@ -131,11 +123,6 @@ def solve_constraints(config: SolverConfig, ctx):
             with open("{0}/var.txt".format(constraintsdir)) as varsfile:
                 for line in varsfile.readlines():
                     parts = line.split(":")
-                    # if parts[1] == "constant":
-                    #     v = m.addVar(vtype=GRB.CONTINUOUS, lb=float(parts[2]), ub=float(parts[2]), name=parts[0])
-                    #     totalvars+=1
-                    #     vars[parts[0]] = v
-                    # else:
                     if "eps" in parts[0]:
                         v = model.addVar(vtype=GRB.CONTINUOUS, lb=0.0, name=parts[0])
                         totalvars += 1
@@ -155,13 +142,8 @@ def solve_constraints(config: SolverConfig, ctx):
             # Set objective
             model.setObjective(problem.objective(), GRB.MINIMIZE)
 
-            #if query is None:
             model.write(modelfile_path)
             model.write(modelfile_mps_path)
-            # else:
-            #     os.makedirs("models/{0}/{1}".format(projectdir, query), exist_ok=True)
-            #     m.write("models/{0}/{1}/gurobi_model_{1}_{2}.lp".format(projectdir, query, known_samples_ratio, trial))
-            #     m.write("models/{0}/{1}/gurobi_model_{1}_{2}.mps".format(projectdir, query, known_samples_ratio, trial))
 
             # Optimize model
             model.optimize()
@@ -186,11 +168,3 @@ def solve_constraints(config: SolverConfig, ctx):
 
         except AttributeError:
             print('Encountered an attribute error')
-
-
-if __name__ == '__main__':
-    #projectdir = 'eclipse_orion'
-    #known_samples_ratio = 1
-    #lambda_const = 0.1
-    #solve_constraints(projectdir, 1, lambda_const, known_samples_ratio, "DomBasedXss")
-    pass

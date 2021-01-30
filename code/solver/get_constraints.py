@@ -140,15 +140,11 @@ class ConstraintBuilder:
         return list(set(blacklist))
 
     def getVar(self, rep, suffix="") -> str:
-        # if self.rep_count[rep] >= self.min_rep_events:
         return "n{0}{1}".format(self.unique_reps[rep], suffix)
-        # else:
-        #     assert False, "Invalid rep"
 
     # When constraint_type == "known" it returns a tuple (constraint, rep count)
     def getBackOffVar(self, event: Event, suffix: str, constraint_type="flow") -> str:
         reps = event.reps
-        #reps = list(filter(lambda x: self.rep_count[x] >= self.min_rep_events, reps))
         if len(reps) == 0:
             assert False, "No Reps"
         elif len(reps) > 1:
@@ -233,11 +229,6 @@ class ConstraintBuilder:
                 self.variables[k[0]] = Variable(k[0])
                 self.variables[k[1]] = Variable(k[1])
                 self.variables[k[2]] = Variable(k[2])
-            # for _, (rep,i) in enumerate(self.unique_reps.items()):
-            #     self.variables["n{0}_src".format(i)] = Variable("n{0}_src".format(i))
-            #     self.variables["n{0}_san".format(i)] = Variable("n{0}_san".format(i))
-            #     self.variables["n{0}_snk".format(i)] = Variable("n{0}_snk".format(i))
-                #outputstring += "{0}:n{1}\n".format(rep, i)
             print("Done variables")
 
             repToIDfile.write("\n".join(["{0}:n{1}".format(safe_str(k), safe_str(self.unique_reps[k])) for k in self.unique_reps.keys()]))
@@ -336,16 +327,10 @@ class ConstraintBuilder:
         with open(var_path, "w") as varfile:
             varfile.write("\n".join([self.variables[v].print() for v in self.variables.keys()]))
             varfile.write("\n")
-            # for v in self.variables.keys():
-            #     varfile.write(self.variables[v].print())
-            #     varfile.write("\n")
 
         with open(var_path, "a") as varfile:
             varfile.write("\n".join([v+":variable" for v in self.eps_vars]))
             varfile.write("\n")
-            # for v in self.eps_vars:
-            #     varfile.write(v + ":variable")
-            #     varfile.write("\n")
 
         # output constraints.txt
         constraints_var_path = os.path.join(self.outputdir, "constraints_var.txt")
@@ -356,19 +341,10 @@ class ConstraintBuilder:
             constraintsfile.write("\n".join([Constraint.print(self.variables[v].id, "0", Constraint.Constraint.GTE, format='norm')
                                              for v in self.variables.keys() if not self.variables[v].is_constant]))
             constraintsfile.write("\n")
-            # for v in self.variables.keys():
-            #     if not self.variables[v].is_constant:
-            #         constraintsfile.write(Constraint.print(self.variables[v].id, "1", Constraint.Constraint.LTE))
-            #         constraintsfile.write("\n")
-            #         constraintsfile.write(Constraint.print(self.variables[v].id, "0", Constraint.Constraint.GTE))
-            #         constraintsfile.write("\n")
 
         with open(constraints_var_path, "a") as constraintsfile:
             constraintsfile.write("\n".join([Constraint.print(v, "0", Constraint.Constraint.GTE, format='norm') for v in self.eps_vars]))
             constraintsfile.write("\n")
-            # for v in self.eps_vars:
-            #     constraintsfile.write(Constraint.print(v, "0", Constraint.Constraint.GTE))
-            #     constraintsfile.write("\n")
 
     def ff(self, row, events, flow_list, other):
         sinks = list(other[other["ssan"] == row["ssan"]]["ssnk"])
@@ -393,8 +369,6 @@ class ConstraintBuilder:
         san_snk_map = {k: g["ssnk"].tolist() for k,g in san_snk_pairs.groupby("ssan")}
         print("san_snk:", len(san_snk_map))
 
-        # print("SEARCH", search(san_snk_map, "remove *"))
-
         sanit_sink = dict()
         source_sanit = dict()
         source_sink = dict()
@@ -407,8 +381,6 @@ class ConstraintBuilder:
             # sanit_sink will contain for every pair of sanit -> sink, the possible
             # sources that complete the triplet.
             sources =  san_src_map[san]
-            # sources =  filter(lambda s: s in self.events, list(sources))
-            #sanit_sink_list = list(map(lambda s: self.events[s], sources))
 
             for snk in san_snk_map[san]:
                 if  san in self.events and  snk in self.events:
@@ -420,14 +392,10 @@ class ConstraintBuilder:
                             sanit_sink[sanit_sink_tuple].append(self.events[src])
                         else:
                             srcNotFound = srcNotFound +1
-                            # print("Src not found!", src)
-                            # sys.exit()
 
                     for src in sources:
                         # source_sink will contain for every pair of source -> sink, the possible
                         # sanitizers that complete the triplet.
-                        #print(src, src in self.events)
-                        #print(snk, snk in self.events)
                         if  src in self.events and snk in self.events:
                             source_sink_tuple = (self.events[src], self.events[snk])
                             source_sink_list = []
@@ -451,16 +419,11 @@ class ConstraintBuilder:
                         else:
                             if snk not in self.events:
                                 snkNotFound = snkNotFound +1
-                                # print("Sink not found!", snk)
-                                # sys.exit()
                 else:
                     if  san not in self.events:
                         sanNotFound = sanNotFound + 1
-                        # print("Sanitizer not found!", san)
                     if  snk not in self.events:
                         snkNotFound = snkNotFound +1
-                        # print("Snk not found!", snk)
-                    # sys.exit()
 
 
         print("Sinks not found", snkNotFound)
@@ -525,7 +488,6 @@ class ConstraintBuilder:
                         "{0}".format(global_constant_C), Constraint.Constraint.LTE, format='norm'))
                     constraintsfile.write("\n")
 
-    # @deprecated("use compute_source_sanit_sink_fromPairs")
     def generate_flow_constraints(self, projectdir, global_constant_C, query=None):
         """Generate the flow constraints required for the Gurobi model.
         It gets the potential flows out of the triples (src, san, snk) from the progapation graph.
@@ -578,27 +540,10 @@ class ConstraintBuilder:
         print("Flows: San-Snk {0}, Src-San {1}, Src-Snk {2}".format(len(sanit_sink), len(source_sanit), len(source_sink)))
 
         with open("{0}/constraints_flow.txt".format(self.outputdir), "a+") as constraintsfile:
-            # constraintsfile.write("\n".join(
-            #     Constraint.print("{0} + {1}".format(self.getBackOffVar(k[0], "san"),
-            #                                         self.getBackOffVar(k[1], "snk")),
-            #                      "{0} + {1} + {2}".format(" + ".join([self.getBackOffVar(k, "src")
-            #                                                           for k in sanit_sink[k]]),
-            #                                               global_constant_C,
-            #                                               "eps_{0}".format(len(self.eps_vars)+i)),
-            #                      Constraint.Constraint.LTE) for i,k in enumerate(sanit_sink.keys())
-            # ))
-
             for san_snk_pair in sanit_sink.keys():
                 newepsvar = "{0}{1}".format(self._eps, len(self.eps_vars))
                 self.eps_vars.append(newepsvar)
                 # get rep for each node
-                # constraintsfile.write(Constraint.print("{0} + {1}".format(self.getBackOffVar(ss[0], "san"),
-                #                                                           self.getBackOffVar(ss[1], "snk")),
-                #                                        "{0} + {1} + {2}".format(" + ".join([self.getBackOffVar(k, "src")
-                #                                                                             for k in sanit_sink[ss]]),
-                #                                                                 global_constant_C,
-                #                                                                 newepsvar),
-                #                                        Constraint.Constraint.LTE))
 
                 # Adding constraint as in Seldon-Sec 4.2-Fig 4.a
                 if len(sanit_sink[san_snk_pair])>0:
@@ -616,10 +561,6 @@ class ConstraintBuilder:
             for src_san_pair in source_sanit.keys():
                 newepsvar = "{0}{1}".format(self._eps, len(self.eps_vars))
                 self.eps_vars.append(newepsvar)
-                # constraintsfile.write(Constraint.print(
-                #     "{0} + {1}".format(self.getBackOffVar(ss[0], "src"), self.getBackOffVar(ss[1], "san")),
-                #     "{0} + {1} + {2}".format(" + ".join([self.getBackOffVar(k, "snk") for k in source_sanit[ss]]),
-                #                              global_constant_C, newepsvar), Constraint.Constraint.LTE))
 
                 # Adding constraint as in Seldon-Sec 4.2-Fig 4.b
                 if len(source_sanit[src_san_pair]):
@@ -635,10 +576,6 @@ class ConstraintBuilder:
             for src_snk_pair in source_sink.keys():
                 newepsvar = "{0}{1}".format(self._eps, len(self.eps_vars))
                 self.eps_vars.append(newepsvar)
-                # constraintsfile.write(Constraint.print(
-                #     "{0} + {1}".format(self.getBackOffVar(ss[0], "src"), self.getBackOffVar(ss[1], "snk")),
-                #     "{0} + {1} + {2}".format(" + ".join([self.getBackOffVar(k, "san") for k in source_sink[ss]]),
-                #                              global_constant_C, newepsvar), Constraint.Constraint.LTE))
 
                 # Adding constraint as in Seldon-Sec 4.2-Fig 4.c
                 if len(source_sink[src_snk_pair])>0:
@@ -673,5 +610,3 @@ class ConstraintBuilder:
                 obj = obj + " + " + " + ".join(self.eps_vars)
             objectivefile.write(obj)
             objectivefile.write("\n")
-
-

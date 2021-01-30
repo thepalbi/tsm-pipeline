@@ -6,23 +6,6 @@ import traceback as tb
 import re
 from typing import List
 
-def remapRepsToClusters(reps):
-    clustersdata = open(r"C:\Users\saika\projects\adaptive-thread-modelling-gnn\clusters.txt").readlines()
-    clusters = dict()
-    function_map = dict()
-    for cluster in clustersdata:
-        functions = cluster.split(",")
-        # clusters[functions[0]] = list(filter(lambda x: len(x.strip()) > 0, functions))
-        for f in functions:
-            if len(f) > 0:
-                # considering 0 as cluster center
-                function_map[f] = functions[0]
-
-    for rep in reps:
-        newrep = re.findall("parameter [0-9]+ \(member ([a-zA-Z0-9_]+)|return ")
-
-    pass
-
 def compute_rep_count(file_loc, rep_count=None):
     print("Reading events from: ", file_loc)
     df=pd.read_csv(file_loc)
@@ -60,22 +43,7 @@ def readEvents(file_loc, events=None, unique_reps=None, rep_count=None, ctx=dict
     i = len(list(unique_reps.keys()))
     for k in new_unique_reps:
         unique_reps[k] = i
-        # TODO: assuming representation does not match partially with others
-        # rep_count[k] = rep_count.get(k, 0) + len(list(df[df["repr"].str.contains(k, regex=False)]))
         i += 1
-        # if unique_reps is not None:
-        #     for r in rep.strip().split("::"):
-        #         if r not in unique_reps:
-        #             unique_reps[r]=len(list(unique_reps.keys()))
-    # for ind in df.index:
-    #     id=df.loc[ind]["repr"]
-    #     if id not in events:
-    #         event_obj = Event(id, reps=id.strip().split("::"))
-    #         events[id] = event_obj
-    #         if unique_reps is not None:
-    #             for r in id.strip().split("::"):
-    #                 if r not in unique_reps:
-    #                     unique_reps[r]=len(list(unique_reps.keys()))
 
     print("Total events: %d" % len(events.keys()))
     return events
@@ -95,9 +63,6 @@ def readFlows(file_loc:str, events: dict):
         except KeyError as k:
             error_ids.append(k.args[0])
 
-    #print("Total flows: %d" % len(flows))
-    #print("Not found: %d" % len(error_ids))
-    #print(error_ids[:5])
     return flows
 
 
@@ -132,20 +97,7 @@ def readFlowsAndReps(file_loc:str, events) -> List[FlowRelation]:
     flows = []
     error_ids = []
     print("Starting flows")
-    # results = mp(f, df.iterrows(), events)
-    # print("Results %d" % len(results))
-    # for r in results:
-    #     flows = flows + r
     df.apply(lambda x: f(events, x, flows), axis=1)
-    # for ind in df.index:
-    #     srcid =  df.loc[ind]["ssrc"]
-    #     sanid = df.loc[ind]["ssan"]
-    #     snkid = df.loc[ind]["ssnk"]
-    #     try:
-    #         flow_obj = FlowRelation(events[srcid], events[sanid], events[snkid])
-    #         flows.append(flow_obj)
-    #     except KeyError as k:
-    #         error_ids.append(k.args[0])
     print("Done flows")
     return flows
 
@@ -185,7 +137,6 @@ def readClass(file_loc:str):
     return eventclass
 
 if __name__ == '__main__':
-    #events=readEvents('data/hadoop/hadoop-eventToReps-at1.prop.csv')
     flows, events, reps=readFlowsAndReps('data/eclipse_orion/eclipse_orion-triple-id.prop.csv')
     print(len(flows))
     print(len(events))

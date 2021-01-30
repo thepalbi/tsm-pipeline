@@ -5,7 +5,6 @@ import argparse
 import logging
 import numpy
 import re
-# import pandas as pd
 from typing import List
 
 
@@ -21,7 +20,6 @@ def processRequires(projectFileName):
                 if lib not in libDict:
                     libDict[lib] = 0
                 libDict[lib] = libDict[lib] +1 
-            # tokens = line.split("require(")
     sorted_dict = {k: v for k, v in sorted(libDict.items(),  key=lambda item: -item[1])}
     print('libs, count')
     count = 0
@@ -53,14 +51,6 @@ def processLibs(projectFileName, item, outputFile):
             countDict[rep] = 0
         projectDict[rep].add(project) 
         countDict[rep] = countDict[rep] + count
-    # sorted_dict = {k: v for k, v in sorted(projectDict.items(), key=lambda item: -len(item[1]))}
-    # print(item+', projects')
-    # count = 0
-    # for rep in sorted_dict.keys():    
-    #     print(rep, ',', len(projectDict[rep]))
-    #     count+=1
-    #     if count>30:
-    #         break
     sorted_dict = {k: v for k, v in sorted(countDict.items(),  key=lambda item: -item[1]* len(projectDict[item[0]]) )}
     print(item+', count, projects')
     count = 0
@@ -86,7 +76,6 @@ def filterMinOccurrences(projectFileName, occurrences, outputFile):
             continue
         line = line.strip()
         columns = line.split(',') 
-        #print(line)
         pos = len(columns)-2
         rep = columns[pos]
         count = int(columns[pos+1])
@@ -99,24 +88,14 @@ def filterMinOccurrences(projectFileName, occurrences, outputFile):
 
 
     sorted_dict = {k: v for k, v in sorted(projectDict.items(), key=lambda item: -len(item[1]))}
-    # print(item+', projects')
-    # count = 0
-    # for rep in sorted_dict.keys():    
-    #     print(rep, ',', len(projectDict[rep]))
-    #     count+=1
-    #     # if count>30:
-    #     #     break
     sorted_dict = {k: v for k, v in sorted(countDict.items(),  key=lambda item: -item[1]) }
     print(item+', count, projects')
     count = 0
     for rep in sorted_dict.keys():
         if(countDict[rep]<=occurrences or len(projectDict[rep])<=occurrences):
-            # projects = projectDict[rep]
             projects = ""
             print(rep, ',', countDict[rep],',', len(projectDict[rep]),',', projects)
             count+=1
-        # if count>30:
-        #     break
 
 
 def processQueryDiffConfig(projectFileName, outputFile):
@@ -155,7 +134,6 @@ def processQueryReprSinks(projectFileName, outputFile):
         line = line.strip()
         # there are sinks with commas, that complicated the processing  
         columns = line.split(',') 
-        #print(line)
         pos = len(columns)-2
         count = int(columns[pos])
         rep = columns[pos+1]
@@ -176,9 +154,6 @@ def processQueryReprSinks(projectFileName, outputFile):
         else:
             repsDict[rep] = repsDict[rep] + count
 
-        #print(project,', ', line)
-    # for project in repsProjectDict.keys():    
-    #     print(project, ', ', len(repsProjectDict[project]))
     print('rep,count,projects,w/o outliers, blame')
     sorted_dict = {k: v for k, v in sorted(repsDict.items(), key=lambda item: -item[1])}
     for rep in sorted_dict.keys():
@@ -192,7 +167,6 @@ def processQueryReprSinks(projectFileName, outputFile):
             
             projectCountDict = {k: v for k, v in sorted(projectCountDict.items(), key=lambda item: -item[1])}
             elements = numpy.array(list(projectCountDict.values())) 
-            #print(elements)
             mean = numpy.mean(elements) 
             sd = numpy.std(elements)
 
@@ -232,7 +206,6 @@ def processQueryReprSinksPerProject(projectFileName, outputFile):
             repsPerProject[rep] = repsPerProject[rep] + 1
 
 
-        #print(project,', ', line)
     for project in repsProjectDict.keys():    
         print(project, ', ', len(repsProjectDict[project]))
         for rep in repsProjectDict[project].keys():    
@@ -256,7 +229,6 @@ def processQueryUnlikelyRep(projectFileName, outputFile):
             repsDict[rep] = set()
         repsDict[rep].add(project) 
 
-        # print(project,',', line)
     sorted_dict = {k: v for k, v in sorted(repsDict.items(), key=lambda item: -len(item[1]))}
     for rep in sorted_dict.keys():    
         print(rep, ',', len(repsDict[rep]))
@@ -283,7 +255,6 @@ def processVsReprSinks(projectFileName, outputFile):
         line = line.strip()
         # there are sinks with commas, that complicated the processing  
         columns = line.split(',') 
-        #print(line)
         pos = len(columns)-2
         library = ""
         if hasLibrary:
@@ -296,8 +267,6 @@ def processVsReprSinks(projectFileName, outputFile):
         sink = columns[pos]
         rep = columns[pos+1] +' lib:'+library
         
-        # sink= line.split(',')[0]
-        # rep = line.split(',')[1]
         pr = (project, rep) 
         if pr not in projectRSDict.keys():
             projectRSDict[pr] = dict()
@@ -313,7 +282,6 @@ def processVsReprSinks(projectFileName, outputFile):
         else:
             repsDict[rep] = repsDict[rep] + 1
 
-        #print(project,', ', line)
     oldProject = ""
     for pr in projectRSDict.keys():
         (project, rep) = pr
@@ -365,26 +333,3 @@ kind = parsed_arguments.kind
     'requires': 
         lambda fileName:processRequires(fileName)       
 }[kind](fileName)
-
-# if kind == 'diff':
-#     processQueryDiffConfig(fileName, outputFileName)
-# else: 
-#     if kind == 'repr':
-#         processQueryReprSinks(fileName, outputFileName)
-#     # "/persistent/experiments/nosql/sinks2.txt")
-#     else: 
-#         if kind == 'unlikely':
-#             processQueryUnlikelyRep(fileName, outputFileName)
-#             #(projectFileName = "/persistent/experiments/nosql/unlikely.txt")
-#         else: 
-#             if kind== 'vs':
-#                 processVsReprSinks(fileName, outputFileName)
-#             else:
-#                 if kind == 'reprProject':
-#                     processQueryReprSinksPerProject(fileName, outputFileName)
-#                 else:
-#                     if kind == "libs":
-#                         processLibs(fileName, "lib", outputFileName)
-#                     else:
-#                         if kind == "occurrences":
-#                             filterMinOccurrences(fileName, 50000, outputFileName)

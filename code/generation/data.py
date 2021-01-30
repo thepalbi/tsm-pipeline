@@ -11,17 +11,11 @@ from .wrapper import CodeQLWrapper
 from compute_metrics import createReprPredicate, createReprKnownPredicates
 from orchestration import global_config
 
-# constaintssolving_dir = os.path.join(
-#     global_config.sources_root, "code/")
 constaintssolving_dir =  global_config.results_directory
 logs_folder = os.path.join(constaintssolving_dir, "logs/")
 if not os.path.exists(logs_folder):
     os.mkdir(logs_folder)
     
-# SOURCES = "Sources"
-# SINKS = "Sinks"
-# SANITIZERS = "Sanitizers"
-
 SOURCES = SINKS = SANITIZERS = "Known"
 
 SUPPORTED_QUERY_TYPES = ["NoSql", "Sql", "Xss", "Sel", "Path"]
@@ -135,10 +129,8 @@ class DataGenerator:
 
     def generate_scores(self, query_type: str, combinedScore: bool, kind = "snk") -> Tuple[str, ...]:
         # Run metrics-snk query
-        #kind = "snk"
 
         metrics_file = "metrics_{0}_{1}".format(kind, query_type)
-        #metrics_file = "metrics_{0}".format(query_type)
         self.logger.info("Generating events scores.")
         self.codeql.database_query(
             self.project_dir,
@@ -163,9 +155,6 @@ class DataGenerator:
             bqrs_metrics_file, f"getTSMWorseScores{query_type}{kind}", tsm_worse_scores_file)
         self.codeql.bqrs_decode(bqrs_metrics_file, f"getTSMWorseFiltered{query_type}{kind}",
                                 tsm_worse_filtered_file)
-
-        # self.codeql.bqrs_decode(bqrs_metrics_file, f"predictions{query_type}{kind}",
-        #                         prediction_scores_file)
 
         return tsm_worse_scores_file, tsm_worse_filtered_file
 
@@ -204,9 +193,6 @@ class DataGenerator:
             tmp_propgraph_name = f"PropagationGraph-{self.project_name}-{query_type}.ql"
             new_propgraph_path = os.path.join(os.path.dirname(propgraph_path), tmp_propgraph_name )
             
-            # print(known_predicates_files)
-            # print(new_propgraph_path)
-
             # creates a PG query that includes the reprs from known nodes
             with open(new_propgraph_path , "w", encoding='utf-8') as new_pg_file: 
                 with open(propgraph_path, "r", encoding='utf-8') as pg_file:
@@ -221,14 +207,9 @@ class DataGenerator:
             self.codeql.database_analyze(
                 self.project_dir,
                 new_propgraph_path,
-                # self._get_tsm_query_file(query_type, f"PropagationGraph-{query_type}.ql"),
                 f"{logs_folder}/js-results.csv",
                 global_config.search_path
                 )
-            # FIX self.codeql.database_query(
-            #     self.project_dir,
-            #     self._get_tsm_query_file(query_type, f"PropagationGraph-{query_type}.ql")
-            # )
 
         except Exception as e:
             self.logger.info("Error Analyzing PropagationGraph.ql")
@@ -238,9 +219,7 @@ class DataGenerator:
         os.remove(new_propgraph_path)
 
         self.logger.info("Generating propagation graph data")
-        # bqrs_propgraph = self._get_tsm_bqrs_file_for_entity("PropagationGraph", query_type)
         bqrs_propgraph = self._get_tsm_bqrs_file_for_entity(f"PropagationGraph-{self.project_name}", query_type)
-        # bqrs_propgraph = self._get_tsm_bqrs_file( os.path.splitext(tmp_propgraph_name)[0]+".bqrs")
         # data/1046224544_fontend_19c10c3/1046224544_fontend_19c10c3-src-san.prop.csv
         
         # We remove the entities to make sure we use updated versions
@@ -253,7 +232,6 @@ class DataGenerator:
 
         self.codeql.bqrs_decode(
             bqrs_propgraph,
-            # self._get_tsm_bqrs_file("PropagationGraph.bqrs"),
             "pairSrcSan",
             ctx[SRC_SAN_TUPLES_ENTITIES])
 
@@ -307,8 +285,6 @@ class DataGenerator:
                 entity_type,
                 query_type)
         bqrs_file = self._get_tsm_bqrs_file_for_entity(entity_type, query_type)
-        # print(query_path)
-        # print(bqrs_file)
         
         # We remove the entity to make sure is using a new one
         if os.path.exists(output_file):
@@ -320,9 +296,6 @@ class DataGenerator:
                 query_path,
                 f"{logs_folder}/js-results.csv",
                 search_path)
-            # FIX self.codeql.database_query(
-            #     self.project_dir,
-            #     query_path)
 
         self.codeql.bqrs_decode(
             bqrs_file,

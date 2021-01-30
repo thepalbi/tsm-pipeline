@@ -31,7 +31,6 @@ class Orchestrator:
         GenerateModelStep,
         CountRepsStep,
         OptimizeStep,
-        #GenerateScoresStep,
         GenerateTSMQueryStep
     ]
     possible_steps = [
@@ -86,13 +85,10 @@ class Orchestrator:
     def compute_results_dir(self, new_directory=False):
         if(not self.combinedScore):
             project_name = name = self.project_name
-            #print(self.query_name)
-            #print(self.results_dir)
             if not self.run_single:
                 name = "multiple"   
 
             patternToSearch = os.path.join(self.results_dir, name)+ "/{0}-*".format(self.query_name)
-            #print(patternToSearch)
             results_candidates = glob.glob(patternToSearch)
             print(results_candidates)
             if len(results_candidates)>0 and not new_directory:
@@ -101,7 +97,6 @@ class Orchestrator:
                 print("existing")
                 print(results_folder)
             else:
-                #raise ValueError('Cannot find results directory for ' + self.project_name )           
                 timestamp = str(int(time.mktime(datetime.datetime.now().timetuple())))
                 optimizer_run_name = f"{self.query_name}-{timestamp}"
                 results_folder = os.path.join(self.results_dir, name, optimizer_run_name)

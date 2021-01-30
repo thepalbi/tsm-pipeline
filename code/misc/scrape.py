@@ -147,14 +147,12 @@ def lgtm_contains_analysis(slug, qtype):
         project_id = project_response['id']
         analyses_repsonse = lgtm_session.get(
             'https://lgtm.com/api/v1.0/analyses/{0}/commits/latest'.format(project_id)).json()
-        # print(analyses_repsonse)
     except:
         return False
 
     try:
         analysis_id = analyses_repsonse['id']
         analysis_response = lgtm_session.get('https://lgtm.com/api/v1.0/analyses/{0}/alerts'.format(analysis_id)).json()
-        #print(analysis_id)
         for r in analysis_response['runs']:
             if r['properties']['semmle.sourceLanguage'] != 'javascript':
                 continue
@@ -213,7 +211,6 @@ def get_args():
     return args
 
 
-# python3 .\misc\scrape.py -dep "mscdex/ssh2" -p github -t package -l command -o misc\data\ttt.txt
 args = get_args()
 if args.get_dependents is not None:
     repos = getDependents(args.get_dependents,

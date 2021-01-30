@@ -7,9 +7,6 @@ import time
 
 Context = NewType('Context', Dict[str, Any])
 
-
-# Inter-step context keys
-
 # Generated entities keys
 SOURCE_ENTITIES = "entities.sources"
 SINK_ENTITIES = "entities.sinks"
@@ -28,8 +25,6 @@ SINGLE_STEP_NAME = "orchestrator.single_step_name"
 STEP_NAMES = "orchestrator.steps_to_run"
 COMMAND_NAME = "orchestrator.command_name"
 
-
-# The OrchestrationStep class was moved to another file because of circular imports problems
 
 class OrchestrationStep:
     def __init__(self, orchestrator):
@@ -75,14 +70,12 @@ class OrchestrationStep:
         constraints_dir = os.path.join(working_dir, "constraints", name, optimizer_run_name)
         models_dir = os.path.join(working_dir, "models", name, optimizer_run_name)
         logs_dir = os.path.join(working_dir, "logs", project_name, optimizer_run_name)
-        #results_dir = os.path.join(config.results_dir, project_name, optimizer_run_name)
         return constraints_dir, models_dir, logs_dir
     
     def get_existing_working_directories(self, query_name, working_dir):
         projects_folder = os.path.join(working_dir, "data")
         projects = glob(os.path.join(projects_folder, self.orchestrator.project_name))
 
-        #optimizer_run_name = f"{query_name}-{timestamp}"
         project_name = name = self.orchestrator.project_name
         
         if not self.orchestrator.run_single:
@@ -99,10 +92,8 @@ class OrchestrationStep:
         else:
             raise ValueError('Cannot find results directory for ' + patternToSearch)
 
-        
         constraints_dir = os.path.join(working_dir, "constraints", name, optimizer_run_name)
         models_dir = os.path.join(working_dir, "models", name, optimizer_run_name)
         logs_dir = os.path.join(working_dir, "logs", project_name, optimizer_run_name)
-        #results_dir = os.path.join(config.results_dir, project_name, optimizer_run_name)
         return constraints_dir, models_dir, logs_dir
      

@@ -5,6 +5,3 @@ class FlowRelation:
         self.source = source
         self.sanitizer = sanitizer
         self.sink = sink
-
-
-
