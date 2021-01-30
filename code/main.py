@@ -144,6 +144,7 @@ if __name__ == '__main__':
             except Exception as inst:
                 logging.info(f"Error running  project: {project}, {inst}")
                 traceback.print_exc()
+                #raise
 
 
         elif parsed_arguments.command == "clean":

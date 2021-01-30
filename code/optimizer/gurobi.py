@@ -208,7 +208,7 @@ class GenerateModelStep(OrchestrationStep):
                 stkTrace = traceback.extract_stack()
                 self.logger.info(stkTrace)
                 #traceback.self.logger.info_exc(file=sys.stdout)
-                pass
+                raise
         # exit(1)
         # if we run multiple projects we allow some filtering
         if not self.orchestrator.run_single:
