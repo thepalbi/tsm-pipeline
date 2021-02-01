@@ -18,11 +18,11 @@ In OSX you may need to install `girubi` support for Python manually by executing
 
 ## Downloading databases from LGTM
 
-The files `nosqlinjection_projects.txt`, `sqlinjection_projects.txt`, and `xss_projects.txt` contains each one a a list of databases to be fetched from the LGTM site.
+The files `nosqlinjection_projects.txt`, `sqlinjection_projects.txt`, and `nosql_projects.txt` contains each one a a list of databases to be fetched from the LGTM site.
 
-To get projects for LGTM site you can run `python3 -m misc.scrape -dld [project-slug] -o [projectFolder]` where`project-slug` is one database listed in the three aforementioned files (e.g. `1046224544/fontend`). The result of the script is a zip file (e.g., `projectFolder/1046224544-fontend.zip`) which will be placed in the folder `projectFolder` that must exist beforehand.
+To get projects for LGTM site you can run `python3 -m misc.scrape -dld [project-slug] -o [projectsFolder]` where`project-slug` is one database listed in the three aforementioned files (e.g. `1046224544/fontend`). The result of the script is a zip file (e.g., `projectsFolder/1046224544-fontend.zip`) which will be placed in the folder `projectsFolder` that must exist beforehand.
 
-Finally unzip the zip file corresponding to the downloaded database (e.g., `output/1046224544-fontend.zip`)
+Finally unzip the zip file corresponding to the downloaded database (e.g., `projectsFolder/1046224544-fontend.zip`)
 
 # Executing the analysis pipeline using the Orchestrator
 The `Orchestrator` can be used to execute each phase of the analysis pipeline.
@@ -61,20 +61,20 @@ are placed. Both directories can be overwritten by using (optional) command line
 Then, you can either run the whole pipeline
 
 ```bash
-python main.py --project-dir output/abhinavkumarl-bidding-system/ --query-type Xss --query-name DomBasedXssWorse --results-dir /results/xss --working-dir /wrk/xss --steps=generate_entities,generate_model,optimize run
+python main.py --project-dir projectsFolder/Peachick_fontend_eb7f2c0/ --query-type NoSql --query-name NosqlInjectionWorse --results-dir /results/nosql --working-dir /wrk/nosql --steps=generate_entities,generate_model,optimize run
 ```
 
 or only specific steps. For instance, assuming entities were already computed, the following command will first compute the occurrences and then use then to filter the less frequent representations before building the model.
 
 ```bash
-python main.py --project-dir output/abhinavkumarl-bidding-system/ --steps=count_reps,generate_model,optimize --query-type Xss --query-name DomBasedXssWorse run
+python main.py --project-dir projectsFolder/Peachick_fontend_eb7f2c0/ -query-type NoSql --query-name NosqlInjectionWorse --steps=count_reps,generate_model,optimize run
 ```
 
 Additionally, a set of databases can be processed (either a single step or all steps) by using the option `--projects-list`. For instance:
 
 ```bash
 # Run the whole pipeline on multiple projects:
-python main.py --project-dir output/xss/ --query-type Xss --query-name DomBasedXssWorse --results-dir /results/xss --working-dir /wrk/xss --project-list xss_projects.txt generate_model,optimize run
+python main.py --project-dir projectsFolder/nosql/ --query-type NoSql --query-name NosqlInjectionWorse --results-dir /results/nosql --working-dir /wrk/nosql --project-list nosql_projects.txt generate_model,optimize run
 ```
 
 Because some of the step generate large intermediary files, we have added a clean step. At the moment (https://github.com/garbervetsky/ql/commit/91b21f301b871dd44213f2b60d27d324c44509c7), this just cleans the following intermediate folders:
@@ -85,7 +85,7 @@ Because some of the step generate large intermediary files, we have added a clea
 To run in clean mode, use the following command:
 
 ```bash
-python main.py --project-dir output/abhinavkumarl-bidding-system/ --query-type Xss --query-name DomBasedXssWorse clean
+python main.py --project-dir projectsFolder/Peachick_fontend_eb7f2c0/ --query-type NoSql --query-name NosqlInjectionWorse clean
 ```
 
 To see more options or get help from the CLI:
@@ -99,15 +99,15 @@ Once the pipeline has been executed, individual results can be combined to get a
 
 Use `python3 misc/combinescores.py` to combine the scores from each database.
 This will generate the file `allscores_[query_type]_avg.txt`.  This file is actually the predicate that should be placed in the tsm-query to complete the boosted query.
-Currently, just copy the file as `../tsm-atm-pipeline/src/tsm/[query-type]/[query-name]Representations.qll` (for instance `../tsm-atm-pipeline/src/tsm/xss/DomBasedXssWorseRepresentations.qll`).
+Currently, just copy the file as `../tsm-atm-pipeline/src/tsm/[query-type]/[query-name]Representations.qll` (for instance `../tsm-atm-pipeline/src/tsm/nosql/NosqlInjectionWorseRepresentations.qll`).
 
 Soon (not yet), the step `generate_tsm_query` step will do that automatically with this command:
 
 ```bash
- python3 main.py --project-dir output  --query-name DomBasedXssWorse --query-type Xss  --results-dir .  --working-dir /wrk/xss --project-list xss_projects.txt  --single-step generate_tsm_query --scores-file allscores_DomBasedXssWorse_avg.txt
+ python3 main.py --project-dir projectsFolder/nosql/ --query-type NoSql --query-name NosqlInjectionWorse --results-dir /results/nosql --working-dir /wrk/nosql --project-list nosql_projects.txt  --single-step generate_tsm_query --scores-file allscores_NosqlInjectionWorse_avg.txt
  ```
 
-This command will recompute the queries on *all* the projects contained in the list `xss_projects.txt` using the the combined score `allscores_DomBasedXssWorse_avg.txt` intead of the individual `reprScores.txt` of each individual project.
+This command will recompute the queries on *all* the projects contained in the list `nosql_projects.txt` using the the combined score `allscores_NosqlInjectionWorse_avg.txt` intead of the individual `reprScores.txt` of each individual project.
 
 You can also include the option `--multiple` in `main.py` to build a model for all projects together. This will generate one `reprScores.txt` file in a special folder named `multiple`.
 
