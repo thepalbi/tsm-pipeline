@@ -4,5 +4,6 @@
   "workingDirectory": "/mnt",
   "resultsDirectory": "/persistent/experiments/results",
   "searchPath": "/persistent/diegog/repo2/codeql-main/codeql/",
-  "worseLibSearchPath": "/home/diegog/repos/microsoft/MSR-collab2020/tsm-js/lib-worse/codeql/"
+  "worseLibSearchPath": "/home/diegog/repos/microsoft/MSR-collab2020/tsm-js/lib-worse/codeql/",
+  "logsDirectory" : "/persistent/log/" 
 }

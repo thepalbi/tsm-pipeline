@@ -6,12 +6,18 @@
 import javascript
 import tsm.PropagationGraphsAlt
 
-predicate targetLibraries = npmLibraries/0;
+predicate targetLibraries = packageListFromFrecuency/0;
 
 private string npmLibraries() {
   result in ["mongodb", "mongoose", "lokijs", "nosql", "nano", "rethinkdb", "loopback",
   "memcached", "cassandra-driver", "couchbase", "mongoskin", "dynamoose", "arangojs", 
   "mockgoose", "dynamodb", "aerospike", "rxdb"]
+}
+
+private string packageListFromFrecuency() {
+  result in ["mongoose","express","path","fs","jquery","lodash","util","process","chai",
+  "crypto","react-dom","http","mongodb","react","html-webpack-plugin","validator",
+  "events","moment"]
 }
 
 private string allLibraries() {

@@ -6,7 +6,7 @@
 import javascript
 import tsm.PropagationGraphsAlt
 
-predicate targetLibraries = npmLibraries/0;
+predicate targetLibraries = packageListFromFrecuency/0;
 
 private string npmLibraries() { 
   result in ["sql", "sql.js", "sqlstring", "mssql", "mysql", 
@@ -15,6 +15,16 @@ private string npmLibraries() {
             "tedious", "pretty-data", "db-migrate"] 
   
 }
+
+private string packageListFromFrecuency() {
+  result in [
+    "express","mysql","body-parser","process","path","fs","http",
+    "crypto","express-handlebars","url","morgan",
+    "multer","util","child_process","jsonwebtoken",
+    "method-override","pg","fs-extra","socket.io","https"
+  ]
+} 
+
 
 private string allLibraries() {
   exists(API::Node imp | 

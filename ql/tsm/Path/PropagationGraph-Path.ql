@@ -6,7 +6,7 @@
 import javascript
 import tsm.PropagationGraphsAlt
 
-predicate targetLibraries = packageListFromFrecuency/0;
+predicate targetLibraries = npmLibraries/0;
 
 private string npmLibraries() { 
   result = "fs" 

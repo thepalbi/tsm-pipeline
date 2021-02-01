@@ -26,14 +26,7 @@ module DomBasedXssWorseTSM {
     DomBasedXssWorseRepresentations() { this = "DomBasedXssWorseRepresentations" }
 
     predicate excludedSinkRepr(string repr) {
-      // Top 4-6 with combined scores
-      repr in [
-          "(parameter 0 (return (member test *)))", "(parameter 0 (return (member parse *)))",
-          "(parameter 1 (return (member attr *)))", "(parameter 0 (return (member indexOf *)))"
-          // This reprs has many less ocurrences than the previous ones
-          //"(member innerHTML (return (member id (parameter 1 (return extend)))))",
-          //"(parameter 0 (return (member jQuery (global))))"
-        ]
+      none()
     }
 
     override float getReprScore(string repr, string t) {
