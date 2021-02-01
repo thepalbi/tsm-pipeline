@@ -10,7 +10,7 @@ Current version of libraries to boost is: [commit `e277a2ef6c9998c927cb6e4b277a0
 
 ## Installing dependencies
 
-Execute: `python3 -m pip install -r requirements.txt`
+Execute: `python3 -m pip install -r requirements.txt` (we recommend to use a virtual enviroment).
 
 Then try `python -m pip install -i https://pypi.gurobi.com gurobipy` to install Python support for the `gurobi` solver.   
 
@@ -20,8 +20,7 @@ In OSX you may need to install `girubi` support for Python manually by executing
 
 The files `nosqlinjection_projects.txt`, `sqlinjection_projects.txt`, and `xss_projects.txt` contains each one a a list of databases to be fetched from the LGTM site.
 
-Run `python3 -m misc.scrape -dld [project-slug] -o [outputdirectory]` where
-`project-slug` is one database listed in the three aforementioned files (e.g. `1046224544/fontend`). The result of the script is a zip file (e.g., `outputdirectory/1046224544-fontend.zip`) which will be placed in the folder `outputdirectory` that must exist beforehand.
+To get projects for LGTM site you can run `python3 -m misc.scrape -dld [project-slug] -o [projectFolder]` where`project-slug` is one database listed in the three aforementioned files (e.g. `1046224544/fontend`). The result of the script is a zip file (e.g., `projectFolder/1046224544-fontend.zip`) which will be placed in the folder `projectFolder` that must exist beforehand.
 
 Finally unzip the zip file corresponding to the downloaded database (e.g., `output/1046224544-fontend.zip`)
 
@@ -33,7 +32,10 @@ The pipeline at the moment has the following steps implemented:
 - `generate_model`: Generate `gurobi` model to optimize (intermediate results in `working-dir/constrains`)
 - `optimize`: Run `gurobi` with the model generated in the `generate_model` step (intermediate results in `working-dir/model`)
 -  (disabled)  `generate_tsm_query`: Build a TSM query out of the resulting scores.
-- `count_reps`: Additional step that allows for computing the number of occurrences. That can be used in the `generate_model` step to filter infrequent representations.
+
+Once entities are generated, there is an additional step that can be used to filter infrequent ocurrences. 
+
+- `count_reps`: Additional step that allows for computing the number of occurrences. That can be used *before* the `generate_model` step to filter infrequent representations.
 
 
 These steps can be executed individually or all together in an end-to-end runner. You can use the orchestrator in code, or with its CLI. The latter one is located in `main.py`.
@@ -62,7 +64,7 @@ Then, you can either run the whole pipeline
 python main.py --project-dir output/abhinavkumarl-bidding-system/ --query-type Xss --query-name DomBasedXssWorse --results-dir /results/xss --working-dir /wrk/xss --steps=generate_entities,generate_model,optimize run
 ```
 
-or only specific steps. For instance the following command will first compute the occurrences and then use then to filter the less frequent representations before building the model.
+or only specific steps. For instance, assuming entities were already computed, the following command will first compute the occurrences and then use then to filter the less frequent representations before building the model.
 
 ```bash
 python main.py --project-dir output/abhinavkumarl-bidding-system/ --steps=count_reps,generate_model,optimize --query-type Xss --query-name DomBasedXssWorse run
@@ -96,9 +98,10 @@ python main.py --help
 Once the pipeline has been executed, individual results can be combined to get an aggregated result for a set of DBs.
 
 Use `python3 misc/combinescores.py` to combine the scores from each database.
-This will generate the file `allscores_[query_type]_avg.txt`.
-This file must be included in the target `query-type`:  `codeql/javascript/ql/src/TSM/tsm_repr_pred.qll` and then re-execute the `generate_tsm_query` step.
-This can be done with the command:
+This will generate the file `allscores_[query_type]_avg.txt`.  This file is actually the predicate that should be placed in the tsm-query to complete the boosted query.
+Currently, just copy the file as `../tsm-atm-pipeline/src/tsm/[query-type]/[query-name]Representations.qll` (for instance `../tsm-atm-pipeline/src/tsm/xss/DomBasedXssWorseRepresentations.qll`).
+
+Soon (not yet), the step `generate_tsm_query` step will do that automatically with this command:
 
 ```bash
  python3 main.py --project-dir output  --query-name DomBasedXssWorse --query-type Xss  --results-dir .  --working-dir /wrk/xss --project-list xss_projects.txt  --single-step generate_tsm_query --scores-file allscores_DomBasedXssWorse_avg.txt
@@ -106,7 +109,7 @@ This can be done with the command:
 
 This command will recompute the queries on *all* the projects contained in the list `xss_projects.txt` using the the combined score `allscores_DomBasedXssWorse_avg.txt` intead of the individual `reprScores.txt` of each individual project.
 
-You can also include the option `--multiple` in `main.py` to build a model for all projects together. This will generate one `reprScores.txt` in a special folder named `multiple`.
+You can also include the option `--multiple` in `main.py` to build a model for all projects together. This will generate one `reprScores.txt` file in a special folder named `multiple`.
 
 # Troubleshooting
 
