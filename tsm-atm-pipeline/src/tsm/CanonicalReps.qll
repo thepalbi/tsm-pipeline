@@ -1,9 +1,6 @@
-/**
- * An implementation of canonical representation for sinka that represent a more likely 
- * representation and allows for using less representations for each candidate sink  
- */
-
- import javascript
+// An alternative implementation of `PropagationGraph.ql` using inter-procedural
+// data flow instead of points-to.
+import javascript
 import NodeRepresentation
 
 

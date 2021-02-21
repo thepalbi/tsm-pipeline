@@ -19,7 +19,7 @@ import NodeRepresentation
 
 /**
  * The name of an npm package that should be considered when building the propagation graph.
- * The filter is applied to sink and source candidates
+ * The filter is applied to sink and source candidates 
  *
  * To customize, implement concrete subclasses of this class.
  *
@@ -30,7 +30,7 @@ import NodeRepresentation
  *   MongoDbIsInteresting() { this = "mongodb" }
  * }
  * ```
- *
+ * 
  * To do the same with sources:
  * ```ql
  * class MongoDbIsInteresting extends InterestingPackageForSources {
@@ -38,7 +38,7 @@ import NodeRepresentation
  * }
  * ```
  *
- *
+ * 
  *
  * To consider all imports interesting, both for sorces and sinks use
  *
@@ -59,11 +59,11 @@ abstract class InterestingPackageForSources extends string {
 }
 
 /**
- * Allows to include additional source/sinks/sanitizers as candidates
- *
- * For example, to add additional sinks
- *
- * ```ql
+ * Allows to include additional source/sinks/sanitizers as candidates 
+ * 
+ * For example, to add additional sinks 
+ * 
+ * ```ql 
  * class MoreSinks extends SinkCandidate {
  *    MoreSinks() { this = any(API::moduleImport(_)).getAnArgument() }
  * }
@@ -75,13 +75,6 @@ abstract class AdditionalSinkCandidate extends DataFlow::Node { }
 
 abstract class AdditionalSanitizerCandidate extends DataFlow::Node { }
 
-/**
- * Gets the minimum number of ocurrences of a candidate representation.
- *
- * Reducing this bound will generate more candidate representations, but
- * will generally negatively affect performance.
- */
-int minOcurrences() { result = 1 }
 
 /** Holds if data read from a use of `f` may originate from package `pkg`. */
 predicate mayComeFromLibrary(API::Node f, string pkg) {
@@ -153,26 +146,6 @@ predicate knownStep(DataFlow::Node pred, DataFlow::Node succ) {
 }
 
 /**
- * Gets a candidate representation for `nd`, filtering out very general representations.
- */
-string candidateRep(DataFlow::Node nd, boolean asRhs) {
-  result = candidateRep(nd, _, asRhs) and
-  // exclude some overly general representations like `(member data *)` or
-  // `(parameter 0 (member exports *))`
-  not result.regexpMatch("\\(parameter \\d+ (\\*|\\(member exports \\*\\))\\)") and
-  not result.regexpMatch("\\(root .*\\)")
-}
-
-/**
- * Gets a representation for `nd` that is not extremely rare, that is, it occurs at least five
- * times.
- */
-string rep(DataFlow::Node nd, boolean asRhs) {
-  result = candidateRep(nd, asRhs) and
-  count(DataFlow::Node nd2 | result = candidateRep(nd2, asRhs)) >= minOcurrences()
-}
-
-/**
  * Holds if `u` is a candidate for a taint source.
  */
 predicate isSourceCandidate(DataFlow::Node u) {
@@ -190,7 +163,7 @@ predicate isSourceCandidate(DataFlow::Node u) {
       u instanceof DataFlow::PropRead
     )
   )
-  or
+  or 
   u instanceof AdditionalSourceCandidate
 }
 
@@ -200,7 +173,7 @@ predicate isSourceCandidate(DataFlow::Node u) {
 predicate isSanitizerCandidate(DataFlow::CallNode u) {
   exists(rep(u, false)) and
   not u = any(Import i).getImportedModuleNode()
-  or
+  or 
   u instanceof AdditionalSanitizerCandidate
 }
 
@@ -224,7 +197,7 @@ predicate isSinkCandidate(DataFlow::Node d) {
       d = any(DataFlow::PropWrite pw).getRhs()
     )
   )
-  or
+  or 
   d instanceof AdditionalSinkCandidate
 }
 

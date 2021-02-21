@@ -186,3 +186,35 @@ string baseCandidateRep(DataFlow::SourceNode base, int depth, boolean asRhs) {
     base = nd.getALocalSource()
   )
 }
+
+
+/**
+ * Gets the minimum number of ocurrences of a candidate representation.
+ *
+ * Reducing this bound will generate more candidate representations, but
+ * will generally negatively affect performance.
+ */
+int minOcurrences() { result = 1 }
+
+/**
+ * Gets a candidate representation for `nd`, filtering out very general representations.
+ */
+string candidateRepFiltered(DataFlow::Node nd, int depth, boolean asRhs) {
+  result = candidateRep(nd, depth, asRhs) and
+  // exclude some overly general representations like `(parameter 0 (member exports *))`
+  not result.regexpMatch("\\(parameter \\d+ (\\*|\\(member exports \\*\\))\\)") and
+  not result.regexpMatch("\\(root .*\\)")
+}
+
+/**
+ * Gets a representation for `nd` that is not extremely rare, that is, it occurs at least five
+ * times.
+ */
+string rep(DataFlow::Node nd, int depth,  boolean asRhs) {
+  result = candidateRepFiltered(nd, depth, asRhs) and
+  count(DataFlow::Node nd2 | result = candidateRepFiltered(nd2, _, asRhs)) >= minOcurrences()
+}
+
+string rep(DataFlow::Node nd,  boolean asRhs) {
+  result = rep(nd, _, asRhs)
+}
