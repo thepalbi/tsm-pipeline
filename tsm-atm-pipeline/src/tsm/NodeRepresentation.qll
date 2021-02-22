@@ -189,12 +189,12 @@ string baseCandidateRep(DataFlow::SourceNode base, int depth, boolean asRhs) {
 
 
 /**
- * Gets the minimum number of ocurrences of a candidate representation.
+ * Gets the minimum number of occurrences of a candidate representation.
  *
  * Reducing this bound will generate more candidate representations, but
  * will generally negatively affect performance.
  */
-int minOcurrences() { result = 1 }
+int minOccurrences() { result = 1 }
 
 /**
  * Gets a candidate representation for `nd`, filtering out very general representations.
@@ -207,12 +207,12 @@ string candidateRepFiltered(DataFlow::Node nd, int depth, boolean asRhs) {
 }
 
 /**
- * Gets a representation for `nd` that is not extremely rare, that is, it occurs at least five
+ * Gets a representation for `nd` that is not extremely rare, that is, it occurs at least `minOccurrences()`
  * times.
  */
 string rep(DataFlow::Node nd, int depth,  boolean asRhs) {
   result = candidateRepFiltered(nd, depth, asRhs) and
-  count(DataFlow::Node nd2 | result = candidateRepFiltered(nd2, _, asRhs)) >= minOcurrences()
+  count(DataFlow::Node nd2 | result = candidateRepFiltered(nd2, _, asRhs)) >= minOccurrences()
 }
 
 string rep(DataFlow::Node nd,  boolean asRhs) {
