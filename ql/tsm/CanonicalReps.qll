@@ -1,23 +1,23 @@
 /**
- * An implementation of canonical representation for sinka that represent a more likely 
- * representation and allows for using less representations for each candidate sink  
+ * An implementation of canonical representations for sinks that represent a more likely 
+ * representation and allows for using fewer representations for each candidate sink.
  */
 
- import javascript
+import javascript
 import NodeRepresentation
 
 
-// Canonical representation prioritized for sinks
+/** Canonical representation prioritized for sinks: method parameters. */
 private string regExp1() { result = "\\(parameter \\w+ \\(member (\\w+|\\*) .*\\)\\)" }
 
-// Representation not considered canonical
+/** Representation not considered canonical: parameters of deeply nested members. */
 private string regExp2() {
   result =
     ".*\\(parameter \\w+ \\(member (\\*|\\w+) \\((member|parameter|return|instance) .*\\)\\)\\)"
 }
 
 /**
- *  Prioritizes paterns like `[member _] parameter x ( member fun )
+ *  Prioritizes patterns like `[member _] parameter x (member fun)`
  *  by giving an additional score
  */
 int plusForCanonicalRep(string rep, DataFlow::Node nd, int depth) {
@@ -46,9 +46,12 @@ int plusForCanonicalRep(string rep, DataFlow::Node nd, int depth) {
  */
 int pgmaxdepth() { result = 5 }
 
-// Prefers a small number of member and parameters for canonical representation
-// To-Do: Maybe is easier to define whole canonicalRep with a regular expresion:
-int plusForPreferedStructForRep(int cm, int cmw, int cr, int cp, int cpr, int croot) {
+/**
+ * Prefers a small number of member and parameters for canonical representation.
+ *
+ * To-Do: Maybe is easier to define whole canonicalRep with a regular expression.
+ */
+int plusForPreferredStructForRep(int cm, int cmw, int cr, int cp, int cpr, int croot) {
   cm in [0 .. pgmaxdepth()] and
   cmw in [0 .. pgmaxdepth()] and
   cr in [0 .. pgmaxdepth()] and
@@ -70,7 +73,7 @@ int plusForPreferedStructForRep(int cm, int cmw, int cr, int cp, int cpr, int cr
 }
 
 /**
- *  For sinks prioritizes paterns like `parameter x (return member fun )
+ *  For sinks prioritizes patterns like `(parameter x (member fun) ...)`.
  *  by penalizing more occurences of (pamerameter|member)
  */
 predicate isRepWithScore(string rep, DataFlow::Node sink, int depth, boolean asRhs, int score) {
@@ -84,10 +87,10 @@ predicate isRepWithScore(string rep, DataFlow::Node sink, int depth, boolean asR
     croot = count(rep.indexOf("(root ")) and
     (
       asRhs = true and
-      // Penalizes the receivers againts members and roots
+      // Penalizes the receivers against members and roots
       score =
         plusForCanonicalRep(rep, sink, depth) +
-            plusForPreferedStructForRep(cm, cmw, cr, cp, cpr, croot) - (2 * cpr + 2 * cmw)
+            plusForPreferredStructForRep(cm, cmw, cr, cp, cpr, croot) - (2 * cpr + 2 * cmw)
       or
       asRhs = false and
       // Penalizes the receivers againts members and roots
@@ -97,9 +100,9 @@ predicate isRepWithScore(string rep, DataFlow::Node sink, int depth, boolean asR
 }
 
 /**
- * Returns one `canonical` representation for a node
- * For sinks it prioritizes paterns like `parameter x (member fun )
- * and the use of external functions, penalizes the receiver as parameter
+ * Returns one canonical representation for a node.
+ * For sinks it prioritizes patterns like `(parameter x (member fun))`
+ * and the use of external functions, penalizes the receiver as parameter.
  */
 string chooseBestRep(DataFlow::Node sink, boolean asRhs) {
   result =

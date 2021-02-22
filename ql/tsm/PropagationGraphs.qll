@@ -19,7 +19,7 @@ import NodeRepresentation
 
 /**
  * The name of an npm package that should be considered when building the propagation graph.
- * The filter is applied to sink and source candidates 
+ * The filter is applied to sink and source candidates.
  *
  * To customize, implement concrete subclasses of this class.
  *
@@ -30,7 +30,7 @@ import NodeRepresentation
  *   MongoDbIsInteresting() { this = "mongodb" }
  * }
  * ```
- * 
+ *
  * To do the same with sources:
  * ```ql
  * class MongoDbIsInteresting extends InterestingPackageForSources {
@@ -38,7 +38,7 @@ import NodeRepresentation
  * }
  * ```
  *
- * 
+ *
  *
  * To consider all imports interesting, both for sorces and sinks use
  *
@@ -60,10 +60,10 @@ abstract class InterestingPackageForSources extends string {
 
 /**
  * Allows to include additional source/sinks/sanitizers as candidates 
- * 
- * For example, to add additional sinks 
- * 
- * ```ql 
+ *
+ * For example, to add additional sinks
+ *
+ * ```ql
  * class MoreSinks extends SinkCandidate {
  *    MoreSinks() { this = any(API::moduleImport(_)).getAnArgument() }
  * }
@@ -163,7 +163,7 @@ predicate isSourceCandidate(DataFlow::Node u) {
       u instanceof DataFlow::PropRead
     )
   )
-  or 
+  or
   u instanceof AdditionalSourceCandidate
 }
 
@@ -173,7 +173,7 @@ predicate isSourceCandidate(DataFlow::Node u) {
 predicate isSanitizerCandidate(DataFlow::CallNode u) {
   exists(rep(u, false)) and
   not u = any(Import i).getImportedModuleNode()
-  or 
+  or
   u instanceof AdditionalSanitizerCandidate
 }
 
@@ -197,7 +197,7 @@ predicate isSinkCandidate(DataFlow::Node d) {
       d = any(DataFlow::PropWrite pw).getRhs()
     )
   )
-  or 
+  or
   d instanceof AdditionalSinkCandidate
 }
 
