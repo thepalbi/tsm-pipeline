@@ -1,0 +1,32 @@
+name: "Run CodeQL tests"
+on:
+- pull_request
+
+env:
+  codeql_version: 2.4.4
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v2
+
+      - name: Check out CodeQL standard library
+        uses: actions/checkout@v2
+        with:
+          repository: github/codeql
+          path: codeql-lib
+
+      - name: Download CodeQL
+        run: |
+          wget -q https://github.com/github/codeql-cli-binaries/releases/download/v$codeql_version/codeql-linux64.zip -O codeql.zip
+          unzip -q codeql.zip
+          echo "$(readlink -f codeql)" >>$GITHUB_PATH
+
+          mkdir $HOME/.config/codeql
+          echo '--ram 6000' >$HOME/.config/codeql/config
+          echo '--threads 2' >>$HOME/.config/codeql/config
+          echo '--timeout 900' >>$HOME/.config/codeql/config
+
+      - name: Run tests
+        run: codeql test run --search-path ql ql/test
