@@ -93,7 +93,7 @@ predicate isRepWithScore(string rep, DataFlow::Node sink, int depth, boolean asR
             plusForPreferredStructForRep(cm, cmw, cr, cp, cpr, croot) - (2 * cpr + 2 * cmw)
       or
       asRhs = false and
-      // Penalizes the receivers againts members and roots
+      // Penalizes the receivers against members and roots
       score = cm * 4 + cr * 3 + cp * 5 - (cpr * 2 + cmw * 2)
     )
   )
