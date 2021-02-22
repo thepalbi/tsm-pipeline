@@ -1,8 +1,8 @@
 const lib = require('lib');
-lib.callback((parm) => {
-    var tainted = parm.f;
-    var sanitized = lib.sanitize(tainted);
-    lib.sink(sanitized);
+lib.callback((parm /* event: ba */) => {
+    var tainted = parm.f /* event: ba' */;
+    var sanitized = lib.sanitize(tainted) /* event: bb */;
+    lib.sink(sanitized /* event: bc */);
 })
 
 // make sure we have enough occurrences of the representations we care about
