@@ -17,12 +17,12 @@ const appDir = process.env.APP_PATH;
 console.log(`Using appDir=[${appDir}]`);
 
 // Should report warning 
-app.post('/unsanitized', (req, res) => {
+app.post('/unsanitized', (req /* event: s */, res) => {
     console.log(req.body);
     // line 12 Fig 2.a req.body.path is pretending `request.files['f'].filename` on paper
-    var resolvedPath = path.join(appDir, req.body.path);
+    var resolvedPath = path.join(appDir, req.body.path) /* event: t */;
     // line 14 Fig 2.a req.body.contents is pretending request.files['f'] 
-    fs.writeFile(resolvedPath, req.body.contents, (err) => {
+    fs.writeFile(resolvedPath /* event: u */, req.body.contents /* event: u' */, (err) => {
         if (err) {
             res.sendStatus(500);
         } else {
@@ -32,15 +32,15 @@ app.post('/unsanitized', (req, res) => {
 });
 
 // Should not report warning 
-app.post('/sanitized', (req, res) => {
+app.post('/sanitized', (req /* event: v */, res) => {
     console.log(req.body);
     // line 12 Fig 2.a req.body.path is pretending `request.files['f'].filename` on paper
-    var resolvedPath = path.join(appDir, req.body.path);
+    var resolvedPath = path.join(appDir, req.body.path) /* event: w */;
     // line 13 Fig 2.a secure filename(filename)
     resolvedPath = sanitizePath(resolvedPath);
     // line 14 Fig 2.a req.body.contents is pretending request.files['f']
     if (resolvedPath)
-        fs.writeFile(resolvedPath, req.body.contents, (err) => {
+        fs.writeFile(resolvedPath /* event: x */, req.body.contents /* event: x' */, (err) => {
             if (err) {
                 res.sendStatus(500);
             } else {
@@ -50,7 +50,7 @@ app.post('/sanitized', (req, res) => {
 });
 
 function sanitizePath(path) {
-    if (new RegExp(`${path.sep}..${path.sep}`).test(path))
+    if (new RegExp(`${path.sep}..${path.sep}`).test(path) /* event: w' */)
         return null;
     return path;
 }

@@ -1,16 +1,8 @@
-/**
- * A query for computing triples in propagation graphs.
- */
-
 import tsm.PropagationGraphs
 import NamedEvents
 
-class AllPackagesAreInteresting extends InterestingPackageForSources {
+class AllPackagesAreInteresting extends InterestingPackageForSinks, InterestingPackageForSources {
   AllPackagesAreInteresting() { exists(API::moduleImport(this)) }
-}
-
-class LibIsInteresting extends InterestingPackageForSinks {
-  LibIsInteresting() { this in ["lib"] }
 }
 
 from NamedEvent src, NamedEvent san, NamedEvent snk

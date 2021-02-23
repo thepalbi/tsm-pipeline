@@ -3,23 +3,16 @@
  */
 
 import tsm.PropagationGraphs
+import NamedEvents
 
-class AdditionalSink extends AdditionalSinkCandidate {
-  AdditionalSink() {
-    this.getFile().getBaseName() = "test.js" and
-    this.getStartLine() = 4 and
-    this.getStartColumn() = 10
-  }
+class AdditionalSink extends AdditionalSinkCandidate, NamedEvent {
+  AdditionalSink() { name = "ac" }
 }
 
-class AdditionalSource extends AdditionalSourceCandidate {
-  AdditionalSource() {
-    this.getFile().getBaseName() = "test.js" and
-    this.getStartLine() = 2 and
-    this.getStartColumn() = 15
-  }
+class AdditionalSource extends AdditionalSourceCandidate, NamedEvent {
+  AdditionalSource() { name = "aa" }
 }
 
-from DataFlow::Node src, DataFlow::Node san, DataFlow::Node snk
+from NamedEvent src, NamedEvent san, NamedEvent snk
 where triple(src, san, snk)
-select src, san, snk
+select src.getName(), san.getName(), snk.getName()

@@ -3,6 +3,7 @@
  */
 
 import tsm.PropagationGraphs
+import NamedEvents
 
 class ExpressIsInteresting extends InterestingPackageForSources {
   ExpressIsInteresting() { this in ["express"] }
@@ -12,6 +13,6 @@ class PathIsInteresting extends InterestingPackageForSinks {
   PathIsInteresting() { this in ["fs"] }
 }
 
-from DataFlow::Node src, DataFlow::Node san, DataFlow::Node snk
+from NamedEvent src, NamedEvent san, NamedEvent snk
 where triple(src, san, snk)
-select rep(src, false), rep(san, false), rep(snk, true)
+select src.getName(), san.getName(), snk.getName()
