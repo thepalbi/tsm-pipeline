@@ -38,7 +38,7 @@ def create_project_list(projectListFile):
 
 all_steps = "ALL"
 
-run_separate_on_multiple_projects = False
+run_separate_on_multiple_projects = True
 
 parser = argparse.ArgumentParser()
 

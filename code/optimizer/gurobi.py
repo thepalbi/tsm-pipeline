@@ -94,9 +94,13 @@ class CountRepsStep(OrchestrationStep):
 class GenerateModelStep(OrchestrationStep):
     def populate(self, ctx: Context) -> Context:
         if self.should_use_existing_model_dirs(ctx):
-            (ctx[CONSTRAINTS_DIR_KEY],
-            ctx[MODELS_DIR_KEY],
-            ctx[LOGS_DIR_KEY]) = self.get_existing_working_directories(self.orchestrator.query_name, ctx[WORKING_DIR_KEY])
+            try:
+                (ctx[CONSTRAINTS_DIR_KEY],
+                ctx[MODELS_DIR_KEY],
+                ctx[LOGS_DIR_KEY]) = self.get_existing_working_directories(self.orchestrator.query_name, ctx[WORKING_DIR_KEY])
+            except Exception as inst:
+                raise ValueError('Could not find working directory ' + ctx[WORKING_DIR_KEY] + '. Maybe you never generated a model. Try generate_model step')
+
         else:
             (ctx[CONSTRAINTS_DIR_KEY],
             ctx[MODELS_DIR_KEY],
