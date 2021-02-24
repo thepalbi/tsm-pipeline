@@ -94,7 +94,7 @@ module PropagationGraph {
     result =
       strictconcat(string r |
         r = chooseBestRep(n, asRhs) and
-        count(DataFlow::Node nd2 | r = repGenerator(nd2, _, asRhs)) >= minOcurrences()
+        count(DataFlow::Node nd2 | r = repGenerator(nd2, _, asRhs)) >= minOccurrences()
       |
         r, "::"
       )
