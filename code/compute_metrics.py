@@ -159,8 +159,11 @@ def createReprPredicate(ctx, project_name:str, query_type:str, reprScoresFiles =
         print(e)
 
 
-def createReprKnownPredicates(ctx, project_name:str, query_type:str):
+def createReprKnownPredicates(ctx, project_dir:str, query_type:str):
+    project_name = os.path.basename(project_dir)
     tsm_query_folder = os.path.join(global_config.sources_root, "tsm", "query", query_type, project_name)
+    if not os.path.exists(tsm_query_folder):
+        os.makedirs(tsm_query_folder)
     tsm_known_pred_path = os.path.join(tsm_query_folder, "known.qll")
     print(tsm_known_pred_path)
     known_dict = { 
