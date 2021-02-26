@@ -7,17 +7,17 @@ import javascript
 import tsm.PropagationGraphsAlt
 
 class XssSourceCandidate extends AdditionalSourceCandidate {
-  XssSourceCandidate() { isSourceWorse(this) } 
+  XssSourceCandidate() { isKnownSource(this) }
 }
 class XssSinkCandidate extends AdditionalSinkCandidate {
-  XssSinkCandidate() { none() } 
+  XssSinkCandidate() { none() }
 }
 
 
 predicate targetLibraries = packageListFromFrecuency/0;
 
-private string npmLibraries() { 
-  result = "jquery" 
+private string npmLibraries() {
+  result = "jquery"
   or result = "angular"
   or result = "XRegExp"
   or result = "fs"
@@ -31,31 +31,31 @@ private string packageListFromFrecuency() {
     "lodash","laravel-mix","gulp-rename",
     "axios","shelljs","url","https","glob","webpack"
   ]
-} 
+}
 
 
 private string allLibraries() {
-  exists(API::Node imp | 
+  exists(API::Node imp |
       imp = API::moduleImport(result)
   )
 }
 
 class AllPackagesAreInteresting extends InterestingPackageForSources {
   AllPackagesAreInteresting() { exists(API::moduleImport(this)) }
-} 
+}
 
 class XssIsInteresting extends InterestingPackageForSinks {
   XssIsInteresting() { this = targetLibraries() }
 }
 
-predicate isSourceWorse = PropagationGraph::isSourceWorse/1;
+predicate isKnownSource = PropagationGraph::isKnownSource/1;
 
-predicate isSinkWorse = PropagationGraph::isSinkWorse/1;
+predicate isKnownSink = PropagationGraph::isKnownSink/1;
 
-predicate isSanitizerWorse = PropagationGraph::isSanitizerWorse/1;
+predicate isKnownSanitizer = PropagationGraph::isKnownSanitizer/1;
 
 class FilterWorse extends PropagationGraph::NodeFilter {
-  FilterWorse() { this = "SrcWorse" } 
+  FilterWorse() { this = "SrcWorse" }
   override predicate filterSource(DataFlow::Node src) { any() }
   override predicate filterSink(DataFlow::Node snk) { any() }
   override predicate filterSanitizer(DataFlow::Node san) { any() }

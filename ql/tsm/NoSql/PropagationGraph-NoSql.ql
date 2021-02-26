@@ -46,16 +46,16 @@ class NoSqlSinkCandidate extends AdditionalSinkCandidate {
   NoSqlSinkCandidate() { none() }
 }
 
-predicate isSourceWorse = PropagationGraph::isSourceWorse/1;
+predicate isKnownSource = PropagationGraph::isKnownSource/1;
 
-predicate isSinkWorse = PropagationGraph::isSinkWorse/1;
+predicate isKnownSink = PropagationGraph::isKnownSink/1;
 
-predicate isSanitizerWorse = PropagationGraph::isSanitizerWorse/1;
+predicate isKnownSanitizer = PropagationGraph::isKnownSanitizer/1;
 
 class FilterWorse extends PropagationGraph::NodeFilter {
   FilterWorse() { this = "SrcWorse" } 
   // We consider triples starting from known sources only
-  override predicate filterSource(DataFlow::Node src) { isSourceWorse(src) }
+  override predicate filterSource(DataFlow::Node src) { isKnownSource(src) }
   // Important: NoSql V0 and VWorse consider as sinks the object used as argument to NoSql functions
   // and not the properties within the object. Considering that as sink lead to find actual issues
   // but they are considered as false positive because VWorse/V0 do not contain them.

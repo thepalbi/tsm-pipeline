@@ -9,11 +9,11 @@ Current version of libraries to boost is: [commit `e277a2ef6c9998c927cb6e4b277a0
 
 ## Installing dependencies
 
-Execute: `python3 -m pip install -r requirements.txt` (we recommend to use a virtual enviroment).
+In the `code` directory, execute: `python3 -m pip install -r requirements.txt` (we recommend to use a virtual enviroment).
 
-Then try `python -m pip install -i https://pypi.gurobi.com gurobipy` to install Python support for the `gurobi` solver.   
+Then try `python3 -m pip install -i https://pypi.gurobi.com gurobipy` to install Python support for the `gurobi` solver.
 
-In OSX you may need to install `girubi` support for Python manually by executing this command: `python3 /Library/gurobiXXX/mac64/setup.py install`, where `XXX` is the version installed in your computer. Recall that you need a license to run gurobi. Academic licences are available [here](https://www.gurobi.com/academia/academic-program-and-licenses/).
+In OSX you may need to install `gurobi` support for Python manually by executing this command: `python3 /Library/gurobiXXX/mac64/setup.py install`, where `XXX` is the version installed in your computer. Recall that you need a license to run gurobi. Academic licences are available [here](https://www.gurobi.com/academia/academic-program-and-licenses/).
 
 ## Downloading databases from LGTM
 
@@ -32,19 +32,19 @@ The pipeline at the moment has the following steps implemented:
 - `optimize`: Run `gurobi` with the model generated in the `generate_model` step (intermediate results in `working-dir/model`)
 -  (disabled)  `generate_tsm_query`: Build a TSM query out of the resulting scores.
 
-Once entities are generated, there is an additional step that can be used to filter infrequent ocurrences. 
+Once entities are generated, there is an additional step that can be used to filter infrequent occurrences.
 
 - `count_reps`: Additional step that allows for computing the number of occurrences. That can be used *before* the `generate_model` step to filter infrequent representations.
 
 
 These steps can be executed individually or all together in an end-to-end runner. You can use the orchestrator in code, or with its CLI. The latter one is located in `main.py`.
 
-First, configure the `config.json` file, which has to be located at the `constraintsolving/` root dir. It has the following properties:
+First, configure the `code/config.json` file. It has the following properties:
 
 ```json
 {
   "codeQLExecutable": "absolute path to the CodeQL executable",
-  "codeQLSourcesRoot": "absolute path to this project's root directory (where the `.git` folder lives)",
+  "codeQLSourcesRoot": "absolute path to the `ql` folder in this project",
   "workingDirectory": "absolute path to the working directory",
   "resultsDirectory": "absolute path to the results dir",
   "searchPath": "absolute path where the CodeQL libraries resides",

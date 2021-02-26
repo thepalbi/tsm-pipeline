@@ -49,12 +49,12 @@ class PathIsInteresting extends InterestingPackageForSinks {
 
 // Known sources should be included in the triples
 class PathSourceCandidate extends AdditionalSourceCandidate {
-  PathSourceCandidate() { isSourceWorse(this) }
+  PathSourceCandidate() { isKnownSource(this) }
 }
 
 // Known sanitizers should be included in the triples
 class PathSanitizerCandidate extends AdditionalSanitizerCandidate {
-  PathSanitizerCandidate() { isSanitizerWorse(this) }
+  PathSanitizerCandidate() { isKnownSanitizer(this) }
 }
 
 // No adding sinks to the propagation graph
@@ -62,17 +62,17 @@ class PathSinkCandidate extends AdditionalSinkCandidate {
   PathSinkCandidate() { none() }
 }
 
-predicate isSourceWorse = PropagationGraph::isSourceWorse/1;
+predicate isKnownSource = PropagationGraph::isKnownSource/1;
 
-predicate isSinkWorse = PropagationGraph::isSinkWorse/1;
+predicate isKnownSink = PropagationGraph::isKnownSink/1;
 
-predicate isSanitizerWorse = PropagationGraph::isSanitizerWorse/1;
+predicate isKnownSanitizer = PropagationGraph::isKnownSanitizer/1;
 
 
 class FilterWorse extends PropagationGraph::NodeFilter {
   FilterWorse() { this = "SrcWorse" } 
   // We consider triples starting from known sources only
-  override predicate filterSource(DataFlow::Node src) { isSourceWorse(src)}
+  override predicate filterSource(DataFlow::Node src) { isKnownSource(src)}
   override predicate filterSink(DataFlow::Node snk) { any() }
   override predicate filterSanitizer(DataFlow::Node san) { any() }
 }
