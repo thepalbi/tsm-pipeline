@@ -16,6 +16,7 @@ jobs:
         with:
           repository: github/codeql
           path: codeql-lib
+          ref: lgtm.com
 
       - name: Download CodeQL
         run: |
