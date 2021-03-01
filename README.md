@@ -13,7 +13,15 @@ In the `code` directory, execute: `python3 -m pip install -r requirements.txt` (
 
 Then try `python3 -m pip install -i https://pypi.gurobi.com gurobipy` to install Python support for the `gurobi` solver.
 
-In OSX you may need to install `gurobi` support for Python manually by executing this command: `python3 /Library/gurobiXXX/mac64/setup.py install`, where `XXX` is the version installed in your computer. Recall that you need a license to run gurobi. Academic licences are available [here](https://www.gurobi.com/academia/academic-program-and-licenses/).
+In OSX you may need to install `girubi` support for Python manually by executing this command: `python3 /Library/gurobiXXX/mac64/setup.py install`, where `XXX` is the version installed in your computer. Recall that you need a license to run gurobi. Academic licences are available [here](https://www.gurobi.com/academia/academic-program-and-licenses/).
+
+### Using CBC
+
+Instructions for installing [CBC](https://github.com/coin-or/Cbc) are [here](https://github.com/coin-or/Cbc#download).
+
+(On Ubuntu/Debian simply `sudo apt-get install coinor-cbc`).
+
+N.B. TSM uses Gurobi by default. To use CBC instead add `--solver=CBC` as a command-line argument.
 
 ## Downloading databases from LGTM
 

@@ -264,6 +264,8 @@ class OptimizeStep(OrchestrationStep):
                                 working_dir=working_dir, results_dir=results_dir)
 
         config.no_flow_constraints = self.orchestrator.no_flow
+        config.solver = self.orchestrator.solver
+        
         # Run solver
         solve_constraints_combine_model(config, ctx)
 

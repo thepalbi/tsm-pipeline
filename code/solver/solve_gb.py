@@ -6,6 +6,42 @@ from .config import SolverConfig
 from orchestration.steps import CONSTRAINTS_DIR_KEY, MODELS_DIR_KEY
 import os
 
+import sys
+sys.path.append("./cbc_utils")
+import cbc_utils
+
+def solveLpProblemGurobi(lpFilePath, lpResultsFilePath):
+    try:
+        m = gp.read(lpFilePath)
+        m.optimize()
+        zero = 0
+        non_zero = 0
+        ones = 0
+        eps_non_zero = 0
+        
+        with open(lpResultsFilePath, "w") as resultfile:
+            for v in m.getVars():
+                if v.x == 0:
+                    zero += 1
+                elif v.x == 1:
+                    ones += 1
+                    if v.varName.startswith('e'):
+                        eps_non_zero+=1
+                else:
+                    non_zero += 1
+                    if v.varName.startswith('e'):
+                        eps_non_zero+=1
+            resultfile.write("\n".join(['{0}:{1}'.format(v.varName, v.x) for v in m.getVars()]))
+        print('Obj: %g' % m.objVal)
+        print('Zero: %g, Non-Zero: %g, Ones: %g, Eps: %g' % (zero, non_zero, ones, eps_non_zero))
+
+    except gp.GurobiError as e:
+        print('Error code ' + str(e.errno) + ': ' + str(e))
+
+    except AttributeError:
+        print('Encountered an attribute error')
+
+
 def solve_constraints_combine_model(config: SolverConfig, ctx):
     constraintsdir = ctx[CONSTRAINTS_DIR_KEY]
     modelfile_path = os.path.join(ctx[MODELS_DIR_KEY], f"gurobi_model_{config.known_samples_ratio}_{1}.lp")
@@ -76,38 +112,18 @@ def solve_constraints_combine_model(config: SolverConfig, ctx):
         modelfile.write("End")
     print("Done")
 
-    print("reading model into gurobi")
-    try:
-        m = gp.read(modelfile_path)
-        m.optimize()
-        zero = 0
-        non_zero = 0
-        ones = 0
-        eps_non_zero = 0
-        
-        with open(os.path.join(ctx[MODELS_DIR_KEY], f"results_gb_{config.known_samples_ratio}_{config.lambda_const}_{1}.txt"), "w") as resultfile:
-            for v in m.getVars():
-                if v.x == 0:
-                    zero += 1
-                elif v.x == 1:
-                    ones += 1
-                    if v.varName.startswith('e'):
-                        eps_non_zero+=1
-                else:
-                    non_zero += 1
-                    if v.varName.startswith('e'):
-                        eps_non_zero+=1
-            resultfile.write("\n".join(['{0}:{1}'.format(v.varName, v.x) for v in m.getVars()]))
-        print('Obj: %g' % m.objVal)
-        print('Zero: %g, Non-Zero: %g, Ones: %g, Eps: %g' % (zero, non_zero, ones, eps_non_zero))
-
-    except gp.GurobiError as e:
-        print('Error code ' + str(e.errno) + ': ' + str(e))
-
-    except AttributeError:
-        print('Encountered an attribute error')
+    resultsFilePath = os.path.join(ctx[MODELS_DIR_KEY], f"results_gb_{config.known_samples_ratio}_{config.lambda_const}_{1}.txt")
+    if config.solver == "gurobi":
+        print('Using Gurobi to solve')
+        solveLpProblemGurobi(modelfile_path, resultsFilePath)
+    elif config.solver == "CBC":
+        print('Using CBC solve')
+        cbc_utils.solveLpProblemCBC(modelfile_path, resultsFilePath)
+    else:
+        print(f'ERROR: {config.solver} is not a known solver')
 
 
+# TODO: this function seems to not be used. Delete?
 def solve_constraints(config: SolverConfig, ctx):
     constraintsdir = ctx[CONSTRAINTS_DIR_KEY]
     modelfile_path = os.path.join(ctx[MODELS_DIR_KEY], f"gurobi_model_{config.known_samples_ratio}_{1}.lp")

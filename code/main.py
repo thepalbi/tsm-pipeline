@@ -82,6 +82,9 @@ parser.add_argument("--no-flow", dest="no_flow", action='store_true', help='Igno
 
 parser.add_argument("--multiple-projects", dest="multiple", action='store_true', help='Combine all projects in the model')
 
+parser.add_argument("--solver", dest="solver", required=False, type=str, choices=["gurobi", "CBC"], default="gurobi", 
+                    help="Specify which solver to use (default is gurobi)")
+
 subparsers = parser.add_subparsers(dest="command", required=True)
 run_parser = subparsers.add_parser("run")
 clean_parser = subparsers.add_parser("clean")
@@ -139,6 +142,7 @@ if __name__ == '__main__':
                             working_dir, results_dir,
                             scores_file, no_flow,
                             run_separate_on_multiple_projects,
+                            parsed_arguments.solver,
                             projectList, 
                             rep_counter, 
                             hasExecuted) 

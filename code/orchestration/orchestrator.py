@@ -48,6 +48,7 @@ class Orchestrator:
                 scores_file: str, 
                 no_flow: bool,
                 run_separate_on_multiple_projects: bool,
+                solver: str,
                 project_list: List[str], 
                 rep_counter = dict(),
                 hasExecuted: bool = False):
@@ -61,6 +62,7 @@ class Orchestrator:
         self.no_flow = no_flow
         self.project_list = project_list
         self.run_single = run_separate_on_multiple_projects
+        self.solver = solver
         self.scores_file = scores_file
         if scores_file == None: 
             self.combinedScore = False
