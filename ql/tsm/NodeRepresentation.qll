@@ -23,7 +23,7 @@ predicate isRelevant(DataFlow::Node nd) {
  * are filtered out above, so increasing the bound beyond a certain threshold may
  * not actually yield new candidates.
  */
-private int maxdepth() { result = 4 }
+int maxdepth() { result = 4 }
 
 /** Gets a node that the main module of package `pkgName` exports. */
 private DataFlow::Node getAnExport(string pkgName) {

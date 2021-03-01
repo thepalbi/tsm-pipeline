@@ -1,47 +1,21 @@
 | a | true | (parameter 0 (member * (parameter x *))) | 18 |
-| a | true | (parameter 0 (member * (parameter x *))) | -2 |
-| a | true | (parameter 0 (member bar (parameter x *))) | 0 |
 | a | true | (parameter 0 (member bar (parameter x *))) | 18 |
-| a | true | (parameter 0 (member bar *)) | 0 |
-| a | true | (parameter 0 (member bar *)) | 20 |
-| a | true | (parameter 0 (member bar *)) | 100 |
 | a | true | (parameter 0 (member bar *)) | 120 |
 | b | true | (member * (parameter x *)) | 20 |
-| b | true | (member * (parameter x *)) | -2 |
-| b | true | (member y (parameter x *)) | 0 |
 | b | true | (member y (parameter x *)) | 20 |
 | b | true | (member y *) | 0 |
 | bar | false | (member * (parameter x *)) | 7 |
 | bar | false | (member bar (parameter x *)) | 9 |
 | bar | false | (member bar *) | 4 |
 | c | true | (member * (parameter 0 (member * (parameter x *)))) | 16 |
-| c | true | (member * (parameter 0 (member * (parameter x *)))) | -4 |
 | c | true | (member * (parameter 0 (member baz (parameter x *)))) | 16 |
-| c | true | (member * (parameter 0 (member baz (parameter x *)))) | -2 |
-| c | true | (member * (parameter 0 (member baz *))) | 18 |
-| c | true | (member * (parameter 0 (member baz *))) | 48 |
 | c | true | (member * (parameter 0 (member baz *))) | 68 |
-| c | true | (member * (parameter 0 (member baz *))) | -2 |
 | c | true | (member y (parameter 0 (member * (parameter x *)))) | 16 |
-| c | true | (member y (parameter 0 (member * (parameter x *)))) | -2 |
-| c | true | (member y (parameter 0 (member baz (parameter x *)))) | 0 |
 | c | true | (member y (parameter 0 (member baz (parameter x *)))) | 16 |
-| c | true | (member y (parameter 0 (member baz *))) | 0 |
-| c | true | (member y (parameter 0 (member baz *))) | 18 |
-| c | true | (member y (parameter 0 (member baz *))) | 75 |
 | c | true | (member y (parameter 0 (member baz *))) | 93 |
 | c | true | (member y *) | 0 |
-| d | true | (parameter 0 (member * (root https://www.npmjs.com/package/fs))) | 10 |
-| d | true | (parameter 0 (member * (root https://www.npmjs.com/package/fs))) | 98 |
 | d | true | (parameter 0 (member * (root https://www.npmjs.com/package/fs))) | 110 |
-| d | true | (parameter 0 (member * (root https://www.npmjs.com/package/fs))) | -2 |
-| d | true | (parameter 0 (member writeFileSync (root https://www.npmjs.com/package/fs))) | 0 |
-| d | true | (parameter 0 (member writeFileSync (root https://www.npmjs.com/package/fs))) | 10 |
-| d | true | (parameter 0 (member writeFileSync (root https://www.npmjs.com/package/fs))) | 100 |
 | d | true | (parameter 0 (member writeFileSync (root https://www.npmjs.com/package/fs))) | 110 |
-| d | true | (parameter 0 (member writeFileSync *)) | 0 |
-| d | true | (parameter 0 (member writeFileSync *)) | 20 |
-| d | true | (parameter 0 (member writeFileSync *)) | 100 |
 | d | true | (parameter 0 (member writeFileSync *)) | 120 |
 | wfs | false | (member * (root https://www.npmjs.com/package/fs)) | 2 |
 | wfs | false | (member writeFileSync (root https://www.npmjs.com/package/fs)) | 4 |

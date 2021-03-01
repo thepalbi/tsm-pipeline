@@ -1,11 +1,10 @@
 /**
- * An implementation of canonical representations for sinks that represent a more likely 
+ * An implementation of canonical representations for sinks that represent a more likely
  * representation and allows for using fewer representations for each candidate sink.
  */
 
 import javascript
 import NodeRepresentation
-
 
 /** Canonical representation prioritized for sinks: method parameters. */
 private string regExp1() { result = "\\(parameter \\w+ \\(member (\\w+|\\*) .*\\)\\)" }
@@ -42,22 +41,17 @@ int plusForCanonicalRep(string rep, DataFlow::Node nd, int depth) {
 }
 
 /**
- * This should be the maxdepth() from NodeRepresentations, but is currently private
- */
-int pgmaxdepth() { result = 5 }
-
-/**
  * Prefers a small number of member and parameters for canonical representation.
  *
  * To-Do: Maybe is easier to define whole canonicalRep with a regular expression.
  */
 int plusForPreferredStructForRep(int cm, int cmw, int cr, int cp, int cpr, int croot) {
-  cm in [0 .. pgmaxdepth()] and
-  cmw in [0 .. pgmaxdepth()] and
-  cr in [0 .. pgmaxdepth()] and
-  cp in [0 .. pgmaxdepth()] and
-  cpr in [0 .. pgmaxdepth()] and
-  croot in [0 .. pgmaxdepth()] and
+  cm in [0 .. maxdepth()] and
+  cmw in [0 .. maxdepth()] and
+  cr in [0 .. maxdepth()] and
+  cp in [0 .. maxdepth()] and
+  cpr in [0 .. maxdepth()] and
+  croot in [0 .. maxdepth()] and
   (
     cm in [1 .. 2] and
     cp in [0 .. 2] and
@@ -89,8 +83,8 @@ predicate isRepWithScore(string rep, DataFlow::Node sink, int depth, boolean asR
       asRhs = true and
       // Penalizes the receivers against members and roots
       score =
-        plusForCanonicalRep(rep, sink, depth) +
-            plusForPreferredStructForRep(cm, cmw, cr, cp, cpr, croot) - (2 * cpr + 2 * cmw)
+        max(plusForCanonicalRep(rep, sink, depth)) +
+          max(plusForPreferredStructForRep(cm, cmw, cr, cp, cpr, croot) - (2 * cpr + 2 * cmw))
       or
       asRhs = false and
       // Penalizes the receivers against members and roots
