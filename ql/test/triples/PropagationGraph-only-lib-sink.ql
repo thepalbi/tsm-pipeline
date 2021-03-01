@@ -3,7 +3,7 @@
  */
 
 import tsm.PropagationGraphs
-import NamedEvents
+import test.NamedEvents
 
 class AllPackagesAreInteresting extends InterestingPackageForSources {
   AllPackagesAreInteresting() { exists(API::moduleImport(this)) }
