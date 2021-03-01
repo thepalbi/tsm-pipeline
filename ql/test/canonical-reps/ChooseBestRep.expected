@@ -1,6 +1,7 @@
 | a | true | (parameter 0 (member bar *)) |
 | b | true | (member y (parameter x *)) |
+| bar | false | (member bar (parameter x *)) |
 | c | true | (member y (parameter 0 (member baz *))) |
-| e | false | (member bar (parameter x *)) |
-| g | false | (member writeFileSync (root https://www.npmjs.com/package/fs)) |
-| h | true | (parameter 0 (member writeFileSync *)) |
+| d | true | (parameter 0 (member writeFileSync *)) |
+| wfs | false | (member writeFileSync (root https://www.npmjs.com/package/fs)) |
+| x | false | (parameter x *) |
