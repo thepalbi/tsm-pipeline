@@ -6,7 +6,7 @@
 import javascript
 import tsm.PropagationGraphsAlt
 
-predicate targetLibraries = npmLibraries/0;
+predicate targetLibraries = packageListFromFrecuency/0;
 
 private string npmLibraries() { 
   result = "fs" 
@@ -72,7 +72,7 @@ predicate isKnownSanitizer = PropagationGraph::isKnownSanitizer/1;
 class FilterWorse extends PropagationGraph::NodeFilter {
   FilterWorse() { this = "SrcWorse" } 
   // We consider triples starting from known sources only
-  override predicate filterSource(DataFlow::Node src) { isKnownSource(src)}
+  override predicate filterSource(DataFlow::Node src) { isKnownSource(src) }
   override predicate filterSink(DataFlow::Node snk) { any() }
   override predicate filterSanitizer(DataFlow::Node san) { any() }
 }
