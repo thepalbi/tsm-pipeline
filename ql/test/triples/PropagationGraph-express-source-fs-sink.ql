@@ -3,7 +3,7 @@
  */
 
 import tsm.PropagationGraphs
-import NamedEvents
+import test.NamedEvents
 
 class ExpressIsInteresting extends InterestingPackageForSources {
   ExpressIsInteresting() { this in ["express"] }

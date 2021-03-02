@@ -3,7 +3,7 @@
  */
 
 import tsm.PropagationGraphs
-import NamedEvents
+import test.NamedEvents
 
 class AdditionalSink extends AdditionalSinkCandidate, NamedEvent {
   AdditionalSink() { name = "ac" }

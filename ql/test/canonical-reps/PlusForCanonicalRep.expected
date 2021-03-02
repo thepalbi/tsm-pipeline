@@ -1,0 +1,22 @@
+| a | (parameter 0 (member * (parameter x *))) | 0 |
+| a | (parameter 0 (member bar (parameter x *))) | 0 |
+| a | (parameter 0 (member bar *)) | 0 |
+| a | (parameter 0 (member bar *)) | 100 |
+| b | (member * (parameter x *)) | 0 |
+| b | (member y (parameter x *)) | 0 |
+| b | (member y *) | 0 |
+| c | (member * (parameter 0 (member * (parameter x *)))) | 0 |
+| c | (member * (parameter 0 (member baz (parameter x *)))) | 0 |
+| c | (member * (parameter 0 (member baz *))) | 0 |
+| c | (member * (parameter 0 (member baz *))) | 50 |
+| c | (member y (parameter 0 (member * (parameter x *)))) | 0 |
+| c | (member y (parameter 0 (member baz (parameter x *)))) | 0 |
+| c | (member y (parameter 0 (member baz *))) | 0 |
+| c | (member y (parameter 0 (member baz *))) | 75 |
+| c | (member y *) | 0 |
+| d | (parameter 0 (member * (root https://www.npmjs.com/package/fs))) | 0 |
+| d | (parameter 0 (member * (root https://www.npmjs.com/package/fs))) | 100 |
+| d | (parameter 0 (member writeFileSync (root https://www.npmjs.com/package/fs))) | 0 |
+| d | (parameter 0 (member writeFileSync (root https://www.npmjs.com/package/fs))) | 100 |
+| d | (parameter 0 (member writeFileSync *)) | 0 |
+| d | (parameter 0 (member writeFileSync *)) | 100 |
