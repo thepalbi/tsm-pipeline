@@ -118,6 +118,10 @@ This command will recompute the queries on *all* the projects contained in the l
 
 You can also include the option `--multiple` in `main.py` to build a model for all projects together. This will generate one `reprScores.txt` file in a special folder named `multiple`.
 
+# Running Python tests
+
+At the root directory, simply running `pytest` on the command line will run all the python tests.
+
 # Troubleshooting
 
 The CodeQL runtime uses java.nio for file handlings. A not so rare error, is `/some_disk/lost+found` having the incorrect permissions, `root` for example, and not letting the CodeQL process write to it. The error looks as follows:
