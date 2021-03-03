@@ -25,23 +25,18 @@ predicate isRelevant(DataFlow::Node nd) {
  */
 int maxdepth() { result = 4 }
 
-/** Gets a node that the main module of package `pkgName` exports. */
-private DataFlow::Node getAnExport(string pkgName) {
-  exists(NPMPackage pkg, Module m | pkg.getPackageName() = pkgName and m = pkg.getMainModule() |
-    exists(AnalyzedPropertyWrite apw |
-      apw.writes(m.(AnalyzedModule).getModuleObject(), "exports", result)
-    )
-    or
-    m.(ES2015Module).exports("default", result.(DataFlow::ValueNode).getAstNode())
-  )
-}
-
 /** Gets a node that the main module of `pkgName` exports under the name `prop`. */
 private DataFlow::Node getAnExport(string pkgName, string prop) {
-  exists(NPMPackage pkg, AnalyzedModule m, AnalyzedPropertyWrite apw |
+  exists(NPMPackage pkg, Module m |
     pkg.getPackageName() = pkgName and
-    m = pkg.getMainModule() and
-    apw.writes(m.getAnExportsValue(), prop, result)
+    m = pkg.getMainModule()
+  |
+    result = m.getAnExportedValue(prop)
+    or
+    exists(DataFlow::PropWrite pw |
+      pw.writes(m.(NodeModule).getModuleVariable().getAnAccess().flow(), "exports", result) and
+      prop = "default"
+    )
   )
 }
 
@@ -64,7 +59,7 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
     pkg.regexpMatch("[^./].*") and
     asRhs = false
     or
-    nd = getAnExport(pkg) and
+    nd = getAnExport(pkg, "default") and
     asRhs = true
   |
     result = "(root https://www.npmjs.com/package/" + pkg + ")" and
@@ -187,7 +182,6 @@ string baseCandidateRep(DataFlow::SourceNode base, int depth, boolean asRhs) {
   )
 }
 
-
 /**
  * Gets the minimum number of occurrences of a candidate representation.
  *
@@ -210,11 +204,9 @@ string candidateRepFiltered(DataFlow::Node nd, int depth, boolean asRhs) {
  * Gets a representation for `nd` that is not extremely rare, that is, it occurs at least `minOccurrences()`
  * times.
  */
-string rep(DataFlow::Node nd, int depth,  boolean asRhs) {
+string rep(DataFlow::Node nd, int depth, boolean asRhs) {
   result = candidateRepFiltered(nd, depth, asRhs) and
   count(DataFlow::Node nd2 | result = candidateRepFiltered(nd2, _, asRhs)) >= minOccurrences()
 }
 
-string rep(DataFlow::Node nd,  boolean asRhs) {
-  result = rep(nd, _, asRhs)
-}
+string rep(DataFlow::Node nd, boolean asRhs) { result = rep(nd, _, asRhs) }
