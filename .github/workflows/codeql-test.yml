@@ -33,6 +33,15 @@ jobs:
           echo '--threads 2' >>$HOME/.config/codeql/config
           echo '--timeout 900' >>$HOME/.config/codeql/config
 
+      - name: Check autoformatting
+        run: |
+          make autoformat
+          git diff-index --quiet HEAD -- || (
+            echo "The following files are not formatted correctly (run 'make autoformat' to fix):"
+            git diff-index --name-only HEAD --
+            exit 1
+          )
+
       - name: Compile all queries
         run: |
           codeql query compile --check-only $(find ql -name *.ql)
