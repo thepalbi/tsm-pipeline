@@ -8,7 +8,7 @@ from orchestration.steps import SOURCE_ENTITIES, SINK_ENTITIES, SANITIZER_ENTITI
     SRC_SAN_TUPLES_ENTITIES, SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES, RESULTS_DIR_KEY
 from orchestration import global_config
 from .wrapper import CodeQLWrapper
-from compute_metrics import createReprPredicate, createReprKnownPredicates, createReprKnownURLPredicates
+from compute_metrics import createReprPredicate
 from orchestration import global_config
 
 constaintssolving_dir =  global_config.results_directory
@@ -187,10 +187,20 @@ class DataGenerator:
         # to feed the corresponding predicates in the PG query
         try:
             propgraph_path = self._get_tsm_query_file(query_type, f"PropagationGraph-{query_type}.ql")
+            tmp_propgraph_name = f"PropagationGraph-{self.project_name}-{query_type}.ql"
+            new_propgraph_path = os.path.join(os.path.dirname(propgraph_path), tmp_propgraph_name )
+            
+            # Create a copy of PG query with the name of the project
+            # This is useful for debugging (e.g., if the query times-out or fails)
+            with open(new_propgraph_path , "w", encoding='utf-8') as new_pg_file: 
+                with open(propgraph_path, "r", encoding='utf-8') as pg_file:
+                    pg_lines = pg_file.readlines()
+                new_pg_file.writelines(pg_lines)
+
             # For Progapation graphs we use current version of CodeQl Libraries  
             self.codeql.database_analyze(
                 self.project_dir,
-                propgraph_path,
+                new_propgraph_path,
                 f"{logs_folder}/js-results.csv",
                 global_config.search_path,
                 [f"--external=knownSource={ctx[SOURCE_ENTITIES]}",
@@ -202,8 +212,11 @@ class DataGenerator:
             self.logger.info("Error Analyzing PropagationGraph.ql")
             raise(e)
 
+        # removes temporary progatation graph query
+        os.remove(new_propgraph_path)
+
         self.logger.info("Generating propagation graph data")
-        bqrs_propgraph = self._get_tsm_bqrs_file_for_entity(f"PropagationGraph", query_type)
+        bqrs_propgraph = self._get_tsm_bqrs_file_for_entity(f"PropagationGraph-{self.project_name}", query_type)
         # data/1046224544_fontend_19c10c3/1046224544_fontend_19c10c3-src-san.prop.csv
         
         # We remove the entities to make sure we use updated versions
