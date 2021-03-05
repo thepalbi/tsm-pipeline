@@ -4,7 +4,6 @@ from typing import List
 from generation.data import DataGenerator, GenerateEntitiesStep, GenerateScoresStep, GenerateTSMQueryStep
 from optimizer.gurobi import GenerateModelStep, OptimizeStep, CountRepsStep
 
-from orchestration import global_config
 from orchestration.steps import Context,  RESULTS_DIR_KEY, WORKING_DIR_KEY, SINGLE_STEP_NAME, COMMAND_NAME, STEP_NAMES
 
 import time
@@ -88,24 +87,23 @@ class Orchestrator:
         if(not self.combinedScore):
             project_name = name = self.project_name
             if not self.run_single:
-                name = "multiple"   
+                name = "multiple"
 
             patternToSearch = os.path.join(self.results_dir, name)+ "/{0}-*".format(self.query_name)
             results_candidates = glob.glob(patternToSearch)
-            print(results_candidates)
+            print(f'result candidates = {results_candidates}')
             if len(results_candidates)>0 and not new_directory:
                 results_candidates.sort()
                 results_folder = results_candidates[-1]
-                print("existing")
-                print(results_folder)
+                print("Result candidates exist")
             else:
                 timestamp = str(int(time.mktime(datetime.datetime.now().timetuple())))
                 optimizer_run_name = f"{self.query_name}-{timestamp}"
                 results_folder = os.path.join(self.results_dir, name, optimizer_run_name)
-                print("not existing")
-                print(results_folder)
-                print(self.results_dir)
+                print("Results candidates do not exist")
+                print(f'(given results folder = {self.results_dir}')
 
+            print(f'results folder = {results_folder}')
             return results_folder
         else:
             return self.results_dir
