@@ -9,15 +9,19 @@ import tsm.Triples
 predicate targetLibraries = packageListFromFrequency/0;
 
 private string npmLibraries() {
-  result in ["mongodb", "mongoose", "lokijs", "nosql", "nano", "rethinkdb", "loopback", "memcached",
-        "cassandra-driver", "couchbase", "mongoskin", "dynamoose", "arangojs", "mockgoose",
-        "dynamodb", "aerospike", "rxdb"]
+  result in [
+      "mongodb", "mongoose", "lokijs", "nosql", "nano", "rethinkdb", "loopback", "memcached",
+      "cassandra-driver", "couchbase", "mongoskin", "dynamoose", "arangojs", "mockgoose",
+      "dynamodb", "aerospike", "rxdb"
+    ]
 }
 
 private string packageListFromFrequency() {
-  result in ["mongoose", "express", "path", "fs", "jquery", "lodash", "util", "process", "chai",
-        "crypto", "react-dom", "http", "mongodb", "react", "html-webpack-plugin", "validator",
-        "events", "moment"]
+  result in [
+      "mongoose", "express", "path", "fs", "jquery", "lodash", "util", "process", "chai", "crypto",
+      "react-dom", "http", "mongodb", "react", "html-webpack-plugin", "validator", "events",
+      "moment"
+    ]
 }
 
 private string allLibraries() { exists(API::Node imp | imp = API::moduleImport(result)) }

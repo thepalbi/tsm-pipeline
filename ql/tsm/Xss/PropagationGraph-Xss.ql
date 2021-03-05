@@ -20,10 +20,11 @@ private string npmLibraries() {
 }
 
 private string packageListFromFrequency() {
-  result in ["fs", "path", "process", "jquery", "express", "angular", "http", "gulp", "crypto",
-        "socket.io", "child_process", "react-dom", "body-parser", "util", "react", "moment",
-        "lodash", "laravel-mix", "gulp-rename", "axios", "shelljs", "url", "https", "glob",
-        "webpack"]
+  result in [
+      "fs", "path", "process", "jquery", "express", "angular", "http", "gulp", "crypto",
+      "socket.io", "child_process", "react-dom", "body-parser", "util", "react", "moment", "lodash",
+      "laravel-mix", "gulp-rename", "axios", "shelljs", "url", "https", "glob", "webpack"
+    ]
 }
 
 private string allLibraries() { exists(API::Node imp | imp = API::moduleImport(result)) }
