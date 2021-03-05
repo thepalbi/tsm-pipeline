@@ -8,7 +8,7 @@ python ../code/main.py \
    --project-list nosql_projects.txt \
    --steps=generate_entities,generate_model,optimize \
    run
-
-# echo "Combining scores"
-# python ../code/misc/combinescores.py --query-name NosqlInjectionWorse
-
+echo "Combining scores"
+# N.B. --project-dir parameter is misnamed, it's value should be results-dir
+python ../code/misc/combinescores.py --project-dir /home/wright/coding/ml-ql-taint-specification-mining/results --query-name NosqlInjectionWorse
+echo "Completed: see allscores_*_avg.txt"
