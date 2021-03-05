@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import precision_score, recall_score, f1_score
-from DataParser import readKnown
+from DataParser import readKnown, readURL
 from solver.config import SolverConfig
 from orchestration import global_config
 from orchestration.steps import RESULTS_DIR_KEY, CONSTRAINTS_DIR_KEY, MODELS_DIR_KEY, RESULTS_DIR_KEY, SOURCE_ENTITIES, SANITIZER_ENTITIES, SINK_ENTITIES
@@ -186,11 +186,47 @@ def createReprKnownPredicates(ctx, project_dir:str, query_type:str):
                 for repr in known_nodes:
                     reprToWrite = "    result = \"{0}\" and t = \"{1}\" or \n".format(repr, known_kind)
                     tsm_known_pred_file.writelines([reprToWrite])
+
             tsm_known_pred_file.writelines(["    none()\n"])    
             tsm_known_pred_file.writelines(["  }\n","}\n"])
     except Exception as e:
         raise(e)
     return tsm_known_pred_path
+
+def createReprKnownURLPredicates(ctx, project_dir:str, query_type:str):
+    project_name = os.path.basename(project_dir)
+    tsm_query_folder = os.path.join(global_config.sources_root, "tsm", "query", query_type, project_name)
+    if not os.path.exists(tsm_query_folder):
+        os.makedirs(tsm_query_folder)
+    tsm_known_pred_path = os.path.join(tsm_query_folder, "known.qll")
+    print(tsm_known_pred_path)
+    known_dict = { 
+                "sources": ctx[SOURCE_ENTITIES],
+                "sanitizers": ctx[SANITIZER_ENTITIES],
+                "sinks": ctx[SINK_ENTITIES], 
+                }
+    try:
+        with open(tsm_known_pred_path , "w", encoding='utf-8') as tsm_known_pred_file:
+            logging.info("Writing: {0}".format(tsm_known_pred_path))
+            tsm_known_pred_file.writelines([
+                "class KnownURLDB extends PropagationGraph::KnownURL {\n",
+                "  KnownURLDB() { this =  \"KnownURLDB\" }\n", 
+                "  override string getURL(string t){\n"
+                ])
+                
+            for known_kind in ["sources", "sinks", "sanitizers"]:
+                known_urls = readURL(known_dict[known_kind])
+
+                for url in known_urls:
+                    urlToWrite = "    result = \"{0}\" and t = \"{1}\" or \n".format(url, known_kind)
+                    tsm_known_pred_file.writelines([urlToWrite])
+
+            tsm_known_pred_file.writelines(["    none()\n"])    
+            tsm_known_pred_file.writelines(["  }\n","}\n"])
+    except Exception as e:
+        raise(e)
+    return tsm_known_pred_path
+
 
 def createTSMQuery(ctx, project_name: str, query_type: str):
     tsm_folder = os.path.join(global_config.sources_root, "tsm")

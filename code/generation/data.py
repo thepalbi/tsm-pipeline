@@ -8,7 +8,7 @@ from orchestration.steps import SOURCE_ENTITIES, SINK_ENTITIES, SANITIZER_ENTITI
     SRC_SAN_TUPLES_ENTITIES, SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES, RESULTS_DIR_KEY
 from orchestration import global_config
 from .wrapper import CodeQLWrapper
-from compute_metrics import createReprPredicate, createReprKnownPredicates
+from compute_metrics import createReprPredicate, createReprKnownPredicates, createReprKnownURLPredicates
 from orchestration import global_config
 
 constaintssolving_dir =  global_config.results_directory
@@ -185,7 +185,7 @@ class DataGenerator:
         # Creates a codeql predicate with repr for the known nodes
         # This is to decouple the computation os known nodes, using worse libraries
         # from the analysis that uses the most current library
-        known_predicates_files = createReprKnownPredicates(ctx, self.project_dir, query_type)
+        known_predicates_files = createReprKnownURLPredicates(ctx, self.project_dir, query_type)
 
         # running propagation graph queries
         try:
