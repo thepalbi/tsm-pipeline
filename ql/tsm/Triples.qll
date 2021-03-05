@@ -16,15 +16,15 @@ module PropagationGraph {
   string candidateRep(DataFlow::Node nd, boolean asRhs) { result = candidateRep(nd, _, asRhs) }
 
   external predicate knownSource(string nd, string url, string q, string rep);
+
   external predicate knownSink(string nd, string url, string q, string rep);
+
   external predicate knownSanitizer(string nd, string url, string q, string rep);
 
   string buildURL(DataFlow::Node nd) {
-    result = "file://" + nd.getFile().getAbsolutePath() +
-        ":" + nd.getStartLine() +
-        ":" + nd.getStartColumn() +
-        ":" + nd.getEndLine() +
-        ":" + (nd.getEndColumn())
+    result =
+      "file://" + nd.getFile().getAbsolutePath() + ":" + nd.getStartLine() + ":" +
+        nd.getStartColumn() + ":" + nd.getEndLine() + ":" + nd.getEndColumn()
   }
 
   /**
@@ -32,7 +32,7 @@ module PropagationGraph {
    */
   predicate isKnownSource(DataFlow::Node source) {
     exists(string url |
-      knownSource(_,url , _,_) and
+      knownSource(_, url, _, _) and
       url = buildURL(source)
     )
   }
@@ -42,10 +42,9 @@ module PropagationGraph {
    */
   predicate isKnownSink(DataFlow::Node sink) {
     exists(string url |
-      knownSink(_,url , _,_) and
+      knownSink(_, url, _, _) and
       url = buildURL(sink)
     )
-
   }
 
   /**
@@ -53,7 +52,7 @@ module PropagationGraph {
    */
   predicate isKnownSanitizer(DataFlow::Node sanitizer) {
     exists(string url |
-      knownSanitizer(_,url , _,_) and
+      knownSanitizer(_, url, _, _) and
       url = buildURL(sanitizer)
     )
   }

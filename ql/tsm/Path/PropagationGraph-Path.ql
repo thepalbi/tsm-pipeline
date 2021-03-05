@@ -29,11 +29,9 @@ private string npmLibraries() {
 }
 
 private string packageListFromFrequency() {
-  result in [
-      "fs", "path", "http", "process", "express", "url", "child_process", "util", "assert",
-      "socket.io", "crypto", "gulp", "request", "jquery", "async", "moment", "supertest", "lodash",
-      "mongoose", "chalk", "nunjucks", "fs-extra", "events"
-    ]
+  result in ["fs", "path", "http", "process", "express", "url", "child_process", "util", "assert",
+        "socket.io", "crypto", "gulp", "request", "jquery", "async", "moment", "supertest",
+        "lodash", "mongoose", "chalk", "nunjucks", "fs-extra", "events"]
 }
 
 class AllPackagesAreInteresting extends InterestingPackageForSources {
