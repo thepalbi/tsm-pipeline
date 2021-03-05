@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn.metrics import precision_score, recall_score, f1_score
-from DataParser import readKnown, readURL
 from solver.config import SolverConfig
 from orchestration import global_config
 from orchestration.steps import RESULTS_DIR_KEY, CONSTRAINTS_DIR_KEY, MODELS_DIR_KEY, RESULTS_DIR_KEY, SOURCE_ENTITIES, SANITIZER_ENTITIES, SINK_ENTITIES
