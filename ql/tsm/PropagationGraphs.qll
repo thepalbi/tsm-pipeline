@@ -11,7 +11,8 @@
  * We use a simple access-path language to represent events; see `NodeRepresentation.qll`.
  *
  * Unlike Seldon, we do not use a points-to analysis to model inter-procedural flow, but instead use
- * the type-tracking functionality from the CodeQL standard library; see predicate `triple` below.
+ * the type-tracking functionality from the CodeQL standard library; see predicate `triple`
+ * in `Triples.qll`.
  */
 
 import javascript
@@ -59,7 +60,7 @@ abstract class InterestingPackageForSources extends string {
 }
 
 /**
- * Allows to include additional source/sinks/sanitizers as candidates 
+ * Allows to include additional source/sinks/sanitizers as candidates
  *
  * For example, to add additional sinks
  *
@@ -74,7 +75,6 @@ abstract class AdditionalSourceCandidate extends DataFlow::Node { }
 abstract class AdditionalSinkCandidate extends DataFlow::Node { }
 
 abstract class AdditionalSanitizerCandidate extends DataFlow::Node { }
-
 
 /** Holds if data read from a use of `f` may originate from package `pkg`. */
 predicate mayComeFromLibrary(API::Node f, string pkg) {
@@ -212,53 +212,4 @@ predicate step(DataFlow::Node pred, DataFlow::Node succ) {
   succ.(DataFlow::CallNode).getAnArgument() = pred
   or
   guard(pred, succ)
-}
-
-/**
- * Gets a node that is reachable from a source candidate in the propagation graph.
- */
-DataFlow::Node reachableFromSourceCandidate(DataFlow::Node src, DataFlow::TypeTracker t) {
-  isSourceCandidate(result) and
-  src = result and
-  t.start()
-  or
-  step(reachableFromSourceCandidate(src, t), result)
-  or
-  exists(DataFlow::TypeTracker t2 | t = t2.smallstep(reachableFromSourceCandidate(src, t2), result))
-}
-
-/**
- * Gets a node that is reachable from a source candidate through a sanitiser candidate
- * in the propagation graph.
- */
-DataFlow::Node reachableFromSanitizerCandidate(DataFlow::Node san, DataFlow::TypeTracker t) {
-  isSanitizerCandidate(san) and
-  exists(DataFlow::Node src |
-    san = reachableFromSourceCandidate(src, DataFlow::TypeTracker::end()) and
-    src != san
-  ) and
-  result = san and
-  t.start()
-  or
-  step(reachableFromSanitizerCandidate(san, t), result)
-  or
-  exists(StepSummary summary | t = aux(san, result, summary).append(summary))
-}
-
-private import semmle.javascript.dataflow.internal.StepSummary
-
-pragma[noinline]
-private DataFlow::TypeTracker aux(DataFlow::Node san, DataFlow::Node res, StepSummary summary) {
-  StepSummary::smallstep(reachableFromSanitizerCandidate(san, result), res, summary)
-}
-
-/**
- * Holds if there is a path from `src` through `san` to `snk` in the propagation graph,
- * which are source, sanitiser, and sink candidate, respectively.
- */
-predicate triple(DataFlow::Node src, DataFlow::Node san, DataFlow::Node snk) {
-  san = reachableFromSourceCandidate(src, DataFlow::TypeTracker::end()) and
-  src != san and
-  snk = reachableFromSanitizerCandidate(san, DataFlow::TypeTracker::end()) and
-  isSinkCandidate(snk)
 }

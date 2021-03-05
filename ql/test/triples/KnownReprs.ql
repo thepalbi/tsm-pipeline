@@ -1,4 +1,4 @@
-import tsm.PropagationGraphsAlt
+import tsm.Triples
 import test.NamedEvents
 
 class MyKnownReprs extends PropagationGraph::KnownRepr {

@@ -3,8 +3,8 @@
  */
 
 import javascript
-import tsm.PropagationGraphsAlt
-// In this version we use older verisions of standard libraries as Worse versions 
+import tsm.Triples
+// In this version we use older verisions of standard libraries as Worse versions
 import semmle.javascript.security.dataflow.NosqlInjectionCustomizations as NosqlInjectionCustomizationsWorse
 
 module NosqlInjectionWorse = NosqlInjectionCustomizationsWorse::NosqlInjection;

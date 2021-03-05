@@ -1,8 +1,10 @@
 /**
  * An implementation of triples in propagation graphs with additional filtering.
  */
+
 import javascript
 import PropagationGraphs
+private import semmle.javascript.dataflow.internal.StepSummary
 
 predicate repGenerator = candidateRep/3;
 
@@ -81,14 +83,6 @@ module PropagationGraph {
     predicate filterSink(DataFlow::Node snk) { any() }
   }
 
-  /**
-   * Holds if `(src, san, snk)` is a triple, and it is acceptable according to some `NodeFilter`.
-   */
-  predicate tripleSrcSanSnk(DataFlow::Node src, DataFlow::Node san, DataFlow::Node snk) {
-    triple(src, san, snk) and
-    applyFilter(src, san, snk)
-  }
-
   /** Holds if `(src, san, snk)` would be an acceptable triple according to some `NodeFilter`. */
   pragma[inline]
   predicate applyFilter(DataFlow::Node src, DataFlow::Node san, DataFlow::Node snk) {
@@ -100,7 +94,56 @@ module PropagationGraph {
   }
 
   /**
-   * Holds if there is a triple `(ssrc, ssan, ssnk)` that is acceptable according to some.
+   * Gets a node that is reachable from a source candidate in the propagation graph.
+   */
+  DataFlow::Node reachableFromSourceCandidate(DataFlow::Node src, DataFlow::TypeTracker t) {
+    isSourceCandidate(result) and
+    src = result and
+    t.start()
+    or
+    step(reachableFromSourceCandidate(src, t), result)
+    or
+    exists(DataFlow::TypeTracker t2 |
+      t = t2.smallstep(reachableFromSourceCandidate(src, t2), result)
+    )
+  }
+
+  /**
+   * Gets a node that is reachable from a source candidate through a sanitiser candidate
+   * in the propagation graph.
+   */
+  DataFlow::Node reachableFromSanitizerCandidate(DataFlow::Node san, DataFlow::TypeTracker t) {
+    isSanitizerCandidate(san) and
+    exists(DataFlow::Node src |
+      san = reachableFromSourceCandidate(src, DataFlow::TypeTracker::end()) and
+      src != san
+    ) and
+    result = san and
+    t.start()
+    or
+    step(reachableFromSanitizerCandidate(san, t), result)
+    or
+    exists(StepSummary summary | t = aux(san, result, summary).append(summary))
+  }
+
+  pragma[noinline]
+  private DataFlow::TypeTracker aux(DataFlow::Node san, DataFlow::Node res, StepSummary summary) {
+    StepSummary::smallstep(reachableFromSanitizerCandidate(san, result), res, summary)
+  }
+
+  /**
+   * Holds if there is a path from `src` through `san` to `snk` in the propagation graph,
+   * which are source, sanitiser, and sink candidate, respectively.
+   */
+  predicate triple(DataFlow::Node src, DataFlow::Node san, DataFlow::Node snk) {
+    san = reachableFromSourceCandidate(src, DataFlow::TypeTracker::end()) and
+    src != san and
+    snk = reachableFromSanitizerCandidate(san, DataFlow::TypeTracker::end()) and
+    isSinkCandidate(snk)
+  }
+
+  /**
+   * Holds if there is a triple `(ssrc, ssan, ssnk)` that is acceptable according to some
    * `NodeFilter`.
    */
   predicate pairSanSnk(string ssan, string ssnk) {

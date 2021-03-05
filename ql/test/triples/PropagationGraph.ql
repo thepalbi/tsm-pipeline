@@ -1,5 +1,6 @@
-import tsm.PropagationGraphs
+import tsm.Triples
 import test.NamedEvents
+import PropagationGraph
 
 class AllPackagesAreInteresting extends InterestingPackageForSinks, InterestingPackageForSources {
   AllPackagesAreInteresting() { exists(API::moduleImport(this)) }

@@ -33,6 +33,10 @@ jobs:
           echo '--threads 2' >>$HOME/.config/codeql/config
           echo '--timeout 900' >>$HOME/.config/codeql/config
 
+      - name: Compile all queries
+        run: |
+          codeql query compile --check-only $(find ql -name *.ql)
+
       - name: Run tests
         run: |
           codeql --version

@@ -2,7 +2,8 @@
  * A query for computing triples in propagation graphs.
  */
 
-import PropagationGraphs
+import Triples
+import PropagationGraph
 
 class AllPackagesAreInteresting extends InterestingPackageForSinks, InterestingPackageForSources {
   AllPackagesAreInteresting() { exists(API::moduleImport(this)) }

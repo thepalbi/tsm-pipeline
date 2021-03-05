@@ -2,8 +2,9 @@
  * A query for computing triples in propagation graphs.
  */
 
-import tsm.PropagationGraphs
+import tsm.Triples
 import test.NamedEvents
+import PropagationGraph
 
 class AllPackagesAreInteresting extends InterestingPackageForSources {
   AllPackagesAreInteresting() { exists(API::moduleImport(this)) }

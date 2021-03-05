@@ -2,8 +2,9 @@
  * A query for computing triples in propagation graphs.
  */
 
-import tsm.PropagationGraphs
+import tsm.Triples
 import test.NamedEvents
+import PropagationGraph
 
 class AdditionalSink extends AdditionalSinkCandidate, NamedEvent {
   AdditionalSink() { name = "ac" }

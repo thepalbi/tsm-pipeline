@@ -3,7 +3,7 @@
  */
 
 import javascript
-import tsm.PropagationGraphsAlt
+import tsm.Triples
 // In this version we use older verisions of standard libraries as Worse versions
 import semmle.javascript.security.dataflow.DomBasedXssCustomizations as DomBasedXssCustomizationsWorse
 

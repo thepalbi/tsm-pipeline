@@ -1,4 +1,4 @@
-import tsm.PropagationGraphsAlt
+import tsm.Triples
 import test.NamedEvents
 
 class AllPackagesAreInteresting extends InterestingPackageForSinks, InterestingPackageForSources {
