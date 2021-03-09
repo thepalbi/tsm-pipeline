@@ -54,6 +54,7 @@ class CodeQLWrapper:
                          query_file: str,
                          output_file: str, 
                          search_path: str = global_config.search_path,
+                         extra_options = [], 
                          output_format="csv"):
         command_and_arguments = [
             self._code_ql_binary_path,
@@ -68,6 +69,9 @@ class CodeQLWrapper:
             "--ram=64536",
             "--threads=-1"
         ]
+        
+        command_and_arguments = command_and_arguments + extra_options
+
         self._logger.info(
             "Running 'database analyze' for project=[%s] and query_file=[%s]", project, query_file)
         self._run_process(command_and_arguments)

@@ -8,7 +8,7 @@ from orchestration.steps import SOURCE_ENTITIES, SINK_ENTITIES, SANITIZER_ENTITI
     SRC_SAN_TUPLES_ENTITIES, SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES, RESULTS_DIR_KEY
 from orchestration import global_config
 from .wrapper import CodeQLWrapper
-from compute_metrics import createReprPredicate, createReprKnownPredicates
+from compute_metrics import createReprPredicate
 from orchestration import global_config
 
 constaintssolving_dir =  global_config.results_directory
@@ -182,33 +182,30 @@ class DataGenerator:
             query_type, SANITIZERS, f"sanitizer{query_type}Classes", ctx[SANITIZER_ENTITIES], False,
             global_config.worse_lib_search_path)
         
-        # Creates a codeql predicate with repr for the known nodes
-        # This is to decouple the computation os known nodes, using worse libraries
-        # from the analysis that uses the most current library
-        known_predicates_files = createReprKnownPredicates(ctx, self.project_dir, query_type)
-
         # running propagation graph queries
+        # we use the csv files of known sources/sinks/sanitizers 
+        # to feed the corresponding predicates in the PG query
         try:
             propgraph_path = self._get_tsm_query_file(query_type, f"PropagationGraph-{query_type}.ql")
             tmp_propgraph_name = f"PropagationGraph-{self.project_name}-{query_type}.ql"
             new_propgraph_path = os.path.join(os.path.dirname(propgraph_path), tmp_propgraph_name )
             
-            # creates a PG query that includes the reprs from known nodes
+            # Create a copy of PG query with the name of the project
+            # This is useful for debugging (e.g., if the query times-out or fails)
             with open(new_propgraph_path , "w", encoding='utf-8') as new_pg_file: 
                 with open(propgraph_path, "r", encoding='utf-8') as pg_file:
-                    with open(known_predicates_files, "r", encoding='utf-8') as known_file:
-                        pg_lines = pg_file.readlines()
-                        kn_lines = known_file.readlines()
+                    pg_lines = pg_file.readlines()
                 new_pg_file.writelines(pg_lines)
-                new_pg_file.writelines(["\n","\n"])
-                new_pg_file.writelines(kn_lines)
 
             # For Progapation graphs we use current version of CodeQl Libraries  
             self.codeql.database_analyze(
                 self.project_dir,
                 new_propgraph_path,
                 f"{logs_folder}/js-results.csv",
-                global_config.search_path
+                global_config.search_path,
+                [f"--external=knownSource={ctx[SOURCE_ENTITIES]}",
+                f"--external=knownSink={ctx[SINK_ENTITIES]}",
+                f"--external=knownSanitizer={ctx[SANITIZER_ENTITIES]}"]
                 )
 
         except Exception as e:
