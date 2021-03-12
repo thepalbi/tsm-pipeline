@@ -16,6 +16,8 @@ parser.add_argument("--CodeQL-executable", dest="CodeQLExecutable", required=Tru
                     help="Path to the location of the CodeQL executable")
 parser.add_argument("--QL-source-code", dest="QLSourceCode", required=True, type=str, 
                     help="Path to the location of the QL source code (queries)")
+parser.add_argument("--clean", dest="clean", default=False, required=False, 
+                    help="Set to True to perform a clean run")
 
 parsed_arguments = parser.parse_args()
 
@@ -58,14 +60,14 @@ def fetchDatabase(database_name, project_dir):
         # Fetch from Azure blob store
         command = fetchDatabaseCommand(full_database_name, project_dir)
         try:
-            print(f'Fetching {database_name}')
+            print(f'-Fetching {database_name}')
             result = subprocess.run(command, capture_output=True, text=True, shell=True)
             if not databaseExists(full_database_name, project_dir):
-                print(f'Failed to fetch {database_name}')
-                print(f'Failing command is:')
+                print(f'-Failed to fetch {database_name}')
+                print(f'-Failing command is:')
                 print("\t" + command)
                 return False
-            print(f'Unzipping {database_name}')
+            print(f'-Unzipping {database_name}')
             # unzip into tmp directory
             result = subprocess.run(f'unzip {databasePath(full_database_name, project_dir)} -d {tempUnzipDirectory}', capture_output=True, text=True, shell=True)
             # move (and rename) to correct location
@@ -75,7 +77,7 @@ def fetchDatabase(database_name, project_dir):
             return False
         return True
     else:
-        print(f'Skipping fetch because {database_name} exists')
+        print(f'-Skipping fetch because {database_name} exists')
     return True
 
 def listDatabases(project_list):
@@ -92,6 +94,11 @@ if __name__ == '__main__':
     logDirectory = str(Path(__file__).parent.absolute() / "logs")
     projectDirectory = str(Path(__file__).parent.absolute() / "databases")
     # Create results and working folders
+    if parsed_arguments.clean:
+        print("-Cleaning local state")
+        shutil.rmtree(workingDirectory, ignore_errors=True)
+        shutil.rmtree(resultsDirectory, ignore_errors=True)
+        shutil.rmtree(projectDirectory, ignore_errors=True)
     os.makedirs(workingDirectory, exist_ok = True)
     os.makedirs(resultsDirectory, exist_ok = True)
     os.makedirs(resultsLogDirectory, exist_ok=True)
@@ -122,8 +129,11 @@ if __name__ == '__main__':
         "--query-name", f'{query_name}', "--query-type", f'{query_type}',
         "--solver=CBC", "--project-list", f'{parsed_arguments.projectList}',
         "--steps=generate_entities,generate_model,optimize", "run"]
-    print("COMMAND: " + ' '.join(command))
+    print("-Invoking TSM on specified projects: " + ' '.join(command))
     result = subprocess.run(command, capture_output=True, text=True)
-    print("RESULT: " + result.stdout)
-    print("ERROR: " + result.stderr)
-
+    print("-Combining TSM results")
+    combine_scores_path = str(Path(__file__).absolute().parent.parent / "code" / "misc" / "combinescores.py")
+    # N.B. --project-dir parameter is misnamed, it's value should be results-dir
+    command = ["python", combine_scores_path, "--project-dir", f'{resultsDirectory}', "--query-name", query_name]
+    result = subprocess.run(command, capture_output=True, text=True)
+    print(f'-Completed: final output is allscores_{query_name}_avg.txt')
