@@ -43,4 +43,4 @@ jobs:
           STORAGE_SAS: ${{ secrets.ATM_BLOB_STORE_SAS_TOKEN }}
       run: |
         source env/bin/activate
-        pytest --full-trace -v
+        pytest --full-trace -v -s
