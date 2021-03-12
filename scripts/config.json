@@ -1,9 +1,0 @@
-{
-  "codeQLExecutable": "/home/wright/codeql-home/codeql/codeql",
-  "codeQLSourcesRoot": "/home/wright/coding/ml-ql-taint-specification-mining/ql",  
-  "workingDirectory": "/home/wright/coding/ml-ql-taint-specification-mining/workingDirectory",
-  "resultsDirectory": "/home/wright/coding/ml-ql-taint-specification-mining/results",
-  "searchPath": "/home/wright/coding/ml-ql-taint-specification-mining/lib-worse/codeql",
-  "worseLibSearchPath": "/home/wright/coding/ml-ql-taint-specification-mining/lib-worse/codeql",
-  "logsDirectory" : "/home/wright/coding/ml-ql-taint-specification-mining/logs"
-}

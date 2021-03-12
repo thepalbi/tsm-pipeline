@@ -2,6 +2,8 @@
 echo "Processing databases"
 python ../code/main.py \
    --project-dir /home/wright/ATM-JavaScript-Databases/nosql_databases \
+   --results-dir /home/wright/coding/ml-ql-taint-specification-mining/results \
+   --working-dir /home/wright/coding/ml-ql-taint-specification-mining/workingDirectory \
    --query-name NosqlInjectionWorse \
    --query-type NoSql \
    --solver=CBC \
