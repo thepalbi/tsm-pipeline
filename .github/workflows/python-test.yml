@@ -2,6 +2,9 @@ name: Run Python unit tests
 on:
 - pull_request
 
+env:
+  AZURE_STORAGE_URL: https://atmcodeqldata.blob.core.windows.net
+
 jobs:
   run-tests:
     runs-on: ubuntu-latest
@@ -35,6 +38,9 @@ jobs:
         pip install -r code/requirements.txt
 
     - name: Run unit tests
+      env:
+          # Some tests need to pull data from Azure blob storage
+          STORAGE_SAS: ${{ secrets.ATM_BLOB_STORE_SAS_TOKEN }}
       run: |
         source env/bin/activate
         pytest --full-trace -v
