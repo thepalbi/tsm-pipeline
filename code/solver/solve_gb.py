@@ -50,7 +50,7 @@ def solve_constraints_combine_model(config: SolverConfig, ctx):
     # write minimization objective
     print("Writing minimization objective")
     print("Model file: %s" % modelfile_path)
-    print("Constraint foler: %s" % constraintsdir)
+    print("Constraint folder: %s" % constraintsdir)
     with open(modelfile_path, "w") as modelfile:
         modelfile.write("Minimize\n")
         modelfile.write(open(os.path.join(constraintsdir, "objective.txt")).read())
