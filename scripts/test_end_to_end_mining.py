@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 import filecmp
 
-def test_regress_cbc():
+def test_end_to_end_mining():
     thisFolder = str(Path(__file__).parent.absolute())
     # Remove final output
     finalOutput = os.path.join(thisFolder, "allscores_NosqlInjectionWorse_avg.txt")
