@@ -61,6 +61,7 @@ def fetchDatabase(database_name, project_dir):
         command = fetchDatabaseCommand(full_database_name, project_dir)
         try:
             print(f'-Fetching {database_name}')
+            print(f'-using command: {command}')
             subprocess.check_call(command, text=True, shell=True)
             if not databaseExists(full_database_name, project_dir):
                 print(f'-Failed to fetch {database_name}')
