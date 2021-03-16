@@ -68,4 +68,4 @@ jobs:
           ATM_BLOB_STORE_SAS_TOKEN: ${{ secrets.ATM_BLOB_STORE_SAS_TOKEN }}
       run: |
         source env/bin/activate
-        cd /home/runner/work/ml-ql-taint-specification-mining/ml-ql-taint-specification-mining; pytest --full-trace -v -s
+        pytest --rootdir=/home/runner/work/ml-ql-taint-specification-mining/ml-ql-taint-specification-mining --full-trace -v -s
