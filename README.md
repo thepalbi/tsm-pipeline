@@ -49,8 +49,7 @@ and follow the instructions.
 
 The high-level entry point is the bash script `/scripts/run.sh`. Edit that script to configure your run. You need only specify:
 - the query name (currently one of `NoSql`, `Sql`, `Xss`, `TaintedPath`)
-- the path to a `.txt` file that contains the list of databases to mine (that are availble on blob storage)
-- and the path to your local installation of CodeQL
+- and the path to a `.txt` file that contains the list of databases to mine (that are availble on blob storage).
 
 Running `./run.sh` in the `scripts` folder will fetch each database in turn, mine it, and then finally combine the scores.
 
