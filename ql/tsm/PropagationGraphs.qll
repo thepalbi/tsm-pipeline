@@ -17,6 +17,7 @@
 
 import javascript
 import NodeRepresentation
+private import semmle.javascript.dataflow.internal.StepSummary
 
 /**
  * The name of an npm package that should be considered when building the propagation graph.
@@ -212,4 +213,76 @@ predicate step(DataFlow::Node pred, DataFlow::Node succ) {
   succ.(DataFlow::CallNode).getAnArgument() = pred
   or
   guard(pred, succ)
+}
+
+/**
+ * Holds if `mcn` looks like it might be a call to a setter updating property `prop` on `base`
+ * to `rhs`.
+ *
+ * The property name is determined heuristically, being either the entire method name or `Foo`
+ * if the method name is `storeFoo`, `putFoo`, `setFoo`, or `writeFoo`.
+ */
+private predicate candidateSetterCall(
+  DataFlow::MethodCallNode mcn, DataFlow::Node rhs, DataFlow::Node base, string prop
+) {
+  // allow up to two extra arguments (e.g., a key and a callback)
+  mcn.getNumArgument() <= 3 and
+  rhs = mcn.getAnArgument() and
+  base = mcn.getReceiver() and
+  exists(string m | m = mcn.getMethodName() |
+    m = ["store", "put", "set", "write"] + prop
+    or
+    m = prop
+  )
+}
+
+/**
+ * Holds if `mcn` looks like it might be a call to a getter retrieving property `prop` on `base`
+ * and making it available in `output`.
+ *
+ * The property name is determined heuristically, being either the entire method name or `Foo`
+ * if the method name is `getFoo`, `loadFoo`, or `readFoo`.
+ */
+private predicate candidateGetterCall(
+  DataFlow::MethodCallNode mcn, DataFlow::Node base, DataFlow::Node output, string prop
+) {
+  // allow up to two extra arguments (e.g., a default value and a callback)
+  mcn.getNumArgument() <= 3 and
+  base = mcn.getReceiver() and
+  output = mcn and
+  exists(string m | m = mcn.getMethodName() | m = ["get", "load", "read"] + prop or m = prop)
+}
+
+/**
+ * A property being read or stored by a (candidate) getter or setter.
+ */
+private class GetterSetterPseudoProperty extends TypeTrackingPseudoProperty {
+  string prop;
+
+  GetterSetterPseudoProperty() {
+    this = "$GetterSetter$" + prop and
+    (candidateSetterCall(_, _, _, prop) or candidateGetterCall(_, _, _, prop))
+  }
+
+  string getPropertyName() { result = prop }
+}
+
+class GetterSetterStep extends DataFlow::AdditionalTypeTrackingStep, DataFlow::MethodCallNode {
+  GetterSetterStep() {
+    exists(DataFlow::SourceNode src |
+      not src = DataFlow::moduleImport(_) and
+      this = src.getAMethodCall()
+    )
+  }
+
+  override predicate storeStep(DataFlow::Node pred, DataFlow::SourceNode succ, string prop) {
+    exists(DataFlow::Node recv |
+      candidateSetterCall(this, pred, recv, prop.(GetterSetterPseudoProperty).getPropertyName()) and
+      succ = recv.getALocalSource()
+    )
+  }
+
+  override predicate loadStep(DataFlow::Node pred, DataFlow::Node succ, string prop) {
+    candidateGetterCall(this, pred, succ, prop.(GetterSetterPseudoProperty).getPropertyName())
+  }
 }
