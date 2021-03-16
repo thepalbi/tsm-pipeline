@@ -24,6 +24,9 @@ def test_end_to_end_mining():
     codeQLPath, err = process.communicate()
     codeQLPath = codeQLPath.decode("utf-8").rstrip()
     print(f'CodeQL path = {codeQLPath}')
+    if not codeQLPath:
+        print("Error: Bad CodeQL path")
+        assert(False)
     run.runTSM(projectsPath, codeQLPath, qlSourceCodePath, "NoSql", False)
     # Check final output was generated
     if not os.path.isfile(finalOutput):
