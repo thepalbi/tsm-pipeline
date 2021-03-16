@@ -61,7 +61,7 @@ def fetchDatabase(database_name, project_dir):
         command = fetchDatabaseCommand(full_database_name, project_dir)
         try:
             print(f'-Fetching {database_name}')
-            result = subprocess.run(command, capture_output=True, text=True, shell=True)
+            subprocess.check_call(command, text=True, shell=True)
             if not databaseExists(full_database_name, project_dir):
                 print(f'-Failed to fetch {database_name}')
                 print(f'-Failing command is:')
@@ -69,9 +69,9 @@ def fetchDatabase(database_name, project_dir):
                 return False
             print(f'-Unzipping {database_name}')
             # unzip into tmp directory
-            result = subprocess.run(f'unzip {databasePath(full_database_name, project_dir)} -d {tempUnzipDirectory}', capture_output=True, text=True, shell=True)
+            subprocess.check_call(f'unzip {databasePath(full_database_name, project_dir)} -d {tempUnzipDirectory}', text=True, shell=True)
             # move (and rename) to correct location
-            result = subprocess.run(f'cp -r {tempUnzipDirectory}/* {project_dir}/{database_name}', capture_output=True, text=True, shell=True)
+            subprocess.check_call(f'cp -r {tempUnzipDirectory}/* {project_dir}/{database_name}', text=True, shell=True)
         except subprocess.CalledProcessError as e:
             print(e.output)
             return False
@@ -124,16 +124,16 @@ if __name__ == '__main__':
     # Invoke TSM
     query_name, query_type = convertQueryName(parsed_arguments.query_name)
     tsm_path = str(Path(__file__).absolute().parent.parent / "code" / "main.py")
-    command = ["python", tsm_path, "--project-dir", f'{projectDirectory}',
+    command = ["python3", tsm_path, "--project-dir", f'{projectDirectory}',
         "--results-dir", f'{resultsDirectory}', "--working-dir", f'{workingDirectory}',
         "--query-name", f'{query_name}', "--query-type", f'{query_type}',
         "--solver=CBC", "--project-list", f'{parsed_arguments.projectList}',
         "--steps=generate_entities,generate_model,optimize", "run"]
     print("-Invoking TSM on specified projects: " + ' '.join(command))
-    result = subprocess.run(command, capture_output=True, text=True)
+    subprocess.check_call(command, text=True)
     print("-Combining TSM results")
     combine_scores_path = str(Path(__file__).absolute().parent.parent / "code" / "misc" / "combinescores.py")
     # N.B. --project-dir parameter is misnamed, it's value should be results-dir
-    command = ["python", combine_scores_path, "--project-dir", f'{resultsDirectory}', "--query-name", query_name]
-    result = subprocess.run(command, capture_output=True, text=True)
+    command = ["python3", combine_scores_path, "--project-dir", f'{resultsDirectory}', "--query-name", query_name]
+    subprocess.check_call(command, text=True)
     print(f'-Completed: final output is allscores_{query_name}_avg.txt')
