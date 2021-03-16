@@ -1,14 +1,10 @@
-import datetime
 import os
 import shutil
-import traceback
 from glob import glob
 from generation.data import DataGenerator
 from DataParser import compute_rep_count
-import sys
-import time
 
-from compute_metrics import getallmetrics, createReprPredicate
+from compute_metrics import getallmetrics
 from orchestration.steps import OrchestrationStep, Context,\
     CONSTRAINTS_DIR_KEY, MODELS_DIR_KEY, RESULTS_DIR_KEY, WORKING_DIR_KEY, LOGS_DIR_KEY, \
     SOURCE_ENTITIES, SANITIZER_ENTITIES,  SINK_ENTITIES,SRC_SAN_TUPLES_ENTITIES,SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES, \
@@ -16,7 +12,7 @@ from orchestration.steps import OrchestrationStep, Context,\
 
 from solver.config import SolverConfig
 from solver.get_constraints import ConstraintBuilder
-from solver.solve_gb import solve_constraints_combine_model, solve_constraints
+from solver.solve_gb import solve_constraints_combine_model
 
 
 class CountRepsStep(OrchestrationStep):
@@ -62,7 +58,7 @@ class CountRepsStep(OrchestrationStep):
             project = os.path.basename(project_path)
             project_dir = os.path.dirname(project_path)
             try:
-                self.logger.info("Analizing project: %s", project)
+                self.logger.info("Analyzing project: %s", project)
 
                 # hack -> refactor using populate
                 dataGenerator = DataGenerator(project_dir, project, 
@@ -167,7 +163,7 @@ class GenerateModelStep(OrchestrationStep):
             project = os.path.basename(project_path)
             project_dir = os.path.dirname(project_path)
             try:
-                self.logger.info("Analizing project: %s", project)
+                self.logger.info("Analyzing project: %s", project)
 
                 # hack -> refactor using populate
                 if not self.orchestrator.run_single:

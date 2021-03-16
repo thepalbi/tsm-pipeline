@@ -23,15 +23,38 @@ Instructions for installing [CBC](https://github.com/coin-or/Cbc) are [here](htt
 
 N.B. TSM uses Gurobi by default. To use CBC instead add `--solver=CBC` as a command-line argument.
 
-## Downloading databases from LGTM
+## Executing the analysis pipeline using a high-level script
 
-The files `nosqlinjection_projects.txt`, `sqlinjection_projects.txt`, and `nosql_projects.txt` contains each one a a list of databases to be fetched from the LGTM site.
+TSM can be invoked at a fine-grained level (see next section), which is useful for TSM development and performing experiments. 
+But TSM can also be invoked using a high-level script, which gives less control, but is easier to configure. Here the databases
+containing source code to mine are pulled from the CodeML's teams Azure blob storage.
 
-To get projects for LGTM site you can run `python3 -m misc.scrape -dld [project-slug] -o [projectsFolder]` where`project-slug` is one database listed in the three aforementioned files (e.g. `1046224544/fontend`). The result of the script is a zip file (e.g., `projectsFolder/1046224544-fontend.zip`) which will be placed in the folder `projectsFolder` that must exist beforehand.
+First, you need to install some prerequisites:
 
-Finally unzip the zip file corresponding to the downloaded database (e.g., `projectsFolder/1046224544-fontend.zip`)
+### Install azcopy
 
-# Executing the analysis pipeline using the Orchestrator
+Some python scripts use `azcopy` to fetch data. Follow the instructions [here](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10) to install `azcopy` for your machine. Then:
+
+- Ensure `azcopy` is in your OS path
+- Request an Azure SAS token from @z80coder
+- Create a `SAS_TOKEN` environment variable and set its value to the provided SAS token
+
+Before running any scripts that rely on `azcopy` please ensure that you login to Azure with:
+```
+azcopy login
+```
+and follow the instructions.
+
+### Invoking the script
+
+The high-level entry point is the bash script `/scripts/run.sh`. Edit that script to configure your run. You need only specify:
+- the query name (currently one of `NoSql`, `Sql`, `Xss`, `TaintedPath`)
+- and the path to a `.txt` file that contains the list of databases to mine (that are availble on blob storage).
+
+Running `./run.sh` in the `scripts` folder will fetch each database in turn, mine it, and then finally combine the scores.
+
+## Executing the analysis pipeline using the low-level Orchestrator
+
 The `Orchestrator` can be used to execute each phase of the analysis pipeline.
 The pipeline at the moment has the following steps implemented:
 
@@ -44,8 +67,17 @@ Once entities are generated, there is an additional step that can be used to fil
 
 - `count_reps`: Additional step that allows for computing the number of occurrences. That can be used *before* the `generate_model` step to filter infrequent representations.
 
-
 These steps can be executed individually or all together in an end-to-end runner. You can use the orchestrator in code, or with its CLI. The latter one is located in `main.py`.
+
+### Downloading databases from LGTM
+
+The files `nosqlinjection_projects.txt`, `sqlinjection_projects.txt`, and `nosql_projects.txt` contains each one a a list of databases to be fetched from the LGTM site.
+
+To get projects for LGTM site you can run `python3 -m misc.scrape -dld [project-slug] -o [projectsFolder]` where`project-slug` is one database listed in the three aforementioned files (e.g. `1046224544/fontend`). The result of the script is a zip file (e.g., `projectsFolder/1046224544-fontend.zip`) which will be placed in the folder `projectsFolder` that must exist beforehand.
+
+Finally unzip the zip file corresponding to the downloaded database (e.g., `projectsFolder/1046224544-fontend.zip`)
+
+### Specify the configuration
 
 First, configure the `code/config.json` file. It has the following properties:
 
@@ -64,6 +96,8 @@ First, configure the `code/config.json` file. It has the following properties:
 The `workingDirectory` determines the location where all working files (e.g., csv files, constraints, and gurobi model) are placed.
 `resultsDirectory` is the place where the resulting files of the process (e.g, `reprScores.txt`)
 are placed. Both directories can be overwritten by using (optional) command line options.
+
+### Running the pipeline
 
 Then, you can either run the whole pipeline
 
@@ -101,7 +135,8 @@ To see more options or get help from the CLI:
 python main.py --help
 ```
 
-## Combine the scores from each database
+### Combine the scores from each database
+
 Once the pipeline has been executed, individual results can be combined to get an aggregated result for a set of DBs.
 
 Use `python3 misc/combinescores.py` to combine the scores from each database.
@@ -118,11 +153,11 @@ This command will recompute the queries on *all* the projects contained in the l
 
 You can also include the option `--multiple` in `main.py` to build a model for all projects together. This will generate one `reprScores.txt` file in a special folder named `multiple`.
 
-# Running Python tests
+## Running Python tests
 
 At the root directory, simply running `pytest` on the command line will run all the python tests.
 
-# Troubleshooting
+## Troubleshooting
 
 The CodeQL runtime uses java.nio for file handlings. A not so rare error, is `/some_disk/lost+found` having the incorrect permissions, `root` for example, and not letting the CodeQL process write to it. The error looks as follows:
 

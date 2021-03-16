@@ -1,13 +1,15 @@
 import gurobipy as gp
 from gurobipy import GRB
 from .MyConstraintedProblem import GBTaintSpecConstraints
-import shutil
 from .config import SolverConfig
 from orchestration.steps import CONSTRAINTS_DIR_KEY, MODELS_DIR_KEY
 import os
 
+# TODO: set-up proper Python project structure
+from pathlib import Path
+path = str(Path(__file__).parent.parent.absolute() / "cbc_utils")
 import sys
-sys.path.append("./cbc_utils")
+sys.path.append(path)
 import cbc_utils
 
 def solveLpProblemGurobi(lpFilePath, lpResultsFilePath):
@@ -48,7 +50,7 @@ def solve_constraints_combine_model(config: SolverConfig, ctx):
     # write minimization objective
     print("Writing minimization objective")
     print("Model file: %s" % modelfile_path)
-    print("Constraint foler: %s" % constraintsdir)
+    print("Constraint folder: %s" % constraintsdir)
     with open(modelfile_path, "w") as modelfile:
         modelfile.write("Minimize\n")
         modelfile.write(open(os.path.join(constraintsdir, "objective.txt")).read())

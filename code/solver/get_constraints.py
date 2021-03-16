@@ -440,7 +440,7 @@ class ConstraintBuilder:
         print("Flows: San-Snk {0}, Src-San {1}, Src-Snk {2}".format(len(sanit_sink), len(source_sanit), len(source_sink)))
 
         constraints_flow_path = os.path.join(self.outputdir, "constraints_flow.txt")
-        print(constraints_flow_path)
+        print(f'constraints flow path = {constraints_flow_path}')
 
         with open(constraints_flow_path, "a+") as constraintsfile:
             for san_snk_pair in sanit_sink.keys():
