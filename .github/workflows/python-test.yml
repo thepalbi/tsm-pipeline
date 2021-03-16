@@ -18,6 +18,30 @@ jobs:
 
     - uses: actions/checkout@v2
 
+    - name: Check out CodeQL standard library
+      uses: actions/checkout@v2
+      with:
+        repository: github/codeql
+        path: codeql-lib
+        ref: lgtm.com
+
+    - name: Download CodeQL
+      uses: dsaltares/fetch-gh-release-asset@939be9e72e81fe7009b6112bc96abde38bf7b68f
+      with:
+        repo: "github/codeql-cli-binaries"
+        version: "latest"
+        file: "codeql-linux64.zip"
+        target: "codeql.zip"
+
+    - name: Set up CodeQL
+      run: |
+        unzip -q codeql.zip
+        echo "$(readlink -f codeql)" >>$GITHUB_PATH
+        mkdir $HOME/.config/codeql
+        echo '--ram 6000' >$HOME/.config/codeql/config
+        echo '--threads 2' >>$HOME/.config/codeql/config
+        echo '--timeout 900' >>$HOME/.config/codeql/config
+
     - name: Cache pip
       uses: actions/cache@v2
       with:
