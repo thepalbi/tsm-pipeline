@@ -42,7 +42,7 @@ def databaseExists(database_name, project_dir):
 def fetchDatabaseCommand(database_name, project_dir):
     # We assume that the database_name is stored as a .zip file on blob store
     database_path = databasePath(database_name, project_dir)
-    command = "azcopy copy " + f'"https://atmcodeqldata.blob.core.windows.net/atm/javascript-databases/nosql_800_no_evaluation/{database_name}' + "?" + "${SAS_TOKEN}\"" + f' "{database_path}"' + ' --overwrite=true --check-md5 FailIfDifferent --from-to=BlobLocal --recursive'
+    command = "azcopy copy " + f'"https://atmcodeqldata.blob.core.windows.net/atm/javascript-databases/nosql_800_no_evaluation/{database_name}' + "?" + "${ATM_BLOB_STORE_SAS_TOKEN}\"" + f' "{database_path}"' + ' --overwrite=true --check-md5 FailIfDifferent --from-to=BlobLocal --recursive'
     return command
 
 def fetchDatabase(database_name, project_dir):
