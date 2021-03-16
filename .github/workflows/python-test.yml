@@ -36,6 +36,7 @@ jobs:
         virtualenv env
         source env/bin/activate
         pip install -r code/requirements.txt
+        python -m pip install -i https://pypi.gurobi.com gurobipy
 
     - name: Run unit tests
       env:
