@@ -100,6 +100,7 @@ class CodeQLWrapper:
         self._logger.debug("command issued: %s",
                            " ".join(command_and_arguments))
         try:
+            print(f'COMMAND: {" ".join(command_and_arguments)}')
             process = subprocess.check_call(command_and_arguments, text=True, shell=True)
         except subprocess.CalledProcessError as call_error:
             print(f'COMMAND FAILED: {call_error.stderr}')
