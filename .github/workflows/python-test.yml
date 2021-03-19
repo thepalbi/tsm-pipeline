@@ -40,7 +40,6 @@ jobs:
         mkdir $HOME/.config/codeql
         echo '--ram 6000' >$HOME/.config/codeql/config
         echo '--threads 2' >>$HOME/.config/codeql/config
-        echo '--timeout 900' >>$HOME/.config/codeql/config
 
     - name: Cache pip
       uses: actions/cache@v2

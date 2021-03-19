@@ -105,5 +105,5 @@ class CodeQLWrapper:
         except subprocess.CalledProcessError as call_error:
             self._logger.error(
                 "Error when executing codeql:\n%s", call_error.stderr)
-            sys.exit(f'error calling codeql: {call_error}')
+            sys.exit(f'Error when calling codeql: {call_error}')
         self._logger.debug("Output from codeql:\n%s", process.stdout)
