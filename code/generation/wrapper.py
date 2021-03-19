@@ -103,7 +103,8 @@ class CodeQLWrapper:
         process = ""
         try:
             process = subprocess.run(
-                command_and_arguments, capture_output=True, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                command_and_arguments, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(f'COMMAND SUCCEEDED:\n\tstdout: {process.stdout}')
         except subprocess.CalledProcessError as call_error:
             print(f'COMMAND FAILED:\n\tstdout: {process.stdout}\n\tstderr: {process.stderr}')
             self._logger.error(
