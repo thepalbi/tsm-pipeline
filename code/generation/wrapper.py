@@ -100,7 +100,6 @@ class CodeQLWrapper:
         self._logger.debug("command issued: %s",
                            " ".join(command_and_arguments))
 
-        process = ""
         try:
             process = subprocess.run(
                 command_and_arguments, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
