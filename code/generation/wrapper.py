@@ -102,8 +102,8 @@ class CodeQLWrapper:
         try:
             process = subprocess.check_call(command_and_arguments, text=True, shell=True)
         except subprocess.CalledProcessError as call_error:
-            print(f'COMMAND FAILED: {call_error.output}')
+            print(f'COMMAND FAILED: {call_error.stderr}')
             self._logger.error(
-                "Error when executing codeql:\n%s", call_error.output)
-            sys.exit(f'Error when executing codeql: {call_error.output}')
+                "Error when executing codeql:\n%s", call_error.stderr)
+            sys.exit(f'Error when executing codeql: {call_error.stderr}')
         self._logger.debug("Output from codeql:\n%s", process.stdout)
