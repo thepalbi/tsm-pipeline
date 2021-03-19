@@ -99,14 +99,11 @@ class CodeQLWrapper:
     def _run_process(self, command_and_arguments):
         self._logger.debug("command issued: %s",
                            " ".join(command_and_arguments))
-
         try:
-            process = subprocess.run(
-                command_and_arguments, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print(f'COMMAND SUCCEEDED:\n\tstdout: {process.stdout}')
+            process = subprocess.check_call(command_and_arguments, check=True, shell=True)
         except subprocess.CalledProcessError as call_error:
-            print(f'COMMAND FAILED:\n\tstdout: {process.stdout}\n\tstderr: {process.stderr}')
+            print(f'COMMAND FAILED: {call_error.output}')
             self._logger.error(
-                "Error when executing codeql:\n%s", call_error.stderr)
-            sys.exit(f'Error when executing codeql: {call_error.stderr}')
+                "Error when executing codeql:\n%s", call_error.output)
+            sys.exit(f'Error when executing codeql: {call_error.output}')
         self._logger.debug("Output from codeql:\n%s", process.stdout)
