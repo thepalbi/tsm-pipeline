@@ -37,9 +37,6 @@ def test_end_to_end_mining():
         output = f.readlines()
     print("Output from test is:")
     print("".join(output))
-    """
-    TODO: make TSM deterministic
-
     # N.B. We can't activate this more stringent test because it seems TSM is not deterministic
     expectedOutput = os.path.join(thisFolder, "allscores_NosqlInjectionWorse_avg.expected.txt")
     if not filecmp.cmp(finalOutput, expectedOutput):
@@ -51,4 +48,4 @@ def test_end_to_end_mining():
         print("".join(expectedOutput))
         print("This indicates a bug, or you need to update the expected output.")
         assert(False)
-    """
+        
