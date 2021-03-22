@@ -98,6 +98,8 @@ def printmetrics(trainingsize, config: SolverConfig, ctx):
         with open(repr_scores_file_path, "w", encoding='utf-8') as reprscores:
             sizeReprSet = len(repConstraints) 
             countRepr = 0     
+            # sort constraints before writing to enforce determinism 
+            repConstraints.sort()
             for repConstraint in repConstraints:
                 countRepr = countRepr + 1
                 if countRepr<sizeReprSet:

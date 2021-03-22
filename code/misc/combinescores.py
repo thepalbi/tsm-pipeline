@@ -74,8 +74,10 @@ def combine_scores(query, \
             "module TsmRepr {\n",""
             "  float getReprScore(string repr, string t){\n"
             ])
+        # we are currently only writing combined scores for sinks
+        # to add sources and sanitizers simple add a similar line with src_dict and san_dict 
         scoresfile.write(" or\n".join(["   repr = \"{0}\" and t = \"{1}\" and result = {2}".format(k, "snk",  "%.10f" 
-    % np.mean(snk_dict[k])) for k in snk_dict.keys()]))
+    % np.mean(snk_dict[k])) for k in sorted(snk_dict.keys())]))
         scoresfile.writelines([
         "\n",
         "   } \n",""
