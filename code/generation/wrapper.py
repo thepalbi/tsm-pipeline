@@ -65,11 +65,10 @@ class CodeQLWrapper:
             f'--format={output_format}',
             f'--logdir={self._logs_directory}',
             f'--output={output_file}',
-            f'--search-path={search_path}'
-            # May not work well on Actions
-            #"--timeout=3600"
-            #"--ram=64536",
-            #"--threads=-1"
+            f'--search-path={search_path}',
+            "--timeout=3600",
+            "--ram=64536",
+            "--threads=-1"
         ]
 
         command_and_arguments = command_and_arguments + extra_options
