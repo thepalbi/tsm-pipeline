@@ -38,7 +38,6 @@ jobs:
         unzip -q codeql.zip
         echo "$(readlink -f codeql)" >>$GITHUB_PATH
         mkdir $HOME/.config/codeql
-        echo '--ram 6000' >$HOME/.config/codeql/config
         echo '--threads 2' >>$HOME/.config/codeql/config
 
     - name: Cache pip
