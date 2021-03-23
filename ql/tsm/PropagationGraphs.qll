@@ -279,10 +279,12 @@ class GetterSetterStep extends DataFlow::AdditionalTypeTrackingStep, DataFlow::M
     exists(DataFlow::Node recv |
       candidateSetterCall(this, pred, recv, prop.(GetterSetterPseudoProperty).getPropertyName()) and
       succ = recv.getALocalSource()
-    )
+    ) and
+    not pred.asExpr() instanceof Literal
   }
 
   override predicate loadStep(DataFlow::Node pred, DataFlow::Node succ, string prop) {
-    candidateGetterCall(this, pred, succ, prop.(GetterSetterPseudoProperty).getPropertyName())
+    candidateGetterCall(this, pred, succ, prop.(GetterSetterPseudoProperty).getPropertyName()) and
+    not pred.asExpr() instanceof Literal
   }
 }
