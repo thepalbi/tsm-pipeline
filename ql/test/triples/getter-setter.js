@@ -50,3 +50,9 @@ let w4 = new Wrapper();
 w4.setX(lib.source() /* event: ha */);
 let sanitized = lib.sanitize(w4) /* event: hb */;
 lib.sink(sanitized /* event: hc */);
+
+// no spurious flow through map
+let m = new Map();
+m.set('tainted1', lib.source() /* event: ia */);
+let sanitized3 = lib.sanitize(m.get('tainted2')) /* event: ib */;
+lib.sink(sanitized3 /* event: ic */);

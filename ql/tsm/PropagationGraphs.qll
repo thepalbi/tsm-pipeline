@@ -216,6 +216,29 @@ predicate step(DataFlow::Node pred, DataFlow::Node succ) {
 }
 
 /**
+ * Gets the string value of a constant argument of `mcn`.
+ */
+private string constantArg(DataFlow::MethodCallNode mcn) {
+  mcn.getAnArgument().mayHaveStringValue(result)
+}
+
+/**
+ * For a method call `mcn` where the method is named something like `get<suffix>` or `set<suffix>`,
+ * guess a likely property name for the property that is being get or set.
+ *
+ * If the suffix is not empty, we just use that as our property name. If it is empty and there is a
+ * constant argument, then that's our guess, and otherwise we fall back on the empty name.
+ */
+bindingset[suffix]
+private string guessPropertyName(DataFlow::MethodCallNode mcn, string suffix) {
+  // if the method name gives no hints as to the property name, look for a constant argument
+  suffix = "" and result = constantArg(mcn)
+  or
+  (suffix != "" or not exists(constantArg(mcn))) and
+  result = suffix
+}
+
+/**
  * Holds if `mcn` looks like it might be a call to a setter updating property `prop` on `base`
  * to `rhs`.
  *
@@ -230,7 +253,9 @@ private predicate candidateSetterCall(
   rhs = mcn.getAnArgument() and
   base = mcn.getReceiver() and
   exists(string m | m = mcn.getMethodName() |
-    m = ["store", "put", "set", "write"] + prop
+    exists(string suffix | m = ["store", "put", "set", "write"] + suffix |
+      prop = guessPropertyName(mcn, suffix)
+    )
     or
     m = prop
   )
@@ -250,7 +275,13 @@ private predicate candidateGetterCall(
   mcn.getNumArgument() <= 3 and
   base = mcn.getReceiver() and
   output = mcn and
-  exists(string m | m = mcn.getMethodName() | m = ["get", "load", "read"] + prop or m = prop)
+  exists(string m | m = mcn.getMethodName() |
+    exists(string suffix | m = ["get", "load", "read"] + suffix |
+      prop = guessPropertyName(mcn, suffix)
+    )
+    or
+    m = prop
+  )
 }
 
 /**
