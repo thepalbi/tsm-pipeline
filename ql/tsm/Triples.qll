@@ -87,7 +87,7 @@ module PropagationGraph {
   }
 
   /**
-   * Holds if `res` is reachable from a source candidate in the propagation graph.
+   * Holds if `res` is reachable from source candidate `src` in the propagation graph.
    */
   predicate reachableFromSourceCandidate(
     DataFlow::Node res, DataFlow::Node src, DataFlow::TypeTracker t
@@ -106,15 +106,21 @@ module PropagationGraph {
   }
 
   /**
+   * Holds if `san` is a sanitizer candidate that is reachable from source candidate `src` in the
+     propagation graph, but is not identical to `src`.
+   */
+  private predicate sanitizerCandidateReachableFromSource(DataFlow::Node san, DataFlow::Node src) {
+    isSanitizerCandidate(san) and
+    reachableFromSourceCandidate(san, src, DataFlow::TypeTracker::end()) and
+    src.getEnclosingExpr() != san.getEnclosingExpr()
+  }
+
+  /**
    * Gets a node that is reachable from a source candidate through a sanitiser candidate
    * in the propagation graph.
    */
   DataFlow::Node reachableFromSanitizerCandidate(DataFlow::Node san, DataFlow::TypeTracker t) {
-    isSanitizerCandidate(san) and
-    exists(DataFlow::Node src |
-      reachableFromSourceCandidate(san, src, DataFlow::TypeTracker::end()) and
-      src != san
-    ) and
+    sanitizerCandidateReachableFromSource(san, _) and
     result = san and
     t.start()
     or
@@ -133,8 +139,7 @@ module PropagationGraph {
    * which are source, sanitiser, and sink candidate, respectively.
    */
   predicate triple(DataFlow::Node src, DataFlow::Node san, DataFlow::Node snk) {
-    reachableFromSourceCandidate(san, src, DataFlow::TypeTracker::end()) and
-    src != san and
+    sanitizerCandidateReachableFromSource(san, src) and
     snk = reachableFromSanitizerCandidate(san, DataFlow::TypeTracker::end()) and
     isSinkCandidate(snk)
   }
@@ -145,10 +150,7 @@ module PropagationGraph {
    */
   predicate pairSanSnk(string ssan, string ssnk) {
     exists(DataFlow::Node src, DataFlow::Node san, DataFlow::Node snk |
-      reachableFromSourceCandidate(san, src, DataFlow::TypeTracker::end()) and
-      src.getEnclosingExpr() != san.getEnclosingExpr() and
-      snk = reachableFromSanitizerCandidate(san, DataFlow::TypeTracker::end()) and
-      isSinkCandidate(snk) and
+      triple(src, san, snk) and
       exists(getconcatrep(src, false)) and
       ssan = getconcatrep(san, false) and
       ssnk = getconcatrep(snk, true) and
@@ -162,10 +164,7 @@ module PropagationGraph {
    */
   predicate pairSrcSan(string ssrc, string ssan) {
     exists(DataFlow::Node src, DataFlow::Node san, DataFlow::Node snk |
-      reachableFromSourceCandidate(san, src, DataFlow::TypeTracker::end()) and
-      src.getEnclosingExpr() != san.getEnclosingExpr() and
-      snk = reachableFromSanitizerCandidate(san, DataFlow::TypeTracker::end()) and
-      isSinkCandidate(snk) and
+      triple(src, san, snk) and
       exists(getconcatrep(snk, true)) and
       ssan = getconcatrep(san, false) and
       ssrc = getconcatrep(src, false) and
