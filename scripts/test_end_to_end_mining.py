@@ -27,7 +27,7 @@ def test_end_to_end_mining():
     if not codeQLPath:
         print("Missing CodeQL path")
         assert(False)
-    run.runTSM(projectsPath, codeQLPath, qlSourceCodePath, "NoSql", False)
+    run.runTSM(projectsPath, codeQLPath, qlSourceCodePath, "NoSql", True)
     # Check final output was generated
     if not os.path.isfile(finalOutput):
         print(f'Expected output at {finalOutput} but it\'s missing')

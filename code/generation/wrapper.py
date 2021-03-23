@@ -65,7 +65,8 @@ class CodeQLWrapper:
             f'--format={output_format}',
             f'--logdir={self._logs_directory}',
             f'--output={output_file}',
-            f'--search-path={search_path}'
+            f'--search-path={search_path}',
+            f'--threads=0' # 1 thread per core
         ]
 
         command_and_arguments = command_and_arguments + extra_options
