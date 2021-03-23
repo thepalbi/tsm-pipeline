@@ -108,7 +108,7 @@ module PropagationGraph {
 
   /**
    * Holds if `san` is a sanitizer candidate that is reachable from source candidate `src` in the
-     propagation graph, but is not identical to `src`.
+   *     propagation graph, but is not identical to `src`.
    */
   private predicate sanitizerCandidateReachableFromSource(DataFlow::Node san, DataFlow::Node src) {
     isSanitizerCandidate(san) and
