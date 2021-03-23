@@ -89,6 +89,7 @@ module PropagationGraph {
   /**
    * Holds if `res` is reachable from source candidate `src` in the propagation graph.
    */
+  pragma[nomagic]
   predicate reachableFromSourceCandidate(
     DataFlow::Node res, DataFlow::Node src, DataFlow::TypeTracker t
   ) {
