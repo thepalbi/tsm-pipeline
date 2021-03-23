@@ -227,15 +227,11 @@ private string constantArg(DataFlow::MethodCallNode mcn) {
  * guess a likely property name for the property that is being get or set.
  *
  * If the suffix is not empty, we just use that as our property name. If it is empty and there is a
- * constant argument, then that's our guess, and otherwise we fall back on the empty name.
+ * constant argument, then that's our guess.
  */
 bindingset[suffix]
 private string guessPropertyName(DataFlow::MethodCallNode mcn, string suffix) {
-  // if the method name gives no hints as to the property name, look for a constant argument
-  suffix = "" and result = constantArg(mcn)
-  or
-  (suffix != "" or not exists(constantArg(mcn))) and
-  result = suffix
+  if suffix = "" then result = constantArg(mcn) else result = suffix
 }
 
 /**
