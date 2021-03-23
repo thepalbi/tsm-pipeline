@@ -254,14 +254,17 @@ private predicate candidateGetterCall(
 }
 
 /**
- * A property being read or stored by a (candidate) getter or setter.
+ * A property being read or stored by a (candidate) getter and a setter.
+ *
+ * We require both since we ultimately want to track through a setter-getter pair.
  */
 private class GetterSetterPseudoProperty extends TypeTrackingPseudoProperty {
   string prop;
 
   GetterSetterPseudoProperty() {
     this = "$GetterSetter$" + prop and
-    (candidateSetterCall(_, _, _, prop) or candidateGetterCall(_, _, _, prop))
+    candidateSetterCall(_, _, _, prop) and
+    candidateGetterCall(_, _, _, prop)
   }
 
   string getPropertyName() { result = prop }
