@@ -248,12 +248,8 @@ private predicate candidateSetterCall(
   mcn.getNumArgument() <= 3 and
   rhs = mcn.getAnArgument() and
   base = mcn.getReceiver() and
-  exists(string m | m = mcn.getMethodName() |
-    exists(string suffix | m = ["store", "put", "set", "write"] + suffix |
-      prop = guessPropertyName(mcn, suffix)
-    )
-    or
-    m = prop
+  exists(string suffix | mcn.getMethodName() = ["store", "put", "set", "write"] + suffix |
+    prop = guessPropertyName(mcn, suffix)
   )
 }
 
@@ -271,12 +267,8 @@ private predicate candidateGetterCall(
   mcn.getNumArgument() <= 3 and
   base = mcn.getReceiver() and
   output = mcn and
-  exists(string m | m = mcn.getMethodName() |
-    exists(string suffix | m = ["get", "load", "read"] + suffix |
-      prop = guessPropertyName(mcn, suffix)
-    )
-    or
-    m = prop
+  exists(string suffix | mcn.getMethodName() = ["get", "load", "read"] + suffix |
+    prop = guessPropertyName(mcn, suffix)
   )
 }
 

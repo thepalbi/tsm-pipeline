@@ -10,7 +10,7 @@ w.setX(lib.source() /* event: ca */);
 let sanitized = lib.sanitize(w.getX()) /* event: cb */;
 lib.sink(sanitized /* event: cc */);
 
-// flow through getter/setter pair
+// missing flow through getter/setter pair
 class Wrapper2 {
   x(v) { this._x = v; }
   x() { return this._x; }
