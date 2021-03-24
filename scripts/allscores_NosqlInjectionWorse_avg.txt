@@ -1,0 +1,9 @@
+module TsmRepr {
+  float getReprScore(string repr, string t){
+   repr = "(parameter 1 (member sendFile *))" and t = "snk" and result = 0.1250000000 or
+   repr = "(parameter 0 (member json *))" and t = "snk" and result = 0.1250000000 or
+   repr = "(parameter 0 (member exists *))" and t = "snk" and result = 0.1250000000 or
+   repr = "(parameter 0 (member stat *))" and t = "snk" and result = 0.1250000000 or
+   repr = "(parameter 0 (member createReadStream *))" and t = "snk" and result = 0.1250000000
+   } 
+}
