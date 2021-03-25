@@ -216,6 +216,25 @@ predicate step(DataFlow::Node pred, DataFlow::Node succ) {
 }
 
 /**
+ * Gets the string value of a constant argument of `mcn`.
+ */
+private string constantArg(DataFlow::MethodCallNode mcn) {
+  mcn.getAnArgument().mayHaveStringValue(result)
+}
+
+/**
+ * For a method call `mcn` where the method is named something like `get<suffix>` or `set<suffix>`,
+ * guess a likely property name for the property that is being get or set.
+ *
+ * If the suffix is not empty, we just use that as our property name. If it is empty and there is a
+ * constant argument, then that's our guess.
+ */
+bindingset[suffix]
+private string guessPropertyName(DataFlow::MethodCallNode mcn, string suffix) {
+  if suffix = "" then result = constantArg(mcn) else result = suffix
+}
+
+/**
  * Holds if `mcn` looks like it might be a call to a setter updating property `prop` on `base`
  * to `rhs`.
  *
@@ -229,10 +248,8 @@ private predicate candidateSetterCall(
   mcn.getNumArgument() <= 3 and
   rhs = mcn.getAnArgument() and
   base = mcn.getReceiver() and
-  exists(string m | m = mcn.getMethodName() |
-    m = ["store", "put", "set", "write"] + prop
-    or
-    m = prop
+  exists(string suffix | mcn.getMethodName() = ["store", "put", "set", "write"] + suffix |
+    prop = guessPropertyName(mcn, suffix)
   )
 }
 
@@ -250,18 +267,23 @@ private predicate candidateGetterCall(
   mcn.getNumArgument() <= 3 and
   base = mcn.getReceiver() and
   output = mcn and
-  exists(string m | m = mcn.getMethodName() | m = ["get", "load", "read"] + prop or m = prop)
+  exists(string suffix | mcn.getMethodName() = ["get", "load", "read"] + suffix |
+    prop = guessPropertyName(mcn, suffix)
+  )
 }
 
 /**
- * A property being read or stored by a (candidate) getter or setter.
+ * A property being read or stored by a (candidate) getter and a setter.
+ *
+ * We require both since we ultimately want to track through a setter-getter pair.
  */
 private class GetterSetterPseudoProperty extends TypeTrackingPseudoProperty {
   string prop;
 
   GetterSetterPseudoProperty() {
     this = "$GetterSetter$" + prop and
-    (candidateSetterCall(_, _, _, prop) or candidateGetterCall(_, _, _, prop))
+    candidateSetterCall(_, _, _, prop) and
+    candidateGetterCall(_, _, _, prop)
   }
 
   string getPropertyName() { result = prop }
@@ -279,10 +301,12 @@ class GetterSetterStep extends DataFlow::AdditionalTypeTrackingStep, DataFlow::M
     exists(DataFlow::Node recv |
       candidateSetterCall(this, pred, recv, prop.(GetterSetterPseudoProperty).getPropertyName()) and
       succ = recv.getALocalSource()
-    )
+    ) and
+    not pred.asExpr() instanceof Literal
   }
 
   override predicate loadStep(DataFlow::Node pred, DataFlow::Node succ, string prop) {
-    candidateGetterCall(this, pred, succ, prop.(GetterSetterPseudoProperty).getPropertyName())
+    candidateGetterCall(this, pred, succ, prop.(GetterSetterPseudoProperty).getPropertyName()) and
+    not pred.asExpr() instanceof Literal
   }
 }
