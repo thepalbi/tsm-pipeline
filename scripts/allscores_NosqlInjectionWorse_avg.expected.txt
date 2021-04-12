@@ -1,26 +1,19 @@
 module TsmRepr {
   float getReprScore(string repr, string t){
-   repr = "(parameter 0 (member _storeAndBroadcastNotification *))" and t = "snk" and result = 0.2500000000 or
-   repr = "(parameter 0 (member checkSequence *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member equal *))" and t = "snk" and result = 0.2500000000 or
-   repr = "(parameter 0 (member exist *))" and t = "snk" and result = 0.2500000000 or
-   repr = "(parameter 0 (member expect *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member find *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member fromPairs *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member isEmpty *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member isNull *))" and t = "snk" and result = 0.2500000000 or
-   repr = "(parameter 0 (member isString *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member isUndefined *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member json *))" and t = "snk" and result = 0.7500000000 or
    repr = "(parameter 0 (member map *))" and t = "snk" and result = 0.2500000000 or
-   repr = "(parameter 0 (member mul *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member push *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member send *))" and t = "snk" and result = 0.2500000000 or
-   repr = "(parameter 0 (member sign *))" and t = "snk" and result = 0.2500000000 or
+   repr = "(parameter 0 (member storeNotification *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member update *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 1 (member emit *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 1 (member includes *))" and t = "snk" and result = 0.2500000000 or
-   repr = "(parameter 1 (member slice *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 1 (member update *))" and t = "snk" and result = 0.2500000000
    } 
 }
