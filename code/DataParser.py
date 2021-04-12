@@ -41,7 +41,7 @@ def readEvents(file_loc, events=None, unique_reps=None, rep_count=None, ctx=dict
     print("New Unique reps: %d" % len(new_unique_reps))
     print(list(new_unique_reps)[:5])
     i = len(list(unique_reps.keys()))
-    for k in new_unique_reps:
+    for k in sorted(new_unique_reps):
         unique_reps[k] = i
         i += 1
 
