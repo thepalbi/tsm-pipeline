@@ -1,2 +1,1 @@
-adaptlearning-adapt-authoring
-185594-5-27-spring-cloud-rbac
+bitpay-bitcore

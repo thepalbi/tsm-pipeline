@@ -1,6 +1,7 @@
 import os
 import subprocess
 import logging
+import sys
 
 from orchestration import global_config
 
@@ -61,15 +62,13 @@ class CodeQLWrapper:
             "database", "analyze",
             project,
             query_file,
-            f"--format={output_format}",
-            f"--logdir={self._logs_directory}",
-            f"--output={output_file}",
-            f"--search-path={search_path}",
-            "--timeout=3600",
-            "--ram=64536",
-            "--threads=-1"
+            f'--format={output_format}',
+            f'--logdir={self._logs_directory}',
+            f'--output={output_file}',
+            f'--search-path={search_path}',
+            f'--threads=0' # 1 thread per core
         ]
-        
+
         command_and_arguments = command_and_arguments + extra_options
 
         self._logger.info(
@@ -96,13 +95,16 @@ class CodeQLWrapper:
         self._run_process(command_and_arguments)
 
     def _run_process(self, command_and_arguments):
+        # Since we call subprocess with shell=True we need the command to be a single string
+        command_and_arguments = [" ".join(command_and_arguments)]
         self._logger.debug("command issued: %s",
                            " ".join(command_and_arguments))
         try:
-            process = subprocess.run(
-                command_and_arguments, capture_output=True, check=True, text=True)
+            output = subprocess.run(command_and_arguments, capture_output=True, shell=True, check=True, text=True)
         except subprocess.CalledProcessError as call_error:
+            print("FAIL: Command was ", call_error.cmd, ", return code=", call_error.returncode, ", stdout: ", call_error.stdout, ", stderr: ", call_error.stderr)
             self._logger.error(
                 "Error when executing codeql:\n%s", call_error.stderr)
-            raise Exception("error calling codeql", call_error)
-        self._logger.debug("Output from codeql:\n%s", process.stdout)
+            sys.exit(f'FAIL: Error when executing codeql, stderr: {call_error.stderr}')
+
+        self._logger.debug("Output from codeql:\n%s", output)

@@ -5,21 +5,21 @@ from pathlib import Path
 import subprocess
 import shutil
 
-parser = argparse.ArgumentParser()
-
-parser.add_argument("--query-name", dest="query_name", required=True, type=str,
-                    choices=["NoSql", "Sql", "Xss", "TaintedPath"],
-                    help="Name of the query to solve")
-parser.add_argument("--project-list", dest="projectList", required=True, type=str, 
-                    help="Run all steps on the project passed on this list")
-parser.add_argument("--CodeQL-executable", dest="CodeQLExecutable", required=True, type=str, 
-                    help="Path to the location of the CodeQL executable")
-parser.add_argument("--QL-source-code", dest="QLSourceCode", required=True, type=str, 
-                    help="Path to the location of the QL source code (queries)")
-parser.add_argument("--clean", dest="clean", default=False, required=False, 
-                    help="Set to True to perform a clean run")
-
-parsed_arguments = parser.parse_args()
+def parseArguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--query-name", dest="query_name", required=True, type=str,
+                        choices=["NoSql", "Sql", "Xss", "TaintedPath"],
+                        help="Name of the query to solve")
+    parser.add_argument("--project-list", dest="projectList", required=True, type=str, 
+                        help="Run all steps on the project passed on this list")
+    parser.add_argument("--CodeQL-executable", dest="CodeQLExecutable", required=True, type=str, 
+                        help="Path to the location of the CodeQL executable")
+    parser.add_argument("--QL-source-code", dest="QLSourceCode", required=True, type=str, 
+                        help="Path to the location of the QL source code (queries)")
+    parser.add_argument("--clean", dest="clean", default=False, required=False, 
+                        help="Set to True to perform a clean run")
+    parsed_arguments = parser.parse_args()
+    return parsed_arguments
 
 def convertQueryName(query_name):
     if query_name == "NoSql":
@@ -42,7 +42,7 @@ def databaseExists(database_name, project_dir):
 def fetchDatabaseCommand(database_name, project_dir):
     # We assume that the database_name is stored as a .zip file on blob store
     database_path = databasePath(database_name, project_dir)
-    command = "azcopy copy " + f'"https://atmcodeqldata.blob.core.windows.net/atm/javascript-databases/nosql_800_no_evaluation/{database_name}' + "?" + "${SAS_TOKEN}\"" + f' "{database_path}"' + ' --overwrite=true --check-md5 FailIfDifferent --from-to=BlobLocal --recursive'
+    command = "azcopy copy " + f'"https://atmcodeqldata.blob.core.windows.net/atm/javascript-databases/nosql_800_no_evaluation/{database_name}' + "?" + "${ATM_BLOB_STORE_SAS_TOKEN}\"" + f' "{database_path}"' + ' --overwrite=true --check-md5 FailIfDifferent --from-to=BlobLocal --recursive'
     return command
 
 def fetchDatabase(database_name, project_dir):
@@ -61,6 +61,7 @@ def fetchDatabase(database_name, project_dir):
         command = fetchDatabaseCommand(full_database_name, project_dir)
         try:
             print(f'-Fetching {database_name}')
+            print(f'-using command: {command}')
             subprocess.check_call(command, text=True, shell=True)
             if not databaseExists(full_database_name, project_dir):
                 print(f'-Failed to fetch {database_name}')
@@ -86,7 +87,7 @@ def listDatabases(project_list):
     databases = [x.strip() for x in databases]
     return databases
 
-if __name__ == '__main__':
+def runTSM(projectList, codeQLExecutable, QLSourceCode, query_name, clean):
     # Get absolute paths
     workingDirectory = str(Path(__file__).parent.absolute() / "workingDirectory")
     resultsDirectory = str(Path(__file__).parent.absolute() / "results")
@@ -94,7 +95,7 @@ if __name__ == '__main__':
     logDirectory = str(Path(__file__).parent.absolute() / "logs")
     projectDirectory = str(Path(__file__).parent.absolute() / "databases")
     # Create results and working folders
-    if parsed_arguments.clean:
+    if clean:
         print("-Cleaning local state")
         shutil.rmtree(workingDirectory, ignore_errors=True)
         shutil.rmtree(resultsDirectory, ignore_errors=True)
@@ -106,34 +107,41 @@ if __name__ == '__main__':
     os.makedirs(logDirectory)
     os.makedirs(projectDirectory, exist_ok = True)
     # Fetch databases
-    databases = listDatabases(parsed_arguments.projectList)
+    databases = listDatabases(projectList)
     for database in databases:
         fetchDatabase(database, projectDirectory)
     # Write config.json file
     config = "{\n"
-    config = config + f'"codeQLExecutable": "{parsed_arguments.CodeQLExecutable}",\n'
-    config = config + f'"codeQLSourcesRoot": "{parsed_arguments.QLSourceCode}",\n'
+    config = config + f'"codeQLExecutable": "{codeQLExecutable}",\n'
+    config = config + f'"codeQLSourcesRoot": "{QLSourceCode}",\n'
     config = config + f'"workingDirectory": "{workingDirectory}",\n'
     config = config + f'"resultsDirectory": "{resultsDirectory}",\n'
     config = config + f'"searchPath": ".",\n' # TODO: is this redundant?
-    config = config + f'"worseLibSearchPath": "{parsed_arguments.QLSourceCode}",\n'
+    config = config + f'"worseLibSearchPath": "{QLSourceCode}",\n'
     config = config + f'"logsDirectory": "{logDirectory}"\n'
     config = config + "}"
     with open("config.json", "w") as text_file:
         print(f"{config}", file=text_file)
     # Invoke TSM
-    query_name, query_type = convertQueryName(parsed_arguments.query_name)
+    effective_query_name, query_type = convertQueryName(query_name)
     tsm_path = str(Path(__file__).absolute().parent.parent / "code" / "main.py")
     command = ["python3", tsm_path, "--project-dir", f'{projectDirectory}',
         "--results-dir", f'{resultsDirectory}', "--working-dir", f'{workingDirectory}',
-        "--query-name", f'{query_name}', "--query-type", f'{query_type}',
-        "--solver=CBC", "--project-list", f'{parsed_arguments.projectList}',
+        "--query-name", f'{effective_query_name}', "--query-type", f'{query_type}',
+        "--solver=CBC", "--project-list", f'{projectList}',
         "--steps=generate_entities,generate_model,optimize", "run"]
     print("-Invoking TSM on specified projects: " + ' '.join(command))
     subprocess.check_call(command, text=True)
     print("-Combining TSM results")
     combine_scores_path = str(Path(__file__).absolute().parent.parent / "code" / "misc" / "combinescores.py")
     # N.B. --project-dir parameter is misnamed, it's value should be results-dir
-    command = ["python3", combine_scores_path, "--project-dir", f'{resultsDirectory}', "--query-name", query_name]
+    command = ["python3", combine_scores_path, "--project-dir", f'{resultsDirectory}', "--query-name", effective_query_name]
     subprocess.check_call(command, text=True)
-    print(f'-Completed: final output is allscores_{query_name}_avg.txt')
+    print(f'-Completed: final output is allscores_{effective_query_name}_avg.txt')
+
+def main():
+    parsed_arguments = parseArguments()
+    runTSM(parsed_arguments.projectList, parsed_arguments.CodeQLExecutable, parsed_arguments.QLSourceCode, parsed_arguments.query_name, parsed_arguments.clean)
+
+if __name__ == '__main__':
+    main()
