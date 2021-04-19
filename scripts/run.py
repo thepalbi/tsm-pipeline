@@ -15,8 +15,8 @@ def parseArguments():
                         help="File containing a list of projects to analyze (either as LGTM.com slugs or as database names to be downloaded from Azure blob storage)")
     parser.add_argument("--CodeQL-executable", dest="codeql_cli", required=True, type=str,
                         help="Location of the CodeQL executable")
-    parser.add_argument("--QL-source-code", dest="codeql_queries", required=True, type=str,
-                        help="Location of the CodeQL queries and libraries")
+    parser.add_argument("--QL-source-code", dest="tsm_ql", required=True, type=str,
+                        help="Location of the CodeQL queries and libraries for TSM")
     parser.add_argument("--clean", dest="clean", default=False, required=False, 
                         help="Set to True to perform a clean run")
     parsed_arguments = parser.parse_args()
@@ -109,7 +109,7 @@ def listDatabases(project_list):
     databases = [x.strip() for x in databases]
     return databases
 
-def runTSM(project_list, codeql_cli, codeql_queries, query_name, clean):
+def runTSM(project_list, codeql_cli, tsm_ql, query_name, clean):
     # Get absolute paths
     workingDirectory = str(Path(__file__).parent.absolute() / "workingDirectory")
     resultsDirectory = str(Path(__file__).parent.absolute() / "results")
@@ -135,11 +135,11 @@ def runTSM(project_list, codeql_cli, codeql_queries, query_name, clean):
     # Write config.json file
     config = "{\n"
     config = config + f'"codeQLExecutable": "{codeql_cli}",\n'
-    config = config + f'"codeQLSourcesRoot": "{codeql_queries}",\n'
+    config = config + f'"codeQLSourcesRoot": "{tsm_ql}",\n'
     config = config + f'"workingDirectory": "{workingDirectory}",\n'
     config = config + f'"resultsDirectory": "{resultsDirectory}",\n'
     config = config + f'"searchPath": ".",\n' # TODO: is this redundant?
-    config = config + f'"worseLibSearchPath": "{codeql_queries}",\n'
+    config = config + f'"worseLibSearchPath": "{tsm_ql}",\n'
     config = config + f'"logsDirectory": "{logDirectory}"\n'
     config = config + "}"
     with open("config.json", "w") as text_file:
@@ -163,7 +163,7 @@ def runTSM(project_list, codeql_cli, codeql_queries, query_name, clean):
 
 def main():
     parsed_arguments = parseArguments()
-    runTSM(parsed_arguments.project_list, parsed_arguments.codeql_cli, parsed_arguments.codeql_queries, parsed_arguments.query_name, parsed_arguments.clean)
+    runTSM(parsed_arguments.project_list, parsed_arguments.codeql_cli, parsed_arguments.tsm_ql, parsed_arguments.query_name, parsed_arguments.clean)
 
 if __name__ == '__main__':
     main()
