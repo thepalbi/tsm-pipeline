@@ -1,13 +1,11 @@
 module TsmRepr {
   float getReprScore(string repr, string t){
-   repr = "(parameter 0 (member _storeAndBroadcastNotification *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member aggregate *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member deleteMany *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member equal *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member expect *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member find *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member findOne *))" and t = "snk" and result = 1.0000000000 or
-   repr = "(parameter 0 (member first *))" and t = "snk" and result = 0.5000000000 or
    repr = "(parameter 0 (member fromPairs *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member insert *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member isEmpty *))" and t = "snk" and result = 0.2500000000 or
@@ -17,6 +15,7 @@ module TsmRepr {
    repr = "(parameter 0 (member map *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member remove *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member send *))" and t = "snk" and result = 0.2500000000 or
+   repr = "(parameter 0 (member storeNotification *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member update *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member updateMany *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 1 (member includes *))" and t = "snk" and result = 0.2500000000 or

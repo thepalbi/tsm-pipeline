@@ -17,7 +17,6 @@
 
 import javascript
 import NodeRepresentation
-private import semmle.javascript.dataflow.internal.StepSummary
 
 /**
  * The name of an npm package that should be considered when building the propagation graph.
@@ -134,16 +133,18 @@ private predicate guard(DataFlow::CallNode pred, DataFlow::Node succ) {
 predicate knownStep(DataFlow::Node pred, DataFlow::Node succ) {
   // exclude known flow/taint step, except for the step from `x` to `x.p` (since otherwise
   // property reads will never be considered sources)
-  any(TaintTracking::AdditionalTaintStep s).step(pred, succ) and
+  TaintTracking::sharedTaintStep(pred, succ) and
   not succ instanceof DataFlow::PropRead
   or
-  exists(DataFlow::AdditionalFlowStep s |
-    s.step(pred, succ) or
-    s.step(pred, succ, _, _) or
-    s.loadStep(pred, succ, _) or
-    s.storeStep(pred, succ, _) or
-    s.loadStoreStep(pred, succ, _)
-  )
+  DataFlow::SharedFlowStep::step(pred, succ)
+  or
+  DataFlow::SharedFlowStep::step(pred, succ, _, _)
+  or
+  DataFlow::SharedFlowStep::loadStep(pred, succ, _)
+  or
+  DataFlow::SharedFlowStep::storeStep(pred, succ, _)
+  or
+  DataFlow::SharedFlowStep::loadStoreStep(pred, succ, _)
 }
 
 /**
@@ -277,7 +278,7 @@ private predicate candidateGetterCall(
  *
  * We require both since we ultimately want to track through a setter-getter pair.
  */
-private class GetterSetterPseudoProperty extends TypeTrackingPseudoProperty {
+private class GetterSetterPseudoProperty extends string {
   string prop;
 
   GetterSetterPseudoProperty() {
@@ -289,24 +290,26 @@ private class GetterSetterPseudoProperty extends TypeTrackingPseudoProperty {
   string getPropertyName() { result = prop }
 }
 
-class GetterSetterStep extends DataFlow::AdditionalTypeTrackingStep, DataFlow::MethodCallNode {
-  GetterSetterStep() {
+class GetterSetterStep extends DataFlow::SharedTypeTrackingStep {
+  /** Gets a method call that does not call the only export of a module. */
+  private DataFlow::MethodCallNode call() {
     exists(DataFlow::SourceNode src |
       not src = DataFlow::moduleImport(_) and
-      this = src.getAMethodCall()
+      result = src.getAMethodCall()
     )
   }
 
   override predicate storeStep(DataFlow::Node pred, DataFlow::SourceNode succ, string prop) {
     exists(DataFlow::Node recv |
-      candidateSetterCall(this, pred, recv, prop.(GetterSetterPseudoProperty).getPropertyName()) and
+      candidateSetterCall(call(), pred, recv, prop.(GetterSetterPseudoProperty).getPropertyName())
+    |
       succ = recv.getALocalSource()
     ) and
     not pred.asExpr() instanceof Literal
   }
 
   override predicate loadStep(DataFlow::Node pred, DataFlow::Node succ, string prop) {
-    candidateGetterCall(this, pred, succ, prop.(GetterSetterPseudoProperty).getPropertyName()) and
+    candidateGetterCall(call(), pred, succ, prop.(GetterSetterPseudoProperty).getPropertyName()) and
     not pred.asExpr() instanceof Literal
   }
 }

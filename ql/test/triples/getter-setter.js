@@ -21,9 +21,9 @@ let sanitized2 = lib.sanitize(w2.x()) /* event: db */;
 lib.sink(sanitized2 /* event: dc */);
 
 // flow through map
-let m = new Map();
-m.set('tainted', lib.source() /* event: ea */);
-let sanitized3 = lib.sanitize(m.get('tainted')) /* event: eb */;
+let m = new FancyMap();
+m.store('tainted', lib.source() /* event: ea */);
+let sanitized3 = lib.sanitize(m.load('tainted')) /* event: eb */;
 lib.sink(sanitized3 /* event: ec */);
 
 // spurious flow through unrelated getter/setter pair
@@ -52,14 +52,14 @@ let sanitized6 = lib.sanitize(w4) /* event: hb */;
 lib.sink(sanitized6 /* event: hc */);
 
 // no spurious flow through map
-let m2 = new Map();
-m2.set('tainted1', lib.source() /* event: ia */);
-let sanitized7 = lib.sanitize(m2.get('tainted2')) /* event: ib */;
+let m2 = new FancyMap();
+m2.store('tainted1', lib.source() /* event: ia */);
+let sanitized7 = lib.sanitize(m2.load('tainted2')) /* event: ib */;
 lib.sink(sanitized7 /* event: ic */);
 
 // missing flow through map
-let m3 = new Map();
+let m3 = new FancyMap();
 let key = computeKey();
-m3.set(key, lib.source() /* event: ja */);
-let sanitized8 = lib.sanitize(m3.get(key)) /* event: jb */;
+m3.store(key, lib.source() /* event: ja */);
+let sanitized8 = lib.sanitize(m3.load(key)) /* event: jb */;
 lib.sink(sanitized8 /* event: jc */);
