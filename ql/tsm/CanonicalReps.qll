@@ -107,3 +107,17 @@ string chooseBestRep(DataFlow::Node sink, boolean asRhs) {
       /*desc, depth desc, rep*/
     )
 }
+
+/**
+ * Gets all the best representations for `n` that occur more than `minOccurrences()`,
+ * concatenated with `::`.
+ */
+string getconcatrep(DataFlow::Node n, boolean asRhs) {
+  result =
+    strictconcat(string r |
+      r = chooseBestRep(n, asRhs) and
+      count(DataFlow::Node nd2 | r = candidateRep(nd2, _, asRhs)) >= minOccurrences()
+    |
+      r, "::"
+    )
+}

@@ -6,8 +6,6 @@ import javascript
 import PropagationGraphs
 private import semmle.javascript.dataflow.internal.StepSummary
 
-predicate repGenerator = candidateRep/3;
-
 int maxReprPerSink() { result = 5 }
 
 module PropagationGraph {
@@ -171,19 +169,5 @@ module PropagationGraph {
       ssrc = getconcatrep(src, false) and
       applyFilter(src, san, snk)
     )
-  }
-
-  /**
-   * Gets all the best representations for `n` that occur more than `minOccurrences()`,
-   * concatenated with `::`.
-   */
-  string getconcatrep(DataFlow::Node n, boolean asRhs) {
-    result =
-      strictconcat(string r |
-        r = chooseBestRep(n, asRhs) and
-        count(DataFlow::Node nd2 | r = repGenerator(nd2, _, asRhs)) >= minOccurrences()
-      |
-        r, "::"
-      )
   }
 }
