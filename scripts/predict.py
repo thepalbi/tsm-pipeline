@@ -81,7 +81,7 @@ import semmle.javascript.security.dataflow.""" + lib + """
 from DataFlow::Node nd, """ + lib + """::Configuration cfg, float score
 where
   TsmRepr::getReprScore(rep(nd, true), "snk") = score and
-  score >= """ + arguments.threshold + """ and
+  score >= """ + str(arguments.threshold) + """ and
   not cfg.isSink(nd) and not cfg.isSink(nd, _)
 select nd, "Predicted new sink (score " + score + ")."
 """
