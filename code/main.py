@@ -25,9 +25,9 @@ def create_project_list(projectListFile):
         projectPrefix =  os.path.join(project_dir, project.replace('\r', '').replace('\n', '').replace("/","_"))
         logging.info(f"Prefix: {projectPrefix}")
         ## To-do: improve. The project list could be a list of projec names or project folders
-        # I'd better to include a cmd line option  
+        # I'd better to include a cmd line option
         if("/" in project):
-            projectCandidate = glob.glob(projectPrefix+"_*", recursive=True)
+            projectCandidate = glob.glob(projectPrefix+"*", recursive=True)
         else:
             projectCandidate = glob.glob(projectPrefix, recursive=True)
             
