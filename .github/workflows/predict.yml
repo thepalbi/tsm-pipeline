@@ -74,15 +74,28 @@ jobs:
           pip install -r code/requirements.txt
           python -m pip install -i https://pypi.gurobi.com gurobipy
 
-      - name: Run prediction
+      - name: Train model
         env:
-          LGTM_TOKEN: ${{ secrets.LGTM_TOKEN }}
           ATM_BLOB_STORE_SAS_TOKEN: ${{ secrets.ATM_BLOB_STORE_SAS_TOKEN }}
         run: |
           source env/bin/activate
+          ./scripts/train.sh \
+            "${{ github.event.inputs.query_name }}" \
+            "${{ github.event.inputs.training_projects }}"
+
+      - name: Predict new sinks
+        env:
+          LGTM_TOKEN: ${{ secrets.LGTM_TOKEN }}
+        run: |
+          source env/bin/activate
+          n=$(compgen -G "allscores_*.txt" | wc -l)
+          if [ $n -ne 1 ]; then
+            echo "Expected a single scores file; got $n."
+            exit 1
+          fi
           ./scripts/predict.sh \
             "${{ github.event.inputs.query_name }}" \
-            "${{ github.event.inputs.training_projects }}" \
+            $(compgen -G "allscores_*.txt") \
             "${{ github.event.inputs.test_projects || github.event.inputs.training_projects }}" \
             "${{ github.event.inputs.threshold }}"
 

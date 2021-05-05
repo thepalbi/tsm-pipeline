@@ -3,14 +3,14 @@
 MYDIR=`dirname $0`
 
 if [ $# -ne 4 ]; then
-  echo "Usage: $0 query_name training_projects test_projects threshold"
+  echo "Usage: $0 query_name scores_file test_projects threshold"
   exit 1
 fi
 
 set -ex
 
 query_name=$1
-training_projects=$2
+scores_file=$2
 test_projects=$3
 threshold=$4
 
@@ -33,9 +33,9 @@ case "$query_name" in
   ;;
 esac
 
-codeql=$(which codeql || true)
-if [ -z "$codeql" ]; then
-  echo "CodeQL not found."
+tsm_ql="$MYDIR/../ql"
+if ! [ -d "$tsm_ql" ]; then
+  echo "Could not find query library ($tsm_ql is not a directory)."
   exit 1
 fi
 
@@ -43,25 +43,6 @@ if [ -z "$LGTM_TOKEN" ]; then
   echo "LGTM_TOKEN not set."
   exit 1
 fi
-
-tsm_ql="$MYDIR/../ql"
-if ! [ -d "$tsm_ql" ]; then
-  echo "Could not find query library ($tsm_ql is not a directory)."
-  exit 1
-fi
-
-scores_file="allscores_${lib}Worse_avg.txt"
-
-# write training projects to a temporary file
-tmpfile=$(mktemp -t projectsXXX.csv)
-for project in $training_projects; do
-  echo $project >> $tmpfile
-done
-
-# run TSM
-python3 $MYDIR/run.py \
-  --query-name $query_name --project-list $tmpfile \
-  --CodeQL-executable $codeql --QL-source-code $tsm_ql
 
 # generate query
 query=$(mktemp -t queryXXX.ql)
