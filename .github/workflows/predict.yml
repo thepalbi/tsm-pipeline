@@ -80,11 +80,11 @@ jobs:
           ATM_BLOB_STORE_SAS_TOKEN: ${{ secrets.ATM_BLOB_STORE_SAS_TOKEN }}
         run: |
           source env/bin/activate
-          python scripts/predict.py \
-            --query-name ${{ github.event.inputs.query_name }} \
-            --training-projects ${{ github.event.inputs.training_projects }} \
-            --test-projects ${{ github.event.inputs.test_projects || github.event.inputs.training_projects }} \
-            --threshold ${{ github.event.inputs.threshold }}
+          ./scripts/predict.sh \
+            "${{ github.event.inputs.query_name }}" \
+            "${{ github.event.inputs.training_projects }}" \
+            "${{ github.event.inputs.test_projects || github.event.inputs.training_projects }}" \
+            "${{ github.event.inputs.threshold }}"
 
       - name: Upload scores
         uses: actions/upload-artifact@v2
