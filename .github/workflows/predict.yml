@@ -9,13 +9,13 @@ on:
         default: "NoSql"
       training_projects:
         description: >
-          A list of projects to train on (specified either as LGTM.com slugs
+          A JSON array of projects to train on (specified either as LGTM.com slugs
           or as database names to be downloaded from Azure blob storage).
         required: true
         default: "g/bitpay/bitcore"
       test_projects:
         description: >
-          A list of projects to predict new taint specifications for
+          A JSON array of projects to predict new taint specifications for
           (specified as LGTM.com slugs); defaults to the same list as training_projects.
         required: false
         default: ""
@@ -25,8 +25,14 @@ on:
         required: false
         default: 0.5
 jobs:
-  predict:
+  train:
+    name: Train on ${{ matrix.project }}
     runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ${{ fromJSON(github.event.inputs.training_projects) }}
     steps:
       - name: Check out this repo
         uses: actions/checkout@v2
@@ -74,6 +80,12 @@ jobs:
           pip install -r code/requirements.txt
           python -m pip install -i https://pypi.gurobi.com gurobipy
 
+      - name: Sanitize project name
+        id: sanitize-name
+        run: |
+          sanitized_name=$(echo ${{ matrix.project }} | sed s/[^a-zA-Z0-9_-]/_/g)
+          echo "::set-output name=sanitized_name::$sanitized_name"
+
       - name: Train model
         env:
           ATM_BLOB_STORE_SAS_TOKEN: ${{ secrets.ATM_BLOB_STORE_SAS_TOKEN }}
@@ -81,26 +93,47 @@ jobs:
           source env/bin/activate
           ./scripts/train.sh \
             "${{ github.event.inputs.query_name }}" \
-            "${{ github.event.inputs.training_projects }}"
-
-      - name: Predict new sinks
-        env:
-          LGTM_TOKEN: ${{ secrets.LGTM_TOKEN }}
-        run: |
-          source env/bin/activate
-          n=$(compgen -G "allscores_*.txt" | wc -l)
-          if [ $n -ne 1 ]; then
-            echo "Expected a single scores file; got $n."
-            exit 1
-          fi
-          ./scripts/predict.sh \
-            "${{ github.event.inputs.query_name }}" \
-            $(compgen -G "allscores_*.txt") \
-            "${{ github.event.inputs.test_projects || github.event.inputs.training_projects }}" \
-            "${{ github.event.inputs.threshold }}"
+            "${{ matrix.project }}"
 
       - name: Upload scores
         uses: actions/upload-artifact@v2
         with:
-          name: scores
-          path: "allscores_*.txt"
+          name: "${{ steps.sanitize-name.outputs.sanitized_name }}-scores.txt"
+          path: "scripts/results/*/*/reprScores.txt"
+
+  combine-scores:
+    name: Combine scores
+    needs:
+      - train
+    runs-on: ubuntu-latest
+    steps:
+      # - name: Check out this repo
+      #   uses: actions/checkout@v2
+
+      - name: Download scores for individual projects
+        uses: actions/download-artifact@v2
+    
+      - name: Display structure of downloaded files
+        run: find .
+
+      # - name: Predict new sinks
+      #   env:
+      #     LGTM_TOKEN: ${{ secrets.LGTM_TOKEN }}
+      #   run: |
+      #     source env/bin/activate
+      #     n=$(compgen -G "allscores_*.txt" | wc -l)
+      #     if [ $n -ne 1 ]; then
+      #       echo "Expected a single scores file; got $n."
+      #       exit 1
+      #     fi
+      #     ./scripts/predict.sh \
+      #       "${{ github.event.inputs.query_name }}" \
+      #       $(compgen -G "allscores_*.txt") \
+      #       "${{ github.event.inputs.test_projects || github.event.inputs.training_projects }}" \
+      #       "${{ github.event.inputs.threshold }}"
+
+      # - name: Upload scores
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: scores
+      #     path: "allscores_*.txt"
