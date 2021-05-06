@@ -158,27 +158,24 @@ jobs:
             --query-name "${lib}Worse" \
             --project-dir "*-scores/*"
 
-      - name: Display structure of downloaded files
-        run: find .
+      - name: Predict new sinks
+        env:
+          LGTM_TOKEN: ${{ secrets.LGTM_TOKEN }}
+        run: |
+          source env/bin/activate
+          n=$(compgen -G "allscores_*.txt" | wc -l)
+          if [ $n -ne 1 ]; then
+            echo "Expected a single scores file; got $n."
+            exit 1
+          fi
+          ./scripts/predict.sh \
+            "${{ github.event.inputs.query_name }}" \
+            $(compgen -G "allscores_*.txt") \
+            "${{ join(fromJSON(github.event.inputs.test_projects || github.event.inputs.training_projects), ' ') }}" \
+            "${{ github.event.inputs.threshold }}"
 
-      # - name: Predict new sinks
-      #   env:
-      #     LGTM_TOKEN: ${{ secrets.LGTM_TOKEN }}
-      #   run: |
-      #     source env/bin/activate
-      #     n=$(compgen -G "allscores_*.txt" | wc -l)
-      #     if [ $n -ne 1 ]; then
-      #       echo "Expected a single scores file; got $n."
-      #       exit 1
-      #     fi
-      #     ./scripts/predict.sh \
-      #       "${{ github.event.inputs.query_name }}" \
-      #       $(compgen -G "allscores_*.txt") \
-      #       "${{ github.event.inputs.test_projects || github.event.inputs.training_projects }}" \
-      #       "${{ github.event.inputs.threshold }}"
-
-      # - name: Upload scores
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: scores
-      #     path: "allscores_*.txt"
+      - name: Upload scores
+        uses: actions/upload-artifact@v2
+        with:
+          name: scores
+          path: "allscores_*.txt"
