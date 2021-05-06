@@ -12,7 +12,7 @@ on:
           A JSON array of projects to train on (specified either as LGTM.com slugs
           or as database names to be downloaded from Azure blob storage).
         required: true
-        default: "g/bitpay/bitcore"
+        default: '["g/bitpay/bitcore"]'
       test_projects:
         description: >
           A JSON array of projects to predict new taint specifications for
@@ -98,7 +98,7 @@ jobs:
       - name: Upload scores
         uses: actions/upload-artifact@v2
         with:
-          name: "${{ steps.sanitize-name.outputs.sanitized_name }}-scores.txt"
+          name: "${{ steps.sanitize-name.outputs.sanitized_name }}-scores"
           path: "scripts/results/*/*/reprScores.txt"
 
   combine-scores:
@@ -107,12 +107,57 @@ jobs:
       - train
     runs-on: ubuntu-latest
     steps:
-      # - name: Check out this repo
-      #   uses: actions/checkout@v2
+      - name: Check out this repo
+        uses: actions/checkout@v2
+
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip # This path is specific to Ubuntu
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-pip-${{ hashFiles('code/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install coinor-cbc
+          python -m pip install --upgrade pip
+          pip install virtualenv
+          virtualenv env
+          source env/bin/activate
+          pip install -r code/requirements.txt
+          python -m pip install -i https://pypi.gurobi.com gurobipy
 
       - name: Download scores for individual projects
         uses: actions/download-artifact@v2
-    
+
+      - name: Combine scores
+        run: |
+          source env/bin/activate
+          case "${{ github.event.inputs.query_name }}" in
+            "NoSql")
+              lib="NosqlInjection"
+            ;;
+            "Sql")
+              lib="SqlInjection"
+            ;;
+            "Xss")
+              lib="DomBasedXss"
+            ;;
+            "TaintedPath")
+              lib="TaintedPath"
+            ;;
+            *)
+              echo "Unsupported query $query_name; should be NoSql, Sql, Xss or TaintedPath."
+              exit 1
+            ;;
+          esac
+          python code/misc/combinescores.py \
+            --query-name "${lib}Worse" \
+            --project-dir "*-scores/*"
+
       - name: Display structure of downloaded files
         run: find .
 

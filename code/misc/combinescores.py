@@ -15,10 +15,12 @@ def combine_scores(query, \
     if multiple:
         files=glob.glob(os.path.join(project_dir) + "/multiple/{0}-*/reprScores.txt".format(query))
     else:
-        files=glob.glob(os.path.join(project_dir) + "/*/{0}-*/reprScores.txt".format(query))
+        g=os.path.join(project_dir) + "/*/{0}-*/reprScores.txt".format(query)
+        print("g: {0}".format(g))
+        files=glob.glob(g)
         files = list(filter(lambda p: os.path.join(project_dir, "multiple") not in p, files))
     files.sort()
-    #print(files)
+    print(files)
     last_files = list()
     projectsFiles = dict()
     for file in files:
