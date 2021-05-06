@@ -154,9 +154,10 @@ jobs:
               exit 1
             ;;
           esac
+          find . -name reprScores.txt
           python code/misc/combinescores.py \
             --query-name "${lib}Worse" \
-            --project-dir "*-scores/*"
+            --project-dir "*-scores"
 
       - name: Predict new sinks
         env:
