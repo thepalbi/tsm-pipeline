@@ -101,8 +101,8 @@ jobs:
           name: "${{ steps.sanitize-name.outputs.sanitized_name }}-scores"
           path: "scripts/results/*/*/reprScores.txt"
 
-  combine-scores:
-    name: Combine scores
+  predict:
+    name: Predict new sinks
     needs:
       - train
     runs-on: ubuntu-latest
