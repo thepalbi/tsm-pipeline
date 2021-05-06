@@ -7,7 +7,7 @@ if [ $# -ne 4 ]; then
   exit 1
 fi
 
-set -ex
+set -e
 
 query_name=$1
 scores_file=$2
@@ -68,12 +68,23 @@ for test_proj in $test_projects; do
   proj_id=$(curl -s $lgtm_url | jq .id)
 
   lgtm_url="https://lgtm.com/api/v1.0/queryjobs?language=javascript&project-id=${proj_id}"
-  query_console_url=$(\
-    curl -s -X POST \
-            -H "Content-Type: text/plain" \
-            -H "Authorization: Bearer $LGTM_TOKEN" \
-            -H "Accept: application/json" \
-            --data-binary @$query $lgtm_url | jq '.["task-result"]["result-url"]' \
-  )
-  echo "LGTM.com query-console URL: ${query_console_url}"
+  resp=$(mktemp -t respXXX.json)
+  curl -s -o "$resp" -X POST \
+       -H "Content-Type: text/plain" \
+       -H "Authorization: Bearer $LGTM_TOKEN" \
+       -H "Accept: application/json" \
+       --data-binary @$query $lgtm_url
+  if [ $(jq .code "$resp") = 429 ]; then
+    echo "Rate limit exceeded; no further query jobs will be created."
+    break
+  fi
+  query_console_url=$(jq '.["task-result"]["result-url"]' "$resp")
+  if [ "$query_console_url" = "null" ]; then
+    echo "Unable to determine query console URL."
+    echo "Response from LGTM was:"
+    cat "$resp"
+    echo
+  else
+    echo "LGTM.com query-console URL: ${query_console_url}"
+  fi
 done
