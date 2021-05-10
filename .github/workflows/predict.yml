@@ -9,13 +9,13 @@ on:
         default: "NoSql"
       training_projects:
         description: >
-          A list of projects to train on (specified either as LGTM.com slugs
+          A JSON array of projects to train on (specified either as LGTM.com slugs
           or as database names to be downloaded from Azure blob storage).
         required: true
-        default: "g/bitpay/bitcore"
+        default: '["g/bitpay/bitcore"]'
       test_projects:
         description: >
-          A list of projects to predict new taint specifications for
+          A JSON array of projects to predict new taint specifications for
           (specified as LGTM.com slugs); defaults to the same list as training_projects.
         required: false
         default: ""
@@ -25,8 +25,14 @@ on:
         required: false
         default: 0.5
 jobs:
-  predict:
+  train:
+    name: Train on ${{ matrix.project }}
     runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ${{ fromJSON(github.event.inputs.training_projects) }}
     steps:
       - name: Check out this repo
         uses: actions/checkout@v2
@@ -74,17 +80,100 @@ jobs:
           pip install -r code/requirements.txt
           python -m pip install -i https://pypi.gurobi.com gurobipy
 
-      - name: Run prediction
+      - name: Sanitize project name
+        id: sanitize-name
+        run: |
+          sanitized_name=$(echo ${{ matrix.project }} | sed s/[^a-zA-Z0-9_-]/_/g)
+          echo "::set-output name=sanitized_name::$sanitized_name"
+
+      - name: Train model
         env:
-          LGTM_TOKEN: ${{ secrets.LGTM_TOKEN }}
           ATM_BLOB_STORE_SAS_TOKEN: ${{ secrets.ATM_BLOB_STORE_SAS_TOKEN }}
         run: |
           source env/bin/activate
-          python scripts/predict.py \
-            --query-name ${{ github.event.inputs.query_name }} \
-            --training-projects ${{ github.event.inputs.training_projects }} \
-            --test-projects ${{ github.event.inputs.test_projects || github.event.inputs.training_projects }} \
-            --threshold ${{ github.event.inputs.threshold }}
+          ./scripts/train.sh \
+            "${{ github.event.inputs.query_name }}" \
+            "${{ matrix.project }}"
+
+      - name: Upload scores
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ steps.sanitize-name.outputs.sanitized_name }}-scores"
+          path: "scripts/results/*/*/reprScores.txt"
+
+  predict:
+    name: Predict new sinks
+    needs:
+      - train
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v2
+
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip # This path is specific to Ubuntu
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-pip-${{ hashFiles('code/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install coinor-cbc
+          python -m pip install --upgrade pip
+          pip install virtualenv
+          virtualenv env
+          source env/bin/activate
+          pip install -r code/requirements.txt
+          python -m pip install -i https://pypi.gurobi.com gurobipy
+
+      - name: Download scores for individual projects
+        uses: actions/download-artifact@v2
+
+      - name: Combine scores
+        run: |
+          source env/bin/activate
+          case "${{ github.event.inputs.query_name }}" in
+            "NoSql")
+              lib="NosqlInjection"
+            ;;
+            "Sql")
+              lib="SqlInjection"
+            ;;
+            "Xss")
+              lib="DomBasedXss"
+            ;;
+            "TaintedPath")
+              lib="TaintedPath"
+            ;;
+            *)
+              echo "Unsupported query $query_name; should be NoSql, Sql, Xss or TaintedPath."
+              exit 1
+            ;;
+          esac
+          find . -name reprScores.txt
+          python code/misc/combinescores.py \
+            --query-name "${lib}Worse" \
+            --project-dir "*-scores"
+
+      - name: Predict new sinks
+        env:
+          LGTM_TOKEN: ${{ secrets.LGTM_TOKEN }}
+        run: |
+          source env/bin/activate
+          n=$(compgen -G "allscores_*.txt" | wc -l)
+          if [ $n -ne 1 ]; then
+            echo "Expected a single scores file; got $n."
+            exit 1
+          fi
+          ./scripts/predict.sh \
+            "${{ github.event.inputs.query_name }}" \
+            $(compgen -G "allscores_*.txt") \
+            "${{ join(fromJSON(github.event.inputs.test_projects || github.event.inputs.training_projects), ' ') }}" \
+            "${{ github.event.inputs.threshold }}"
 
       - name: Upload scores
         uses: actions/upload-artifact@v2
