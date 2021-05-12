@@ -44,7 +44,6 @@ import semmle.javascript.security.dataflow.ConditionalBypassCustomizations
 import semmle.javascript.security.dataflow.CorsMisconfigurationForCredentialsCustomizations
 import semmle.javascript.security.dataflow.DeepObjectResourceExhaustionCustomizations
 import semmle.javascript.security.dataflow.DifferentKindsComparisonBypassCustomizations
-import semmle.javascript.security.dataflow.ExternalAPIUsedWithUntrustedDataCustomizations
 import semmle.javascript.security.dataflow.FileAccessToHttpCustomizations
 import semmle.javascript.security.dataflow.HardcodedCredentialsCustomizations
 import semmle.javascript.security.dataflow.HardcodedDataInterpretedAsCodeCustomizations
@@ -95,7 +94,6 @@ predicate isKnownSink(DataFlow::Node nd) {
   nd instanceof CorsMisconfigurationForCredentials::Sink or
   nd instanceof DeepObjectResourceExhaustion::Sink or
   nd instanceof DifferentKindsComparisonBypass::Sink or
-  nd instanceof ExternalAPIUsedWithUntrustedData::Sink or
   nd instanceof FileAccessToHttp::Sink or
   nd instanceof HardcodedCredentials::Sink or
   nd instanceof HardcodedDataInterpretedAsCode::Sink or
