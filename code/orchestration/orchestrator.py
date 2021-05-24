@@ -125,12 +125,16 @@ class Orchestrator:
         ctx = self.starting_ctx()
         ctx[COMMAND_NAME] = "run"
         ctx[STEP_NAMES] = steps
-        
+
+        todo = steps.copy()
         for step in self.steps:
-            if step.name() in steps:
+            if step.name() in todo:
                 self.print_step_banner(step, "run")
                 ctx = step.populate(ctx)
                 step.run(ctx)
+                todo.remove(step.name())
+                if len(todo) == 0:
+                    break
             else:
                 # Make each previous step populate the ctx
                 self.logger.info(f"Step `{step.name()}` is populating context")
