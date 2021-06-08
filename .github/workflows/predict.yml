@@ -102,8 +102,6 @@ jobs:
           path: "scripts/results/*/*/reprScores.txt"
 
   predict:
-    env:
-      NEXT_PUBLIC_BASE_PATH: /ml-ql-taint-specification-mining
     name: Predict new sinks
     needs:
       - train
