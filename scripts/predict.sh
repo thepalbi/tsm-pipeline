@@ -25,10 +25,8 @@ if [ -z "$LGTM_TOKEN" ]; then
 fi
 
 # generate query
-query=$(mktemp -t queryXXX.ql)
+query=codeql-lib/javascript/ql/src/predict-sinks.ql
 cat >$query <<EOF
-/** @kind problem */
-
 $(cat "$tsm_ql/tsm/NodeRepresentation.qll")
 
 $(cat $scores_file)
@@ -133,12 +131,23 @@ predicate isKnownSink(DataFlow::Node nd) {
   exists(DataFlow::PropWrite pw | isKnownSink(pw.getBase()) | nd = pw.getRhs())
 }
 
-from DataFlow::Node nd, float score
+from DataFlow::Node nd, File f, int startLine, int endLine, int startColumn, int endColumn, string rep, float score
 where
-  TsmRepr::getReprScore(rep(nd, true), "snk") = score and
-  score >= ${threshold} and
-  not isKnownSink(nd)
-select nd, "Predicted new sink (score " + score + ")."
+  rep = rep(nd, true) and
+  TsmRepr::getReprScore(rep, "snk") = score and
+  score >= 0.5 and
+  not isKnownSink(nd) and
+  nd.hasLocationInfo(f.getAbsolutePath(), startLine, startColumn, endLine, endColumn)
+select f.getAbsolutePath(), f.getRelativePath(), startLine, startColumn, endLine, endColumn, rep, score
 EOF
 
-$MYDIR/fetch_database.py $MYDIR/databases $test_projects
+# run it on all databases
+dbRoot=$MYDIR/databases
+$MYDIR/fetch_database.py $dbRoot $test_projects
+for db in $dbRoot/*; do
+  mkdir -p $db/results
+  codeql query run -o $db/results/sink-predictions.bqrs -d $db $query
+done
+
+# generate JSON representation of results
+$MYDIR/predictions2json.js $dbRoot $test_projects >predictions.json
