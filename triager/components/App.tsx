@@ -12,11 +12,15 @@ type LocationProps = {
 }
 
 function Location(props: LocationProps) {
-  return (
-    <a href={`https://github.com/${props.projectName}/blob/master/${props.path}#L${props.startLine}`} target="_blank" rel="noopener noreferrer">
-      {props.projectName}/{props.path}#L{props.startLine}
-    </a>
-  );
+  if (props.projectName.startsWith("g/")) {
+    return (
+      <a href={`https://github.com/${props.projectName.slice(2)}/blob/master/${props.path}#L${props.startLine}`} target="_blank" rel="noopener noreferrer">
+        {props.projectName}/{props.path}#L{props.startLine}
+      </a>
+    );
+  } else {
+    return <span>{props.projectName}/{props.path}#L{props.startLine}</span>
+  }
 }
 
 type RepresentationProps = {

@@ -228,3 +228,7 @@ jobs:
         with:
           name: prediction-query
           path: codeql-lib/javascript/ql/src/predict-sinks.ql
+
+      - name: Finish
+        run: |
+          echo 'Triaging dashboard deployed to https://github.github.io/ml-ql-taint-specification-mining'
