@@ -150,4 +150,4 @@ for db in $dbRoot/*; do
 done
 
 # generate JSON representation of results
-$MYDIR/predictions2json.js $dbRoot $test_projects >predictions.json
+$MYDIR/predictions2json.js $dbRoot $test_projects >triager/data/predictions.json

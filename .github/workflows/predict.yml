@@ -102,6 +102,8 @@ jobs:
           path: "scripts/results/*/*/reprScores.txt"
 
   predict:
+    env:
+      NEXT_PUBLIC_BASE_PATH: /ml-ql-taint-specification-mining
     name: Predict new sinks
     needs:
       - train
@@ -197,6 +199,20 @@ jobs:
             "${{ join(fromJSON(github.event.inputs.test_projects || github.event.inputs.training_projects), ' ') }}" \
             "${{ github.event.inputs.threshold }}"
 
+      - name: Build report
+        run: |
+          cd triager
+          npm install
+          npm run build
+          npm run export
+          touch out/.nojekyll
+
+      - name: Deploy report to gh-pages
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          branch: gh-pages
+          folder: triager/out
+
       - name: Upload scores
         uses: actions/upload-artifact@v2
         with:
@@ -207,7 +223,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: predictions
-          path: predictions.json
+          path: triager/data/predictions.json
 
       - name: Upload prediction query
         uses: actions/upload-artifact@v2
