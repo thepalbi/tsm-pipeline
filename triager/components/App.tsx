@@ -202,11 +202,15 @@ type AppState = {
   from: number;
   // last prediction to show (1-based)
   to: number;
+  // minimum score for a prediction to be included
+  minScore: number;
 }
 
 export class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
+
+    let minScore = 0.5;
 
     let numPredictions = props.predictions.length;
 
@@ -216,14 +220,15 @@ export class App extends React.Component<AppProps, AppState> {
 
     const enabledPredictions: PredictionInfo[] = [];
     for (const pred of props.predictions)
-      if (reprs.get(pred.repr))
+      if (reprs.get(pred.repr) && pred.score >= minScore)
         enabledPredictions.push(pred);
 
     this.state = {
       reprs,
       enabledPredictions,
       from: 1,
-      to: Math.min(100, enabledPredictions.length)
+      to: Math.min(100, enabledPredictions.length),
+      minScore
     };
   }
 
@@ -233,7 +238,7 @@ export class App extends React.Component<AppProps, AppState> {
 
     const enabledPredictions: PredictionInfo[] = [];
     for (const pred of this.props.predictions)
-      if (reprs.get(pred.repr))
+      if (reprs.get(pred.repr) && pred.score >= this.state.minScore)
         enabledPredictions.push(pred);
 
     this.setState({
@@ -241,6 +246,22 @@ export class App extends React.Component<AppProps, AppState> {
       enabledPredictions,
       from: 1,
       to: Math.min(100, enabledPredictions.length)
+    });
+  }
+
+  private setMinScore(minScore: number) {
+    const reprs = new Map(this.state.reprs);
+
+    const enabledPredictions: PredictionInfo[] = [];
+    for (const pred of this.props.predictions)
+      if (reprs.get(pred.repr) && pred.score >= minScore)
+        enabledPredictions.push(pred);
+
+    this.setState({
+      enabledPredictions,
+      from: 1,
+      to: Math.min(100, enabledPredictions.length),
+      minScore
     });
   }
 
@@ -283,7 +304,14 @@ export class App extends React.Component<AppProps, AppState> {
     return (
       <div>
         <h2>Filter</h2>
+        <h3>By Representation</h3>
         <RepresentationSelectionList reprs={reprs} />
+        <h3>By Score</h3>
+        <div>
+          <input type="range" id="score-threshold" min="0" max="100" step="10" value={this.state.minScore*100} onChange={(e) => this.setMinScore(e.target.valueAsNumber/100)}/>
+          <label htmlFor="threshold">{this.state.minScore}</label><br/>
+          Minimum score for a prediction to be included
+        </div>
         <h2>
           Predictions {this.state.from}-{this.state.to} of {numPredictions}
           {numPredictions < this.props.predictions.length ? " (" + (this.props.predictions.length - numPredictions) + " hidden)" : ""}
