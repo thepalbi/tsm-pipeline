@@ -276,8 +276,9 @@ export class App extends React.Component<AppProps, AppState> {
     reprs.sort((a, b) => b.count - a.count);
 
     let numPredictions = this.state.enabledPredictions.length;
-    let predictions = this.state.enabledPredictions.slice(this.state.from - 1, this.state.to);
+    let predictions = this.state.enabledPredictions.slice();
     predictions.sort((a, b) => b.score - a.score);
+    predictions = predictions.slice(this.state.from - 1, this.state.to);
 
     return (
       <div>
