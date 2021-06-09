@@ -2,8 +2,8 @@
 
 MYDIR=`dirname $0`
 
-if [ $# -ne 4 ]; then
-  echo "Usage: $0 scores_file test_projects threshold output_file"
+if [ $# -ne 3 ]; then
+  echo "Usage: $0 scores_file test_projects output_file"
   exit 1
 fi
 
@@ -11,8 +11,7 @@ set -ex
 
 scores_file=$1
 test_projects=$2
-threshold=$3
-output_file=$4
+output_file=$3
 
 if ! [ -f $scores_file ]; then
   echo "scores file $scores_file does not exist"
@@ -136,7 +135,6 @@ from DataFlow::Node nd, File f, int startLine, int endLine, int startColumn, int
 where
   rep = rep(nd, true) and
   TsmRepr::getReprScore(rep, "snk") = score and
-  score >= 0.5 and
   not isKnownSink(nd) and
   nd.hasLocationInfo(f.getAbsolutePath(), startLine, startColumn, endLine, endColumn)
 select f.getAbsolutePath(), f.getRelativePath(), startLine, startColumn, endLine, endColumn, rep, score

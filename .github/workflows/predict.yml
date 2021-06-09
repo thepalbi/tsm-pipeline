@@ -19,11 +19,6 @@ on:
           (specified as LGTM.com slugs); defaults to the same list as training_projects.
         required: false
         default: ""
-      threshold:
-        description: >
-          Minimum score a prediction needs to have to be included.
-        required: false
-        default: 0.5
 jobs:
   train:
     name: Train on ${{ matrix.project }}
@@ -244,7 +239,6 @@ jobs:
           ./scripts/predict.sh \
             $(compgen -G "allscores_*.txt") \
             "${{ matrix.project }}" \
-            "${{ github.event.inputs.threshold }}" \
             "${{ steps.sanitize-name.outputs.sanitized_name }}-predictions.json"
 
       - name: Upload predictions
