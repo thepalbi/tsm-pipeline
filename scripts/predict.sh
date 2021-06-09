@@ -2,8 +2,8 @@
 
 MYDIR=`dirname $0`
 
-if [ $# -ne 3 ]; then
-  echo "Usage: $0 scores_file test_projects threshold"
+if [ $# -ne 4 ]; then
+  echo "Usage: $0 scores_file test_projects threshold output_file"
   exit 1
 fi
 
@@ -12,15 +12,16 @@ set -ex
 scores_file=$1
 test_projects=$2
 threshold=$3
+output_file=$4
+
+if ! [ -f $scores_file ]; then
+  echo "scores file $scores_file does not exist"
+  exit 1
+fi
 
 tsm_ql="$MYDIR/../ql"
 if ! [ -d "$tsm_ql" ]; then
   echo "Could not find query library ($tsm_ql is not a directory)."
-  exit 1
-fi
-
-if [ -z "$LGTM_TOKEN" ]; then
-  echo "LGTM_TOKEN not set."
   exit 1
 fi
 
@@ -150,4 +151,4 @@ for db in $dbRoot/*; do
 done
 
 # generate JSON representation of results
-$MYDIR/predictions2json.js $dbRoot $test_projects >triager/data/predictions.json
+$MYDIR/predictions2json.js $dbRoot $test_projects >$output_file
