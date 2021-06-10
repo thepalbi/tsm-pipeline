@@ -1,1 +1,0 @@
-This is a simple React/Next.js app for triaging TSM sink predictions.
