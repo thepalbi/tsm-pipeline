@@ -19,44 +19,40 @@ async function getSnippet(db, filePath, startLine, startColumn, endLine, endColu
   let beforeLines = [],
     before = "", highlight = "Could not get source code.", after = "",
     afterLines = [];
-  try {
-    const srczip = path.resolve(db, 'src.zip');
-    const zip = new StreamZip.async({ file: srczip });
-    const srcStream = await zip.stream(filePath.slice(1));
-    const srcLines = readline.createInterface({
-      input: srcStream,
-      crlfDelay: Infinity
-    });
+  const srczip = path.resolve(db, 'src.zip');
+  const zip = new StreamZip.async({ file: srczip });
+  const srcStream = await zip.stream(filePath.slice(1));
+  const srcLines = readline.createInterface({
+    input: srcStream,
+    crlfDelay: Infinity
+  });
 
-    const beforeStart = Math.max(0, startLine - 4), afterEnd = endLine + 3;
-    let lineNumber = 0;
-    for await (const line of srcLines) {
-      if (lineNumber >= beforeStart && lineNumber < startLine - 1)
-        beforeLines.push(abbrev(line));
+  const beforeStart = Math.max(0, startLine - 4), afterEnd = endLine + 3;
+  let lineNumber = 0;
+  for await (const line of srcLines) {
+    if (lineNumber >= beforeStart && lineNumber < startLine - 1)
+      beforeLines.push(abbrev(line));
 
-      if (lineNumber === startLine - 1) {
-        before = abbrev(line.slice(0, startColumn - 1));
-        if (startLine === endLine) {
-          highlight = abbrev(line.slice(startColumn - 1, endColumn));
-        } else {
-          highlight = abbrev(line.slice(startColumn - 1)) + '\n...\n';
-        }
+    if (lineNumber === startLine - 1) {
+      before = abbrev(line.slice(0, startColumn - 1));
+      if (startLine === endLine) {
+        highlight = abbrev(line.slice(startColumn - 1, endColumn));
+      } else {
+        highlight = abbrev(line.slice(startColumn - 1)) + '\n...\n';
       }
-
-      if (lineNumber === endLine - 1) {
-        if (startLine !== endLine) {
-          highlight += '...\n' + abbrev(line.slice(0, endColumn));
-        }
-        after = abbrev(line.slice(endColumn));
-      }
-
-      if (lineNumber >= endLine && lineNumber < afterEnd)
-        afterLines.push(abbrev(line));
-
-      lineNumber++;
     }
-  } catch (e) {
-    console.warn("Unable to get snippet: " + e);
+
+    if (lineNumber === endLine - 1) {
+      if (startLine !== endLine) {
+        highlight += '...\n' + abbrev(line.slice(0, endColumn));
+      }
+      after = abbrev(line.slice(endColumn));
+    }
+
+    if (lineNumber >= endLine && lineNumber < afterEnd)
+      afterLines.push(abbrev(line));
+
+    lineNumber++;
   }
   return { beforeLines, before, highlight, afterLines, after };
 }
