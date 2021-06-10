@@ -3,6 +3,7 @@
 const cp = require('child_process');
 const path = require('path');
 const enc = { encoding: 'utf8' };
+const AdmZip = require('adm-zip');
 
 const dbRoot = process.argv[2];
 const projectNames = process.argv.slice(3);
@@ -19,7 +20,8 @@ function getSnippet(db, filePath, startLine, startColumn, endLine, endColumn) {
     afterLines = [];
   try {
     const srczip = path.resolve(db, 'src.zip');
-    const src = cp.execFileSync('unzip', ['-p', srczip, filePath.slice(1)], enc);
+    const zip = new AdmZip(srczip);
+    const src = zip.readAsText(filePath.slice(1));
     const srcLines = src.split('\n');
     beforeLines = srcLines.slice(Math.max(0, startLine - 4), startLine - 1).map(abbrev);
     before = abbrev(srcLines[startLine - 1].slice(0, startColumn - 1));
