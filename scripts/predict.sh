@@ -131,11 +131,20 @@ predicate isKnownSink(DataFlow::Node nd) {
   exists(DataFlow::PropWrite pw | isKnownSink(pw.getBase()) | nd = pw.getRhs())
 }
 
+predicate isEndpoint(DataFlow::Node nd) {
+  not exists(nd.getASuccessor()) and
+  not exists(DataFlow::InvokeNode invk |
+    nd = invk.getAnArgument() and
+    exists(invk.getACallee())
+  )
+}
+
 from DataFlow::Node nd, File f, int startLine, int endLine, int startColumn, int endColumn, string rep, float score
 where
   rep = rep(nd, true) and
   TsmRepr::getReprScore(rep, "snk") = score and
   not isKnownSink(nd) and
+  isEndpoint(nd) and
   nd.hasLocationInfo(f.getAbsolutePath(), startLine, startColumn, endLine, endColumn)
 select f.getAbsolutePath(), f.getRelativePath(), startLine, startColumn, endLine, endColumn, rep, score
 EOF
