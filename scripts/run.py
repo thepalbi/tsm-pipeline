@@ -5,6 +5,7 @@ from pathlib import Path
 import requests
 import subprocess
 import shutil
+from fetch_database import fetchDatabase
 
 def parseArguments():
     parser = argparse.ArgumentParser()
@@ -33,75 +34,6 @@ def convertQueryName(query_name):
         return "TaintedPathWorse", "Path"
     else:
         sys.exit(f'Unknown query name {query_name}')
-
-def databasePath(database_name, databases_dir):
-    database_name = database_name.replace("/", "__")
-    return os.path.join(f'{databases_dir}', f'{database_name}.zip')
-
-def databaseExists(database_name, databases_dir):
-    return os.path.exists(databasePath(database_name, databases_dir))
-
-def fetchDatabaseCommand(database_name, databases_dir):
-    database_path = databasePath(database_name, databases_dir)
-    # check whether database_name looks like an LGTM slug
-    if "/" in database_name:
-        print(f'Downloading {database_name} from LGTM.com')
-        lgtm_url = f'https://lgtm.com/api/v1.0/projects/{database_name}'
-        # send GET request to lgtm_url and get response as json
-        response = requests.get(lgtm_url)
-        response.raise_for_status()
-        # get project id from the json response
-        project_id = response.json()['id']
-        print(f'Project id for {database_name} is {project_id}')
-        command = (
-            f'curl -X GET -L "https://lgtm.com/api/v1.0/snapshots/{project_id}/javascript" '
-            f'-o {database_path}'
-        )
-    else:
-        print(f'Downloading {database_name} from Azure blob storage')
-        database_zip = database_name + ".zip"
-        command = (
-            f'azcopy copy "https://atmcodeqldata.blob.core.windows.net/atm/javascript-databases/nosql_800_no_evaluation/{database_zip}?${{ATM_BLOB_STORE_SAS_TOKEN}}" '
-            f'{database_path} --overwrite=true '
-            f'--check-md5 FailIfDifferent --from-to=BlobLocal --recursive'
-        )
-    return command
-
-def fetchDatabase(database_name, databases_dir):
-    database_dir = f'{databases_dir}/{database_name.replace("/", "_")}'
-    # Conditionally fetch the database
-    if not os.path.exists(database_dir):
-        '''
-        We need to ensure that the unzip folder name is the same as the zipped folder name.
-        We can't guarantee this, so we unzip to a clean temporary directory first before
-        copying the unzipped contents to their final location with a correct name
-        '''
-        tempUnzipDirectory = os.path.join(databases_dir, "tmp")
-        shutil.rmtree(tempUnzipDirectory, ignore_errors=True)
-        os.makedirs(tempUnzipDirectory)
-        # Fetch from Azure blob store
-        command = fetchDatabaseCommand(database_name, databases_dir)
-        try:
-            print(f'-Fetching {database_name}')
-            print(f'-using command: {command}')
-            subprocess.check_call(command, text=True, shell=True)
-            if not databaseExists(database_name, databases_dir):
-                print(f'-Failed to fetch {database_name}')
-                print(f'-Failing command is:')
-                print("\t" + command)
-                return False
-            print(f'-Unzipping {database_name}')
-            # unzip into tmp directory
-            subprocess.check_call(f'unzip {databasePath(database_name, databases_dir)} -d {tempUnzipDirectory}', text=True, shell=True)
-            # move (and rename) to correct location
-            subprocess.check_call(f'cp -r {tempUnzipDirectory}/* {database_dir}', text=True, shell=True)
-        except subprocess.CalledProcessError as e:
-            print(e.output)
-            return False
-        return True
-    else:
-        print(f'-Skipping fetch because {database_name} exists')
-    return True
 
 def listDatabases(project_list):
     with open(project_list) as f:
