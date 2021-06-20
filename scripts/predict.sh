@@ -3,15 +3,20 @@
 MYDIR=`dirname $0`
 
 if [ $# -ne 3 ]; then
-  echo "Usage: $0 scores_file test_projects threshold"
+  echo "Usage: $0 scores_file test_projects output_file"
   exit 1
 fi
 
-set -e
+set -ex
 
 scores_file=$1
 test_projects=$2
-threshold=$3
+output_file=$3
+
+if ! [ -f $scores_file ]; then
+  echo "scores file $scores_file does not exist"
+  exit 1
+fi
 
 tsm_ql="$MYDIR/../ql"
 if ! [ -d "$tsm_ql" ]; then
@@ -19,16 +24,9 @@ if ! [ -d "$tsm_ql" ]; then
   exit 1
 fi
 
-if [ -z "$LGTM_TOKEN" ]; then
-  echo "LGTM_TOKEN not set."
-  exit 1
-fi
-
 # generate query
-query=$(mktemp -t queryXXX.ql)
+query=codeql-lib/javascript/ql/src/predict-sinks.ql
 cat >$query <<EOF
-/** @kind problem */
-
 $(cat "$tsm_ql/tsm/NodeRepresentation.qll")
 
 $(cat $scores_file)
@@ -133,36 +131,31 @@ predicate isKnownSink(DataFlow::Node nd) {
   exists(DataFlow::PropWrite pw | isKnownSink(pw.getBase()) | nd = pw.getRhs())
 }
 
-from DataFlow::Node nd, float score
+predicate isEndpoint(DataFlow::Node nd) {
+  not exists(nd.getASuccessor()) and
+  not exists(DataFlow::InvokeNode invk |
+    nd = invk.getAnArgument() and
+    exists(invk.getACallee())
+  )
+}
+
+from DataFlow::Node nd, File f, int startLine, int endLine, int startColumn, int endColumn, string rep, float score
 where
-  TsmRepr::getReprScore(rep(nd, true), "snk") = score and
-  score >= ${threshold} and
-  not isKnownSink(nd)
-select nd, "Predicted new sink (score " + score + ")."
+  rep = rep(nd, true) and
+  TsmRepr::getReprScore(rep, "snk") = score and
+  not isKnownSink(nd) and
+  isEndpoint(nd) and
+  nd.hasLocationInfo(f.getAbsolutePath(), startLine, startColumn, endLine, endColumn)
+select f.getAbsolutePath(), f.getRelativePath(), startLine, startColumn, endLine, endColumn, rep, score
 EOF
 
-for test_proj in $test_projects; do
-  lgtm_url="https://lgtm.com/api/v1.0/projects/${test_proj}"
-  proj_id=$(curl -s $lgtm_url | jq .id)
-
-  lgtm_url="https://lgtm.com/api/v1.0/queryjobs?language=javascript&project-id=${proj_id}"
-  resp=$(mktemp -t respXXX.json)
-  curl -s -o "$resp" -X POST \
-       -H "Content-Type: text/plain" \
-       -H "Authorization: Bearer $LGTM_TOKEN" \
-       -H "Accept: application/json" \
-       --data-binary @$query $lgtm_url
-  if [ $(jq .code "$resp") = 429 ]; then
-    echo "Rate limit exceeded; no further query jobs will be created."
-    break
-  fi
-  query_console_url=$(jq '.["task-result"]["result-url"]' "$resp")
-  if [ "$query_console_url" = "null" ]; then
-    echo "Unable to determine query console URL."
-    echo "Response from LGTM was:"
-    cat "$resp"
-    echo
-  else
-    echo "LGTM.com query-console URL: ${query_console_url}"
-  fi
+# run it on all databases
+dbRoot=$MYDIR/databases
+$MYDIR/fetch_database.py $dbRoot $test_projects
+for db in $dbRoot/*; do
+  mkdir -p $db/results
+  codeql query run -o $db/results/sink-predictions.bqrs -d $db $query
 done
+
+# generate JSON representation of results
+$MYDIR/../triager/predictions2json.js $dbRoot $test_projects >$output_file
