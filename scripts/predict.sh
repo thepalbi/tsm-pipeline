@@ -149,7 +149,7 @@ where
   nd.hasLocationInfo(f.getAbsolutePath(), startLine, startColumn, endLine, endColumn) and
   nd.getEnclosingExpr().getEnclosingStmt().getLocation().hasLocationInfo(f.getAbsolutePath(), stmtStartLine, stmtStartColumn, stmtEndLine, stmtEndColumn)
 select f.getAbsolutePath(), f.getRelativePath(), startLine, startColumn, endLine, endColumn, rep, score,
-       stmtStartLine, stmtEndLine, stmtStartColumn, stmtEndColumn
+       stmtStartLine, stmtStartColumn, stmtEndLine, stmtEndColumn
 EOF
 
 # run it on all databases
