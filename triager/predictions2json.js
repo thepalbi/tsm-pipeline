@@ -76,7 +76,15 @@ async function getSnippet(db, filePath, startLine, startColumn, endLine, endColu
         },
         repr: tuple[6],
         score: tuple[7],
-        snippet: await getSnippet(db, tuple[0], tuple[2], tuple[3], tuple[4], tuple[5])
+        snippet: await getSnippet(db, tuple[0], tuple[2], tuple[3], tuple[4], tuple[5]),
+        locationEnclosingStm: {
+          projectName,
+          path: tuple[1],
+          startLine: tuple[8],
+          startColumn: tuple[9],
+          endLine: tuple[10],
+          endColumn: tuple[11]
+        },
       };
       predictions.push(prediction);
     }

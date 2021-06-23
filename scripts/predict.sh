@@ -139,14 +139,17 @@ predicate isEndpoint(DataFlow::Node nd) {
   )
 }
 
-from DataFlow::Node nd, File f, int startLine, int endLine, int startColumn, int endColumn, string rep, float score
+from DataFlow::Node nd, File f, int startLine, int endLine, int startColumn, int endColumn, string rep, float score,
+     int stmtStartLine, int stmtEndLine, int stmtStartColumn, int stmtEndColumn
 where
   rep = rep(nd, true) and
   TsmRepr::getReprScore(rep, "snk") = score and
   not isKnownSink(nd) and
   isEndpoint(nd) and
-  nd.hasLocationInfo(f.getAbsolutePath(), startLine, startColumn, endLine, endColumn)
-select f.getAbsolutePath(), f.getRelativePath(), startLine, startColumn, endLine, endColumn, rep, score
+  nd.hasLocationInfo(f.getAbsolutePath(), startLine, startColumn, endLine, endColumn) and
+  nd.getEnclosingExpr().getEnclosingStmt().getLocation().hasLocationInfo(f.getAbsolutePath(), stmtStartLine, stmtStartColumn, stmtEndLine, stmtEndColumn)
+select f.getAbsolutePath(), f.getRelativePath(), startLine, startColumn, endLine, endColumn, rep, score,
+       stmtStartLine, stmtEndLine, stmtStartColumn, stmtEndColumn
 EOF
 
 # run it on all databases
