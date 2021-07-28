@@ -55,72 +55,6 @@ def extendStrLocation(url):
     return url
 
 
-def readKnownLoc(file_loc:str):
-    knownSinks = open(file_loc, 'r', errors='replace', encoding='utf-8').readlines()
-    knownsStm =  list()
-    knownsFunc =  list()
-    db = ""
-    for line in knownSinks:
-        if line.startswith("DB="):
-            db = line[3:].strip()
-            print(db)
-            continue
-        if line.startswith('"nd",'):
-            continue
-        if not line.startswith("\""):
-            continue
-        if not "file:" in line:
-            continue
-        if '"col1"' in line:    
-            continue
-        if ' ?)' in line:    
-            continue
-        if "10'" in line:    
-            continue
-
-        columns = line.split(",")
-        url = columns[1]
-        urlStm = db+"||"+url
-        knownsStm.append(urlStm)
-        # temporary (until I can compute enclosing functions) get a few lines before the enclosing statement
-        urlFunc = extendStrLocation(url)
-        knownsFunc.append(db+"||"+urlFunc)
-        #  print(line)
-         
-    return (knownsStm, knownsFunc)
-
-def loadKnownSinkEmbs():
-    embsStm1 = torch.load( "knownStm1.pickle")
-    embsStm2 = torch.load( "knownStm2.pickle")
-    embsStm = torch.cat((embsStm1, embsStm2),0).cpu()
-    return embsStm
-
-def loadKnownSinkExtendedEmbs():
-    embsFunc1 = torch.load( "knownF1.pickle")
-    embsFunc2 = torch.load( "knownF2.pickle")
-    embsFunc = torch.cat((embsFunc1, embsFunc2),0).cpu()
-    return embsFunc
-
-
-
-def readLocs(fileName): 
-    print("Reading locs")
-    locsDict = dict()
-    with open(fileName) as source:
-        lines = source.readlines()
-        for line in lines:
-            columns = line.split(",")
-            size = len(columns)
-            if(size<4):
-                continue
-            sLoc = columns[size-3].strip()
-            repr = columns[size-1].strip()
-            if(size>4):
-                size = size -1
-            sink = columns[size-4].strip()
-            locsDict[sLoc] = (sink, repr)
-    return locsDict
-
 def encode(inputs):
     outputs = model(inputs,attention_mask = inputs.ne(1))[0]
     # mean pooling
@@ -222,9 +156,9 @@ def readLocation(location:str, prefix:str):
     return result
 
 
-def getKnowCodes(knownSinks):
+def getCodes(locs):
     result = []
-    for ksLoc in knownSinks:
+    for ksLoc in locs:
         ksCode = readLocation(ksLoc, os.path.join(baseFolder, queryType))
         result.append(ksCode)
     return result
@@ -254,17 +188,6 @@ def checkLocation(embs, ksLocs, sLocs):
     return (None, md)
 
 
-def generateAndSaveEmbeddings(knownSinksLocStm,knownSinksLocFunc):
-    knownCodeStm = getKnowCodes(knownSinksLocStm)
-    knownCodeFunc = getKnowCodes(knownSinksLocFunc)
-
-    embsStm = getVectors(knownCodeStm)
-    torch.save(embsStm, "knownStm1.pickle")
-
-    embsFunc = getVectors(knownCodeFunc)
-    torch.save(embsFunc, "knownF1.pickle")
-
-
 def getDBName(project, projectPrefix):
     # if project[0:2]=="g/":
     #     project = project[2:]
@@ -281,22 +204,6 @@ def getDBName(project, projectPrefix):
             return os.path.basename(projectCandidate[0])
     # should throw exception
     return project
-
-def readPredictions(fileName):
-    locs = [] 
-    with open(fileName, encoding="utf-8") as source:
-        data = json.load(source)        
-        for elem in data:
-            loc = elem["locationEnclosingStm"]
-            # print(loc)
-            path = loc["path"] 
-            project = loc["projectName"]
-            location = Location(project, path, 
-                                loc["startLine"],loc["startColumn"], 
-                                loc["endLine"], loc["endColumn"])
-            locs.append(location)
-            # print(sLoc)
-    return locs
         
 
 def createReprDict(predictions, baseFolder, queryType):
@@ -331,6 +238,41 @@ def createReprDict(predictions, baseFolder, queryType):
         reprDict[repr].add((location.toString(),  locationStm.toString(), locationFunc.toString()))
     return reprDict
 
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+import hashlib
+
+def generateAndSaveEmbeddings():
+    generateAndSaveEmbeddingsFromPredictions(dictPredRepr)
+    
+def generateAndSaveEmbeddingsFromPredictions(dictPredRepr):
+    for repr in dictPredRepr.keys():
+        print(repr)
+        allLocs = list(dictPredRepr[repr])
+        locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
+        locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
+        page = 0
+        for locs in chunks(locsStm, 50):
+            print(len(locs))
+            knownCodeStm = getCodes(locs)
+            # print(knownCodeStm)
+            embsStm = getVectors(knownCodeStm)
+            hash = hashlib.md5(repr.encode())
+            filename = os.path.join(baseFolder, "embs", "sql",  "emb_"+str(page)+"_"+hash.hexdigest()+".pickle" )
+            torch.save(embsStm, filename)
+            page = page + 1
+        for locs in chunks(locsFunc, 50):
+            print(len(locs))
+            knownCodeStm = getCodes(locs)
+            # print(knownCodeStm)
+            embsStm = getVectors(knownCodeStm)
+            hash = hashlib.md5(repr.encode())
+            filename = os.path.join(baseFolder, "embs", "sql", "emb_"+str(page)+"_"+hash.hexdigest()+".pickle" )
+            torch.save(embsStm, filename)
+            page = page + 1
 
 
 
@@ -377,10 +319,6 @@ outputFileName = db + '.json'
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 tokenizer = AutoTokenizer.from_pretrained("microsoft/graphcodebert-base")
 model = AutoModel.from_pretrained("microsoft/graphcodebert-base")
-# tokenizer = AutoTokenizer.from_pretrained("mrm8488/codebert-finetuned-clone-detection")
-# model = AutoModel.from_pretrained("mrm8488/codebert-finetuned-clone-detection")
-# tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
-# model = RobertaModel.from_pretrained("microsoft/codebert-base")
 torch.cuda._initialized = True
 model.to(device)
 model.eval()
@@ -388,48 +326,8 @@ model.eval()
 SIMILARITY_THRESHOLD=0.90
 MAX_LEN = 512
 
-# load locations of knows sinks, and same locations extended to get more context
-# knownSinksLocStm,knownSinksLocFunc = readKnownLoc(os.path.join(baseFolder, "KnownEnc.csv"))
 
 # testing embeddings for negative examples
 predictionsFile = "../triager/data/predictions.json"
 data = readJsonPredictions(predictionsFile)
 dictPredRepr = createReprDict(data, baseFolder, queryType)
-locationStm = Location("g/bkimminich/juice-shop", "frontend/src/app/product-details/product-details.component.spec.ts",
-                92, 5, 92, 102)
-locationFunc = Location("g/bkimminich/juice-shop", "frontend/src/app/product-details/product-details.component.spec.ts",
-                88, 67, 92, 102)
-repr = "(parameter 0 (member query *))"
-
-# "projectName": "g/bkimminich/juice-shop", "path": "routes/chatbot.ts",
-#   "startLine": 62,
-#   "startColumn": 3,
-#   "endLine": 64,
-#   "endColumn": 3
-locationStm = Location("g/bkimminich/juice-shop", "routes/chatbot.ts",
-                62, 3, 64, 3)
-locationFunc = Location("g/bkimminich/juice-shop", "routes/chatbot.ts",
-                43, 1, 64, 3)
-repr = "(parameter 0 (member run *))"
-
-locationStm = Location("g/QBisConsult/psql-api", "kdman.js",
-                36, 1, 36, 63)
-locationFunc = Location("g/QBisConsult/psql-api", "kdman.js",
-                1, 1, 36, 63)
-repr = "(parameter 0 (member all *))"
-
-
-# locationStm = Location("g/chaibio/chaipcr", "frontend/javascripts/libs/angular-sanitize.js",
-#                 468, 7, 468, 69)
-# locationFunc = Location("g/chaibio/chaipcr", "frontend/javascripts/libs/angular-sanitize.js",
-#                 457, 5, 468, 69)
-# repr =  "(parameter 0 (member open *))"
-locationStm.db = getDBName(locationStm.db, os.path.join(baseFolder, queryType))
-locationFunc.db = getDBName(locationFunc.db, os.path.join(baseFolder, queryType))
-# selectedSinks = getSimilarSinks(locationStm, locationFunc)
-
-locStm = Location.fromString("g_magda-io_magda||file:///magda-gateway/src/createAuthPluginRouter.ts:69:9:69:64")
-locFunc = Location.fromString("g_magda-io_magda||file:///magda-gateway/src/createAuthPluginRouter.ts:62:23:69:64")
-# repr = request.args.get('repr')
-repr = "(parameter 0 (member end (local res)))"
-# similar = getSimilarSinks(locStm, locFunc, repr)
