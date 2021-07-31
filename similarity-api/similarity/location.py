@@ -32,5 +32,8 @@ class Location:
     def toString(self):
         return self.db+"||"+"file:///opt/src/"+self.path+":"+str(self.startLine)+":"+str(self.startColumn)+":"+str(self.endLine)+":"+str(self.endColumn)
 
+    def toStringFlat(self):
+        return self.db.replace("/","_")+"||"+"file:///opt/src/"+self.path+":"+str(self.startLine)+":"+str(self.startColumn)+":"+str(self.endLine)+":"+str(self.endColumn)
+
     def db(self):
         return self.db

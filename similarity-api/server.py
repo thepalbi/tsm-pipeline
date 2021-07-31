@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 import os
 
-from similarity import getSimilarSinks, Location
+from similarity import getSimilarSinks, getSimilarSinksOrig, Location
 
 app = Flask(__name__)
 CORS(app)
@@ -34,6 +34,7 @@ def calculate():
     body = request.get_json(force=True)
     locStm, locFunc, repr = unserializeJsonBody(body)
     similar = getSimilarSinks(locStm, locFunc, repr)
+    print(similar)
     response_to_serialize = [
         {
             "location": Location.fromString(loc_string).as_dict(),

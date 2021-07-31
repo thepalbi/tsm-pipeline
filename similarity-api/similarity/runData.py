@@ -66,15 +66,16 @@ def encode(inputs):
 def getVectors(codes):
     # build dataset
     inputs = tokenizer(codes,return_tensors='pt',max_length=MAX_LEN, padding=True,truncation=True)['input_ids']
-
-    dataset = TensorDataset(inputs)
-    dataloader = DataLoader(dataset, sampler=SequentialSampler(dataset), batch_size=32)   
-    # obtain embeddings
-    embeddings = []
-    for batch in tqdm(dataloader):
-        embeddings.append(encode(batch[0]))
+    embeddings = encode(inputs).cpu()
+    # dataset = TensorDataset(inputs)
+    # dataloader = DataLoader(dataset, sampler=SequentialSampler(dataset), batch_size=32)   
+    # # obtain embeddings
+    # embeddings = []
+    # for batch in tqdm(dataloader):
+    #     print(batch)
+    #     embeddings.append(encode(batch[0]))
     
-    embeddings = torch.cat(embeddings,0).cpu()
+    # embeddings = torch.cat(embeddings,0).cpu()
 
     return embeddings
 
@@ -88,30 +89,14 @@ def query_candidate(query, candidate):
     probs, ids = scores.topk(1)
     return float(probs)
 
-def query_from_candidates(query,locCodes,code_vecs):
-    # obtain query embeddings
-    inputs = tokenizer(query,return_tensors='pt', max_length=MAX_LEN, padding=True,truncation=True)['input_ids']
-    query_vec = encode(inputs).cpu()
-
-    # calculate
-    # test using cosine:  
-    # query_np = query_vec.detach().numpy()
-    # code_vec_np = code_vecs.detach().numpy()
-    # similarity = cosine_similarity( query_np, code_vec_np)
-    # scores = torch.tensor(similarity)
+def query_candidates(query, locCodes, code_vecs):
+    inputs1 = tokenizer(query,return_tensors='pt', max_length=MAX_LEN, padding=True,truncation=True)['input_ids']
+    query_vec = encode(inputs1).cpu()
     scores=torch.einsum("ab,cb->ac",query_vec,code_vecs)[0]
+    print(scores)
     # search
-    probs, ids = scores.topk(1)
-    print("query:", query)
-    print("Probs", probs, " ids:", ids, " locCodes:", locCodes)
+    probs, ids = scores.topk(len(locCodes))
     return list([(float(x),locCodes[int(y)]) for x,y in zip(probs, ids)])
-
-
-def compareWithKS(code, ksEmbs, knownLocs):
-    result = query_from_candidates(code,knownLocs, ksEmbs)[0]
-    print(result)
-    return result
- 
 
 def readLocation(location:str, prefix:str):
     try: 
@@ -164,30 +149,6 @@ def getCodes(locs):
     return result
 
 
-def checkLocation(embs, ksLocs, sLocs):
-    found  = None
-    # print(sLocs)
-    md = 0
-    for sLoc in sLocs:
-            sCode = readLocation(sLoc, os.path.join(baseFolder, queryType))
-            # print(sCode)
-            elems = [sCode]                
-            d,ksLoc = compareWithKS(sCode, embs, ksLocs)
-            if d > md:
-                md = d
-
-            if d > SIMILARITY_THRESHOLD: 
-                print("Match:", sLoc,  d)
-                found = ksLoc
-                return (found, d)
-            # print(sCode, ksCode)
-            # print(sLoc, ksLoc)
-                #     print("Not Match:", sLoc, ksLoc)
-                # else:
-                    # print("Match:", sCode, ksCode)
-    return (None, md)
-
-
 def getDBName(project, projectPrefix):
     # if project[0:2]=="g/":
     #     project = project[2:]
@@ -234,8 +195,8 @@ def createReprDict(predictions, baseFolder, queryType):
         locationFunc.db = getDBName(location.db, os.path.join(baseFolder, queryType))
 
         if repr not in reprDict.keys():
-            reprDict[repr] = set()
-        reprDict[repr].add((location.toString(),  locationStm.toString(), locationFunc.toString()))
+            reprDict[repr] = list()
+        reprDict[repr].append((location.toString(),  locationStm.toString(), locationFunc.toString()))
     return reprDict
 
 def chunks(lst, n):
@@ -244,6 +205,53 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 import hashlib
+def loadKnownSinkEmbForRepFake(repr, dictPredRepr, prefix):
+    if repr in dictPredRepr.keys(): 
+        allLocs = list(dictPredRepr[repr])
+        locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
+        locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
+        page = 0
+        embsStm = None
+        for locs in chunks(locsStm, 50):
+            print(len(locs))
+            hash = hashlib.md5(repr.encode())
+            knownCodeStm = getCodes(locs)
+            print("Locs:", locs)
+            # print(knownCodeStm)
+            knownCodeStm = [knownCodeStm[3]]*len(locs)
+            embsStm1 = getVectors(knownCodeStm)
+            page = page + 1
+            if embsStm is None:
+                embsStm = embsStm1
+            else:
+                embsStm = torch.cat((embsStm, embsStm1),0).cpu()
+    return embsStm, allLocs
+
+
+def loadKnownSinkEmbForRep(repr, dictPredRepr, prefix):
+    # print(knownSinksLocStm.keys())
+    # repr = '"'+repr+'"'
+    if repr in dictPredRepr.keys(): 
+        allLocs = list(dictPredRepr[repr])
+        # locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
+        # locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
+        page = 0
+        embsStm = None
+        for locs in chunks(allLocs, 50):
+            # print(knownCodeStm)
+            hash = hashlib.md5(repr.encode())
+            filename = os.path.join(baseFolder, "embs", "sql", prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
+            embsStm1 = torch.load(filename)
+            # print(repr, embsStm1)
+            page = page + 1
+            if embsStm is None:
+                embsStm = embsStm1
+            else:
+                embsStm = torch.cat((embsStm, embsStm1),0).cpu()
+        return embsStm, allLocs
+    print(repr, " not found")
+    return None, None
+
 
 def generateAndSaveEmbeddings():
     generateAndSaveEmbeddingsFromPredictions(dictPredRepr)
@@ -257,26 +265,102 @@ def generateAndSaveEmbeddingsFromPredictions(dictPredRepr):
         page = 0
         for locs in chunks(locsStm, 50):
             print(len(locs))
-            knownCodeStm = getCodes(locs)
-            # print(knownCodeStm)
-            embsStm = getVectors(knownCodeStm)
             hash = hashlib.md5(repr.encode())
             filename = os.path.join(baseFolder, "embs", "sql",  "emb_"+str(page)+"_"+hash.hexdigest()+".pickle" )
-            torch.save(embsStm, filename)
+            if not os.path.isfile(filename):
+                knownCodeStm = getCodes(locs)
+                # print(knownCodeStm)
+                embsStm = getVectors(knownCodeStm)
+                torch.save(embsStm, filename)
+            else: 
+                print("File: ", filename, " for ", repr, " ", page, " exists")
             page = page + 1
+        page = 0
         for locs in chunks(locsFunc, 50):
             print(len(locs))
-            knownCodeStm = getCodes(locs)
-            # print(knownCodeStm)
-            embsStm = getVectors(knownCodeStm)
             hash = hashlib.md5(repr.encode())
-            filename = os.path.join(baseFolder, "embs", "sql", "emb_"+str(page)+"_"+hash.hexdigest()+".pickle" )
-            torch.save(embsStm, filename)
+            filename = os.path.join(baseFolder, "embs", "sql", "embF_"+str(page)+"_"+hash.hexdigest()+".pickle" )
+            if not os.path.isfile(filename):
+                knownCodeStm = getCodes(locs)
+                # print(knownCodeStm)
+                embsFunc = getVectors(knownCodeStm)
+                torch.save(embsFunc, filename)
+            else:
+                print("File: ", filename, " for ", repr, " ", page, " exists")
             page = page + 1
 
+def query_from_candidates(emb,locCodes,code_vecs, pos):
+    # obtain query embeddings
+    # inputs = tokenizer(query,return_tensors='pt', max_length=MAX_LEN, padding=True,truncation=True)['input_ids']
+    # query_vec = encode(inputs).cpu()
+    query_vec = emb
+
+    # calculate
+    # test using cosine:  
+    query_np = query_vec.detach().numpy()
+    code_vec_np = code_vecs.detach().numpy()
+    # similarity = cosine_similarity( query_np, code_vec_np)
+    similarity = cosine_similarity( [code_vec_np[pos]], code_vec_np)
+    scores = torch.tensor(similarity)
+
+    # alternative from Daya
+    # scores=torch.einsum("ab,cb->ac",query_vec,code_vecs)[0]
+    # scores=torch.einsum("ab,cb->ac",code_vecs[pos],code_vecs)[0]
+    # print("scores:", scores)
+    # search
+    # probs, ids = scores[0].topk(len(locCodes))
+    # print(probs)
+    # print(ids)
+    # print(list([(float(x),locCodes[y]) for x,y in zip(scores[0], range(len(locCodes)))]))
+    return list([(float(x),locCodes[y]) for x,y in zip(scores[0], range(len(locCodes)))])
+    # return list([(float(x),locCodes[int(y)]) for x,y in zip(probs, ids)])
+
+
+def checkLocation(embs, locs, queryEmb, queryLoc):
+    pos = locs.index(queryLoc)
+    results = query_from_candidates(queryEmb, locs, embs, pos)
+    # print(results)
+    return results
+ 
 
 
 def getSimilarSinks(locationStm, locationFunc, repr):
+    embsAllStm, allLocs = loadKnownSinkEmbForRep(repr, dictPredRepr, "emb_")
+    embsAllFunc, allLocs = loadKnownSinkEmbForRep(repr, dictPredRepr, "embF_")
+    sourceLocStm = locationStm.toStringFlat()
+    sourceLocFunc = locationFunc.toStringFlat()
+    queryCodeStm = readLocation(sourceLocStm,os.path.join(baseFolder,  "sql"))
+    queryCodeFunc = readLocation(sourceLocFunc,os.path.join(baseFolder,  "sql"))
+
+
+    selectedLocs = set()
+    embeddingStm = getVectors([queryCodeStm])
+    embeddingFunc = getVectors([queryCodeFunc])
+    
+    allLocs = list(dictPredRepr[repr])
+    locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
+    locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
+
+    print("Negative example: ", sourceLocStm , " code: ", queryCodeStm)
+    resultStm = checkLocation(embsAllStm, locsStm, embeddingStm,sourceLocStm)
+    resultFunc = checkLocation(embsAllFunc, locsFunc, embeddingFunc,sourceLocFunc)
+    # resultStm = query_candidates(queryCodeStm, locsStm, embsAllStm)
+    # resultFunc = query_candidates(queryCodeFunc, locsFunc, embsAllFunc)
+    for i in range(0,len(allLocs)):
+        scoreStm, locS = resultStm[i]
+        scoreFunc, locF = resultFunc[i]
+        avgScore = (scoreStm+scoreFunc)/2
+        # print(allLocs[i], avgScore)
+        if avgScore > 0.85:
+            # print(allLocs[i])
+            selectedLocs.add((allLocs[i][0],avgScore))
+
+    print("Highlighted ", len(selectedLocs), "/", len(dictPredRepr[repr]))
+    print(selectedLocs)
+    # return selectedLocs
+    return selectedLocs
+
+def getSimilarSinksOrig(locationStm, locationFunc, repr):
     sourceLocStm = locationStm.toString()
     sourceLocFunc = locationFunc.toString()
     queryCodeStm = readLocation(sourceLocStm,os.path.join(baseFolder,  "sql"))
@@ -290,8 +374,8 @@ def getSimilarSinks(locationStm, locationFunc, repr):
         destCodeStm = readLocation(sLoc,os.path.join(baseFolder,  "sql"))
         destCodeFunc = readLocation(fLoc,os.path.join(baseFolder,  "sql"))
         print(destCodeStm)
-        scoreStm, l1 = query_from_candidates(destCodeStm,[sourceLocStm], embeddingStm)[0]
-        scoreFunc, l2 = query_from_candidates(destCodeFunc,[sourceLocFunc], embeddingFunc)[0]
+        scoreStm,_ = query_candidates(destCodeStm,[sourceLocStm], embeddingStm)[0]
+        scoreFunc,_ = query_candidates(destCodeFunc,[sourceLocFunc], embeddingFunc)[0]
         # scoreStm = query_candidate(queryCodeStm, destCodeStm)
         # scoreFunc = query_candidate(queryCodeFunc, destCodeFunc) 
         print(scoreStm, scoreFunc)
@@ -323,7 +407,7 @@ torch.cuda._initialized = True
 model.to(device)
 model.eval()
 
-SIMILARITY_THRESHOLD=0.90
+SIMILARITY_THRESHOLD=0.80
 MAX_LEN = 512
 
 
