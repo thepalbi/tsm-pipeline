@@ -127,7 +127,7 @@ def readLocation(location:str, prefix:str):
                     # print(lines[i-1])
                     text = lines[i-1].decode('utf-8')
                     result += text
-                    result += lines[endLine-1].decode('utf-8')[:endColumn]
+                result += lines[endLine-1].decode('utf-8')[:endColumn]
             else:
                 result += lines[startLine-1].decode('utf-8')[startColumn-1:endColumn]
             # print(result)
@@ -306,7 +306,8 @@ def query_from_candidates(emb,locCodes,code_vecs, pos):
     # alternative from Daya
     # scores=torch.einsum("ab,cb->ac",query_vec,code_vecs)[0]
     # scores=torch.einsum("ab,cb->ac",code_vecs[pos],code_vecs)[0]
-    # print("scores:", scores)
+    print("pos: ", pos)
+    print("scores:", scores)
     # search
     # probs, ids = scores[0].topk(len(locCodes))
     # print(probs)
@@ -351,7 +352,7 @@ def getSimilarSinks(locationStm, locationFunc, repr):
         scoreFunc, locF = resultFunc[i]
         avgScore = (scoreStm+scoreFunc)/2
         # print(allLocs[i], avgScore)
-        if avgScore > 0.85:
+        if avgScore > 0.92:
             # print(allLocs[i])
             selectedLocs.add((allLocs[i][0],avgScore))
 
@@ -412,6 +413,6 @@ MAX_LEN = 512
 
 
 # testing embeddings for negative examples
-predictionsFile = "../triager/data/predictions.json"
+predictionsFile = "../triager/data/predictions.json.updated"
 data = readJsonPredictions(predictionsFile)
 dictPredRepr = createReprDict(data, baseFolder, queryType)
