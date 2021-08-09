@@ -416,9 +416,9 @@ export class App extends React.Component<AppProps, AppState> {
     let bannedPredictionsCount = this.state.bannedPredictions.size;
     let predictions = this.state.enabledPredictions.slice();
     predictions.sort((a, b) => b.score - a.score);
-    predictions = predictions.slice(this.state.from - 1, this.state.to);
     if (this.state.hideBannedPredictions)
       predictions = predictions.filter(p => !p.banned);
+    predictions = predictions.slice(this.state.from - 1, this.state.to);
     let propPredictions = predictions.map(p => {
       return {
         ...p,
