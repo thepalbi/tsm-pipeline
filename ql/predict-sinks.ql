@@ -179,16 +179,16 @@ module TSMConfig {
       source instanceof RemoteFlowSource
     }
 
-    override predicate isSink(DataFlow::Node sink) { 
-      isKnownSink(sink) 
-       or 
-      exists(float score | score = TsmRepr::getReprScore(rep(sink, true), "snk") and score>0)
+    override predicate isSink(DataFlow::Node sink) {
+      isKnownSink(sink)
+      or
+      exists(float score | score = TsmRepr::getReprScore(rep(sink, true), "snk") and score > 0)
     }
 
     override predicate isSink(DataFlow::Node sink, DataFlow::FlowLabel lbl) {
-      isKnownSink(sink) 
-      or 
-      exists(float score | score = TsmRepr::getReprScore(rep(sink, true), "snk") and score>0)
+      isKnownSink(sink)
+      or
+      exists(float score | score = TsmRepr::getReprScore(rep(sink, true), "snk") and score > 0)
     }
 
     override predicate isAdditionalFlowStep(
@@ -199,16 +199,18 @@ module TSMConfig {
   }
 }
 
-boolean isReachable(DataFlow::Node sink)  {
-  exists(TSMConfig::Configuration cfg, DataFlow::Node source | 
-            cfg.hasFlow(source, sink))  and result = true
-  or not exists(TSMConfig::Configuration cfg, DataFlow::Node source | 
-            cfg.hasFlow(source, sink)) and result = false
+boolean isReachable(DataFlow::Node sink) {
+  exists(TSMConfig::Configuration cfg, DataFlow::Node source | cfg.hasFlow(source, sink)) and
+  result = true
+  or
+  not exists(TSMConfig::Configuration cfg, DataFlow::Node source | cfg.hasFlow(source, sink)) and
+  result = false
 }
-      
-from DataFlow::Node nd, File f, int startLine, int endLine, int startColumn, int endColumn, string rep, float score,
-      int stmtStartLine, int stmtEndLine, int stmtStartColumn, int stmtEndColumn, 
-      int funcStartLine, int funcStartColumn,  boolean reach
+
+from
+  DataFlow::Node nd, File f, int startLine, int endLine, int startColumn, int endColumn, string rep,
+  float score, int stmtStartLine, int stmtEndLine, int stmtStartColumn, int stmtEndColumn,
+  int funcStartLine, int funcStartColumn, boolean reach
 where
   rep = rep(nd, true) and
   TsmRepr::getReprScore(rep, "snk") = score and
@@ -216,9 +218,14 @@ where
   reach = isReachable(nd) and
   isEndpoint(nd) and
   nd.hasLocationInfo(f.getAbsolutePath(), startLine, startColumn, endLine, endColumn) and
-  nd.getEnclosingExpr().getEnclosingStmt().getLocation().hasLocationInfo(f.getAbsolutePath(), stmtStartLine, stmtStartColumn, stmtEndLine, stmtEndColumn) and
-  nd.getContainer().getLocation().hasLocationInfo(f.getAbsolutePath(), funcStartLine, funcStartColumn, _, _)
-select f.getAbsolutePath(), f.getRelativePath(), startLine, startColumn, endLine, endColumn, 
-        rep, score, reach, 
-        stmtStartLine, stmtStartColumn, stmtEndLine, stmtEndColumn,
-        funcStartLine, funcStartColumn
+  nd.getEnclosingExpr()
+      .getEnclosingStmt()
+      .getLocation()
+      .hasLocationInfo(f.getAbsolutePath(), stmtStartLine, stmtStartColumn, stmtEndLine,
+        stmtEndColumn) and
+  nd.getContainer()
+      .getLocation()
+      .hasLocationInfo(f.getAbsolutePath(), funcStartLine, funcStartColumn, _, _)
+select f.getAbsolutePath(), f.getRelativePath(), startLine, startColumn, endLine, endColumn, rep,
+  score, reach, stmtStartLine, stmtStartColumn, stmtEndLine, stmtEndColumn, funcStartLine,
+  funcStartColumn
