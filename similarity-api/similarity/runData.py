@@ -196,7 +196,7 @@ def createReprDict(predictions, baseFolder, queryType):
 
         if repr not in reprDict.keys():
             reprDict[repr] = list()
-        reprDict[repr].append((location.toString(),  locationStm.toString(), locationFunc.toString()))
+        reprDict[repr].append((location.toString(),  locationStm.toStringFlat(), locationFunc.toStringFlat()))
     return reprDict
 
 def chunks(lst, n):
