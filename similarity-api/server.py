@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 import os
 
-from similarity import getSimilarSinks, getSimilarSinksOrig, Location
+from similarity import getSimilarSinks, Location
 
 app = Flask(__name__)
 CORS(app)
