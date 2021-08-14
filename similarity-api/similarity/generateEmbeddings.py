@@ -224,35 +224,38 @@ def generateAndSaveEmbeddings():
 def generateAndSaveEmbeddingsFromPredictions(dictPredRepr):
     for repr in dictPredRepr.keys():
         print(repr)
-        allLocs = list(dictPredRepr[repr])
-        locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
-        locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
-        page = 0
-        for locs in chunks(locsStm, 50):
-            print(len(locs))
-            hash = hashlib.md5(repr.encode())
-            filename = os.path.join(baseFolder, "embs", "sql",  "emb_"+str(page)+"_"+hash.hexdigest()+".pickle" )
-            if not os.path.isfile(filename):
-                knownCodeStm = getCodes(locs)
+        generateEmbeddingsForRepr(dictPredRepr, repr)
+
+def generateEmbeddingsForRepr(dictPredRepr, repr):
+    allLocs = list(dictPredRepr[repr])
+    locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
+    locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
+    page = 0
+    for locs in chunks(locsStm, 50):
+        print(len(locs))
+        hash = hashlib.md5(repr.encode())
+        filename = os.path.join(baseFolder, "embs", "sql",  "emb_"+str(page)+"_"+hash.hexdigest()+".pickle" )
+        if not os.path.isfile(filename):
+            knownCodeStm = getCodes(locs)
                 # print(knownCodeStm)
-                embsStm = getVectors(knownCodeStm)
-                torch.save(embsStm, filename)
-            else: 
-                print("File: ", filename, " for ", repr, " ", page, " exists")
-            page = page + 1
-        page = 0
-        for locs in chunks(locsFunc, 50):
-            print(len(locs))
-            hash = hashlib.md5(repr.encode())
-            filename = os.path.join(baseFolder, "embs", "sql", "embF_"+str(page)+"_"+hash.hexdigest()+".pickle" )
-            if not os.path.isfile(filename):
-                knownCodeStm = getCodes(locs)
+            embsStm = getVectors(knownCodeStm)
+            torch.save(embsStm, filename)
+        else: 
+            print("File: ", filename, " for ", repr, " ", page, " exists")
+        page = page + 1
+    page = 0
+    for locs in chunks(locsFunc, 50):
+        print(len(locs))
+        hash = hashlib.md5(repr.encode())
+        filename = os.path.join(baseFolder, "embs", "sql", "embF_"+str(page)+"_"+hash.hexdigest()+".pickle" )
+        if not os.path.isfile(filename):
+            knownCodeStm = getCodes(locs)
                 # print(knownCodeStm)
-                embsFunc = getVectors(knownCodeStm)
-                torch.save(embsFunc, filename)
-            else:
-                print("File: ", filename, " for ", repr, " ", page, " exists")
-            page = page + 1
+            embsFunc = getVectors(knownCodeStm)
+            torch.save(embsFunc, filename)
+        else:
+            print("File: ", filename, " for ", repr, " ", page, " exists")
+        page = page + 1
 
 
 baseFolder = "./dbs"
