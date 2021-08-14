@@ -1,12 +1,50 @@
 import os
+import json
 
 from similarity import generateAndSaveEmbeddings, Location
-from similarity import getSimilarSinks, Location
+# from similarity import getSimilarSinks
 
+# Creates a dictionary repr -> [loc, stmLoc, funcLoc] out of the prediction json in memory
+def createReprDict(predictions):
+    reprDict = dict()
+    for elem in predictions:
+        loc = elem["location"]
+        repr = elem["repr"]
+        # print(loc)
+        path = loc["path"] 
+        project = loc["projectName"]
+        location = Location(project, path, 
+                            loc["startLine"],loc["startColumn"], 
+                            loc["endLine"], loc["endColumn"])
+        # the enclosing stm 
+        locStm = elem["locationEnclosingStm"]
+        locationStm = Location(project, path, 
+                            locStm["startLine"],locStm["startColumn"], 
+                            locStm["endLine"], locStm["endColumn"])
+        # the enclosing function 
+        locFunc = elem["locationEnclosingFunc"]
+        locationFunc = Location(project, path, 
+                            locFunc["startLine"],locFunc["startColumn"], 
+                            locFunc["endLine"], locFunc["endColumn"])
+        if repr not in reprDict.keys():
+            reprDict[repr] = list()
+        reprDict[repr].append((location.toString(),  locationStm.toStringFlat(), locationFunc.toStringFlat()))
+    return reprDict
+
+# Creates a dictionary repr -> [loc, stmLoc, funcLoc] out of the prediction json file
+def readJsonPredictions(fileName):
+    with open(fileName, encoding="utf-8") as source:
+        data = json.load(source)        
+        dictPredRepr = createReprDict(data)
+        return dictPredRepr
 
 if __name__ == "__main__":
-    # generateAndSaveEmbeddings()
-    # exit()
+    # testing embeddings for negative examples
+    predictionsFile = "../triager/data/predictions.json.updated"
+    dictPredRepr = readJsonPredictions(predictionsFile)
+
+    generateAndSaveEmbeddings(dictPredRepr)
+    exit()
     locationStm = Location("g/chaibio/chaipcr", "frontend/javascripts/libs/angular-sanitize.js",
                 468, 7, 468, 69)
     locationFunc = Location("g/chaibio/chaipcr", "frontend/javascripts/libs/angular-sanitize.js",

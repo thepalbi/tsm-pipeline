@@ -136,22 +136,7 @@ def getSimilarSinks(locationStm, locationFunc, repr):
 
 baseFolder = "./dbs"
 
-queryType = "sql" 
-db = "jordanbertasso_vulnerable-web-app_9ea5fa8"
-inputCVS = "inputs4.csv"
-outputFileName = db + '.json'
-
-if len(sys.argv)>1:
-    db = sys.argv[1]
-    inputCVS = sys.argv[2]
-
-outputFileName = db + '.json'
-
-SIMILARITY_THRESHOLD=0.80
-MAX_LEN = 512
-
-
 # testing embeddings for negative examples
-predictionsFile = "../triager/data/predictions.json.updated"
+predictionsFile = "../triager/data/predictions.json"
 dictPredRepr = readJsonPredictions(predictionsFile)
  
