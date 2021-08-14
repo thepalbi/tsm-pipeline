@@ -1,4 +1,3 @@
 from .similarityWithEmb import getSimilarSinks
-from .runData import getSimilarSinksOrig
-from .runData import generateAndSaveEmbeddings
+from .generateEmbeddings import generateAndSaveEmbeddings
 from .location import Location
