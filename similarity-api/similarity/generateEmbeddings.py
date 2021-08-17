@@ -1,5 +1,7 @@
 import genericpath
 import os
+
+from scipy.sparse import base
 from transformers import AutoTokenizer, AutoModel
 from torch.utils.data import DataLoader, SequentialSampler,TensorDataset
 import torch
@@ -8,9 +10,9 @@ import json
 import numpy as np
 from tqdm import tqdm
 from sklearn.metrics.pairwise import cosine_similarity
-import zipfile
 import sys
 from .location import Location
+from .location import getCodes, readLocation
 import glob
 
 
@@ -66,56 +68,6 @@ def query_candidates(query, locCodes, code_vecs):
     probs, ids = scores.topk(len(locCodes))
     return list([(float(x),locCodes[int(y)]) for x,y in zip(probs, ids)])
 
-def readLocation(location:str, prefix:str):
-    try: 
-        locDB = location.split("||")
-        db = locDB[0].strip().replace("/","_")
-        url = locDB[1].replace("\"","")
-        locArray = url.replace("\"","").split(":")
-        startLine = int(locArray[2])
-        startColumn = int(locArray[3])
-        endLine = int(locArray[4])
-        endColumn = int(locArray[5])
-        fileName = locArray[1][3:]
-
-        # print(prefix+db+"/src.zip")
-        
-        archive = zipfile.ZipFile(os.path.join(prefix,db,"src.zip"), 'r')
-        # print(fileName)
-        # print(startLine)
-        # print(endLine)
-        with archive.open(fileName) as source:
-            lines = source.readlines()
-            # lines = text.split('\n')
-            # print(len(lines))
-            result = ""
-            if(endLine>startLine):
-                result += lines[startLine-1].decode('utf-8')[startColumn-1:]
-                for i in range(startLine+1,endLine-1):
-                    # print(lines[i-1])
-                    text = lines[i-1].decode('utf-8')
-                    result += text
-                result += lines[endLine-1].decode('utf-8')[:endColumn]
-            else:
-                result += lines[startLine-1].decode('utf-8')[startColumn-1:endColumn]
-            # print(result)
-    except Exception as inst:
-        print("Error:", location)
-        print(inst)   
-        # raise    
-        result = ""
-        if "None" in location:
-            raise
-    return result
-
-
-def getCodes(locs):
-    result = []
-    for ksLoc in locs:
-        ksCode = readLocation(ksLoc, os.path.join(baseFolder, queryType))
-        result.append(ksCode)
-    return result
-
 
 def getDBName(project, projectPrefix):
     # if project[0:2]=="g/":
@@ -146,7 +98,7 @@ def loadKnownSinkEmbForRepFake(repr, dictPredRepr, prefix):
         for locs in chunks(locsStm, 50):
             print(len(locs))
             hash = hashlib.md5(repr.encode())
-            knownCodeStm = getCodes(locs)
+            knownCodeStm = getCodes(locs, baseFolder, queryType)
             print("Locs:", locs)
             # print(knownCodeStm)
             knownCodeStm = [knownCodeStm[3]]*len(locs)
