@@ -137,6 +137,6 @@ def getSimilarSinks(locationStm, locationFunc, repr):
 baseFolder = "./dbs"
 
 # testing embeddings for negative examples
-predictionsFile = "../triager/data/predictions.json"
+predictionsFile = "../triager/data/predictions.json.updated"
 dictPredRepr = readJsonPredictions(predictionsFile)
  
