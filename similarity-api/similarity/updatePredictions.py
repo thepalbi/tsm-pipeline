@@ -9,8 +9,8 @@ import numpy as np
 from tqdm import tqdm
 from sklearn.metrics.pairwise import cosine_similarity
 import sys
-from .location import Location
-from .location import getCodes, readLocation
+from location import Location
+from location import getCodes, readLocation
 
 
 from typing import List
@@ -106,7 +106,7 @@ def loadKnownSinkEmbForRep(repr,knownSinksLocStm, prefix):
 
 def loadKnownSinkEmbForRepChunk(repr, prefix, page):
     if repr in knownSinksLocStm.keys(): 
-        allLocs = list(knownSinksLocStm[repr])
+        allLocs = list(knownSinksLocStm[repr])[page*50:(page+1)*50]
         print(repr, len(allLocs))
         # page = 0
         embsStm = None
@@ -314,7 +314,7 @@ if __name__ == '__main__':
             allLocs = list(knownSinksLocStm[repr2])
             print(repr2, len(allLocs))
             for locs in chunks(allLocs, 50):
-                embsStm, allLocs = loadKnownSinkEmbForRepChunk(repr2, "knownStm_", page)
+                embsStm, allLocsStm = loadKnownSinkEmbForRepChunk(repr2, "knownStm_", page)
                 # print(loc)
                 path = loc["path"] 
                 project = loc["projectName"]
@@ -351,7 +351,7 @@ if __name__ == '__main__':
                 sLocs = [sLoc]
                 # print(sLocs)
                 if embsStm is not None:
-                    result = checkLocation(embsStm, allLocs,  sLocs)
+                    result = checkLocation(embsStm, allLocsStm,  sLocs)
                 else:
                     print("Is None for ", repr)
                     result = ["",originalScore]
