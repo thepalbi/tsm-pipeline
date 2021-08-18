@@ -1,3 +1,6 @@
+import zipfile
+import os
+
 class Location:
     def __init__(self, db, path, startLine, startColumn, endLine, endColumn):
         self.db = db
@@ -35,11 +38,38 @@ class Location:
     def toStringFlat(self):
         return self.db.replace("/","_")+"||"+"file:///opt/src/"+self.path+":"+str(self.startLine)+":"+str(self.startColumn)+":"+str(self.endLine)+":"+str(self.endColumn)
 
+    def read(self, prefix:str):
+        try:
+            db = self.db.replace("/","_")
+            zipFilename = os.path.join(prefix,db,"src.zip")
+            archive = zipfile.ZipFile(zipFilename, 'r')
+            with archive.open("file:///opt/src/"+self.path) as source:
+                lines = source.readlines()
+                # lines = text.split('\n')
+                # print(len(lines))
+                result = ""
+                if(self.endLine>self.startLine):
+                    result += lines[self.startLine-1].decode('utf-8')[self.startColumn-1:]
+                    for i in range(self.startLine+1,self.endLine-1):
+                        # print(lines[i-1])
+                        text = lines[i-1].decode('utf-8')
+                        result += text
+                    result += lines[self.endLine-1].decode('utf-8')[:self.endColumn]
+                else:
+                    result += lines[self.startLine-1].decode('utf-8')[self.startColumn-1:self.endColumn]
+        
+        except Exception as inst:
+            print("Error in readLocation:", self.toString(), "zip: ", zipFilename)
+            print(inst)   
+            # raise    
+            result = ""
+
+        return result
+
+    
     def db(self):
         return self.db
 
-import zipfile
-import os
 
 def readLocation(location:str, prefix:str):
     try: 
