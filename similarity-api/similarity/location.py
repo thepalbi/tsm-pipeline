@@ -1,3 +1,4 @@
+from xml.etree.ElementTree import tostring
 import zipfile
 import os
 
@@ -38,12 +39,16 @@ class Location:
     def toStringFlat(self):
         return self.db.replace("/","_")+"||"+"file:///opt/src/"+self.path+":"+str(self.startLine)+":"+str(self.startColumn)+":"+str(self.endLine)+":"+str(self.endColumn)
 
+    def __str__(self):
+        return self.toString()
+        
     def read(self, prefix:str):
         try:
             db = self.db.replace("/","_")
             zipFilename = os.path.join(prefix,db,"src.zip")
             archive = zipfile.ZipFile(zipFilename, 'r')
-            with archive.open("file:///opt/src/"+self.path) as source:
+            path = self.path.replace('"',"")
+            with archive.open("opt/src/"+path) as source:
                 lines = source.readlines()
                 # lines = text.split('\n')
                 # print(len(lines))
@@ -59,7 +64,7 @@ class Location:
                     result += lines[self.startLine-1].decode('utf-8')[self.startColumn-1:self.endColumn]
         
         except Exception as inst:
-            print("Error in readLocation:", self.toString(), "zip: ", zipFilename)
+            print("Error in readLocation:", self.toString(), "zip: ", zipFilename, "path:", self.path)
             print(inst)   
             # raise    
             result = ""
@@ -117,6 +122,7 @@ def readLocation(location:str, prefix:str):
 def getCodes(locs, baseFolder, queryType):
     result = []
     for ksLoc in locs:
-        ksCode = readLocation(ksLoc, os.path.join(baseFolder, queryType))
+        # ksCode = readLocation(ksLoc, os.path.join(baseFolder, queryType))
+        ksCode = ksLoc.read(os.path.join(baseFolder, queryType))
         result.append(ksCode)
     return result

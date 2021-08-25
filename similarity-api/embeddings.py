@@ -1,8 +1,8 @@
 import os
 import json
 
-from similarity import generateAndSaveEmbeddings, Location
-# from similarity import getSimilarSinks
+# from similarity import generateAndSaveEmbeddings, Location
+from similarity import getSimilarSinks, Location
 
 # Creates a dictionary repr -> [loc, stmLoc, funcLoc] out of the prediction json in memory
 def createReprDict(predictions):
@@ -28,7 +28,8 @@ def createReprDict(predictions):
                             locFunc["endLine"], locFunc["endColumn"])
         if repr not in reprDict.keys():
             reprDict[repr] = list()
-        reprDict[repr].append((location.toString(),  locationStm.toStringFlat(), locationFunc.toStringFlat()))
+        # reprDict[repr].append((location.toString(),  locationStm.toStringFlat(), locationFunc.toStringFlat()))
+        reprDict[repr].append((location,  locationStm, locationFunc))
     return reprDict
 
 # Creates a dictionary repr -> [loc, stmLoc, funcLoc] out of the prediction json file
@@ -43,8 +44,8 @@ if __name__ == "__main__":
     predictionsFile = "../triager/data/predictions.json.updated"
     dictPredRepr = readJsonPredictions(predictionsFile)
 
-    generateAndSaveEmbeddings(dictPredRepr)
-    exit()
+    # generateAndSaveEmbeddings(dictPredRepr)
+    # exit()
     locationStm = Location("g/chaibio/chaipcr", "frontend/javascripts/libs/angular-sanitize.js",
                 468, 7, 468, 69)
     locationFunc = Location("g/chaibio/chaipcr", "frontend/javascripts/libs/angular-sanitize.js",

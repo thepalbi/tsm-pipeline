@@ -10,7 +10,7 @@ from tqdm import tqdm
 from sklearn.metrics.pairwise import cosine_similarity
 import sys
 from location import Location
-from location import getCodes, readLocation
+from location import getCodes
 
 
 from typing import List
@@ -61,14 +61,16 @@ def readKnownLoc(file_loc:str):
             # knownsStm.append(urlStm)
             if repr not in knownsStm.keys():
                 knownsStm[repr] = set()
-            knownsStm[repr].add(urlStm)
+            # knownsStm[repr].add(urlStm)
+            knownsStm[repr].add(location)
             # temporary (until I can compute enclosing functions) get a few lines before the enclosing statement
             urlFunc = locationFunc.toString()
             # knownsFunc.append(db+"||"+urlFunc)
             # knownsFunc.append(fakeEnclosingStm(location).toString())
             if repr not in knownsFunc.keys():
                 knownsFunc[repr] = set()
-            knownsFunc[repr].add(urlFunc)
+            # knownsFunc[repr].add(urlFunc)
+            knownsStm[repr].add(locationFunc)
             
             # print(location, repr)
         except Exception as e:

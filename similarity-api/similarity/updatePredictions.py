@@ -10,7 +10,7 @@ from tqdm import tqdm
 from sklearn.metrics.pairwise import cosine_similarity
 import sys
 from location import Location
-from location import getCodes, readLocation
+from location import getCodes
 
 
 from typing import List
@@ -61,14 +61,16 @@ def readKnownLoc(file_loc:str):
             # knownsStm.append(urlStm)
             if repr not in knownsStm.keys():
                 knownsStm[repr] = set()
-            knownsStm[repr].add(urlStm)
+            # knownsStm[repr].add(urlStm)
+            knownsStm[repr].add(location)
             # temporary (until I can compute enclosing functions) get a few lines before the enclosing statement
             urlFunc = locationFunc.toString()
             # knownsFunc.append(db+"||"+urlFunc)
             # knownsFunc.append(fakeEnclosingStm(location).toString())
             if repr not in knownsFunc.keys():
                 knownsFunc[repr] = set()
-            knownsFunc[repr].add(urlFunc)
+            # knownsFunc[repr].add(urlFunc)
+            knownsFunc[repr].add(locationFunc)
             
             # print(location, repr)
         except Exception as e:
@@ -173,7 +175,7 @@ def query_from_candidates(query,locCodes,code_vecs):
 
 def compareWithKS(code, ksEmbs, knownLocs):
     result = query_from_candidates(code,knownLocs, ksEmbs)[0]
-    print(result)
+    print(result[0], ",", result[1])
     return result
  
 
@@ -183,7 +185,7 @@ def checkLocation(embs, ksLocs, sLocs):
     # print(sLocs)
     md = 0
     for sLoc in sLocs:
-            sCode = readLocation(sLoc, os.path.join(baseFolder, queryType))
+            sCode = sLoc.read(os.path.join(baseFolder, queryType))
             # print(sCode)
             elems = [sCode]                
             d,ksLoc = compareWithKS(sCode, embs, ksLocs)
@@ -191,7 +193,7 @@ def checkLocation(embs, ksLocs, sLocs):
                 md = d
 
             if d > SIMILARITY_THRESHOLD: 
-                print("Match:", sLoc,  d)
+                print("Match:", sLoc.toString(),  d)
                 found = ksLoc
                 return (found, d)
             # print(sCode, ksCode)
@@ -327,17 +329,12 @@ if __name__ == '__main__':
                                     locFunc["startLine"],locFunc["startColumn"], 
                                     locFunc["endLine"], locFunc["endColumn"])
                 locationFunc.db = getDBName(location.db, os.path.join(baseFolder, queryType))
-                # compare each sink candidate against the enclosing stm of all known sinks
-                # for location in locs:
-                # if not "QBis" in location.db:
-                #     continue
-                # if location.startLine !=15:
-                #     continue
-                # location = fakeEnclosingStm(location)
-                sLoc = location.toString() 
+                # sLoc = location.toString() 
+                sLoc = location
+
                 db = location.db
                 # print(sLoc)
-                if '"col1"' in sLoc:
+                if '"col1"' in sLoc.toString():
                     print("Skip", sLoc)
                     continue
                 if sLoc == '10' or  sLoc == ' 10':    
@@ -367,8 +364,9 @@ if __name__ == '__main__':
             for locs in chunks(allLocs, 50):
                 embsFunc, allLocsFunc = loadKnownSinkEmbForRepChunk(repr2, "knownF_", page)
                 page = page + 1
-                sLocs2 = [locationFunc.toString()]
-                print(sLocs2)
+                # sLocs2 = [locationFunc.toString()]
+                sLocs2 = [locationFunc]
+                # print(sLocs2)
                 # embsFunc, allLocsFunc = loadKnownSinkEmbForRep(repr, knownSinksLocFunc, "knownF_")
                 result2 = checkLocation(embsFunc, allLocsFunc,  sLocs2)
                 # result2=["",1]
@@ -376,18 +374,18 @@ if __name__ == '__main__':
                 if(maxScore2<score2):
                     maxScore2 = score2
 
-                locDict[sLoc] = str(found)  + "= "  + str(score) + ";" + str(score2)  
+                locDict[sLoc.toString()] = str(found)  + "= "  + str(score) + ";" + str(score2)  
                 # sLoc = db+"||"+sLoc
-                sCode = readLocation(sLoc, os.path.join(baseFolder, queryType))
+                sCode = sLoc.read(os.path.join(baseFolder, queryType))
                 ksCode = None
                 if found is not None:
-                    ksCode = readLocation(found, os.path.join(baseFolder, queryType))
+                    ksCode = found.read(os.path.join(baseFolder, queryType))
                     print("C1:", sCode)
                     print("C2:", ksCode)
                 else:
-                    print(sLoc," not found, score", 
+                    print(sLoc.toString()," not found, score", 
                     score)
-                print("Result2:", result2)
+                print("Result2:", result2[0], ",", result2[1])
             print("maxScore2:",maxScore2)
 
         if originalScore == 1:
