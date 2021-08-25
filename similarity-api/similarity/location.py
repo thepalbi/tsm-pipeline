@@ -10,6 +10,16 @@ class Location:
         self.startColumn = startColumn
         self.endLine = endLine
         self.endColumn = endColumn
+    def __hash__(self):
+        return  self.toStringFlat().__hash__()
+    
+    def __eq__(self, other):
+        return self.toStringFlat() == other.toStringFlat() 
+
+    def __str__(self):
+        return self.toString()
+    
+    __repr__ = __str__
 
     def as_dict(self):
         return {
@@ -64,7 +74,7 @@ class Location:
                     result += lines[self.startLine-1].decode('utf-8')[self.startColumn-1:self.endColumn]
         
         except Exception as inst:
-            print("Error in readLocation:", self.toString(), "zip: ", zipFilename, "path:", self.path)
+            print("Error trying to read location:", self.toString(), "zip: ", zipFilename, "path:", self.path)
             print(inst)   
             # raise    
             result = ""
@@ -76,53 +86,9 @@ class Location:
         return self.db
 
 
-def readLocation(location:str, prefix:str):
-    try: 
-        locDB = location.split("||")
-        db = locDB[0].strip().replace("/","_")
-        url = locDB[1].replace("\"","")
-        locArray = url.replace("\"","").split(":")
-        startLine = int(locArray[2])
-        startColumn = int(locArray[3])
-        endLine = int(locArray[4])
-        endColumn = int(locArray[5])
-        fileName = locArray[1][3:]
-
-        # print(prefix+db+"/src.zip")
-        zipFilename = os.path.join(prefix,db,"src.zip")
-        archive = zipfile.ZipFile(zipFilename, 'r')
-        # print(fileName)
-        # print(startLine)
-        # print(endLine)
-        with archive.open(fileName) as source:
-            lines = source.readlines()
-            # lines = text.split('\n')
-            # print(len(lines))
-            result = ""
-            if(endLine>startLine):
-                result += lines[startLine-1].decode('utf-8')[startColumn-1:]
-                for i in range(startLine+1,endLine-1):
-                    # print(lines[i-1])
-                    text = lines[i-1].decode('utf-8')
-                    result += text
-                result += lines[endLine-1].decode('utf-8')[:endColumn]
-            else:
-                result += lines[startLine-1].decode('utf-8')[startColumn-1:endColumn]
-            # print(result)
-    except Exception as inst:
-        print("Error in readLocation:", location, "zip: ", zipFilename)
-        print(inst)   
-        # raise    
-        result = ""
-        if "None" in location:
-            raise
-    return result
-
-
 def getCodes(locs, baseFolder, queryType):
     result = []
     for ksLoc in locs:
-        # ksCode = readLocation(ksLoc, os.path.join(baseFolder, queryType))
         ksCode = ksLoc.read(os.path.join(baseFolder, queryType))
         result.append(ksCode)
     return result

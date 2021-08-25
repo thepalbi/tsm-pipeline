@@ -12,7 +12,7 @@ from tqdm import tqdm
 from sklearn.metrics.pairwise import cosine_similarity
 import sys
 from .location import Location
-from .location import getCodes, readLocation
+from .location import getCodes
 import glob
 
 

@@ -34,7 +34,8 @@ def createReprDict(predictions):
                             locFunc["endLine"], locFunc["endColumn"])
         if repr not in reprDict.keys():
             reprDict[repr] = list()
-        reprDict[repr].append((location.toString(),  locationStm.toStringFlat(), locationFunc.toStringFlat()))
+        # reprDict[repr].append((location.toString(),  locationStm.toStringFlat(), locationFunc.toStringFlat()))
+        reprDict[repr].append((location,  locationStm, locationFunc))
     return reprDict
 
 # Creates a dictionary repr -> [loc, stmLoc, funcLoc] out of the prediction json file
@@ -97,6 +98,7 @@ def query_from_candidates(locCodes,code_vecs, pos):
 
 
 def checkLocation(embs, locs, queryLoc):
+    print("query:" , queryLoc)
     pos = locs.index(queryLoc)
     results = query_from_candidates(locs, embs, pos)
     # print(results)
@@ -107,8 +109,10 @@ def checkLocation(embs, locs, queryLoc):
 def getSimilarSinks(locationStm, locationFunc, repr):
     embsAllStm, allLocs = loadKnownSinkEmbForRep(repr, dictPredRepr, "emb_")
     embsAllFunc, allLocs = loadKnownSinkEmbForRep(repr, dictPredRepr, "embF_")
-    sourceLocStm = locationStm.toStringFlat()
-    sourceLocFunc = locationFunc.toStringFlat()
+    # sourceLocStm = locationStm.toStringFlat()
+    # sourceLocFunc = locationFunc.toStringFlat()
+    sourceLocStm = locationStm
+    sourceLocFunc = locationFunc
 
     selectedLocs = set()
     
