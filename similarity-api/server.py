@@ -37,10 +37,10 @@ def calculate():
     print(similar)
     response_to_serialize = [
         {
-            "location": Location.fromString(loc_string).as_dict(),
+            "location": Location.fromString(loc.toString()).as_dict(),
             "score": score
         }
-        for (loc_string, score) in similar
+        for (loc, score) in similar
     ]
     return jsonify(response_to_serialize)
 
