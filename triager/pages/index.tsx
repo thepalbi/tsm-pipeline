@@ -20,7 +20,7 @@ export default function Home(props: { predictions: PredictionInfo[] }) {
 }
 
 export async function getStaticProps() {
-  let predictions = path.join(process.cwd(), 'data', 'predictions.json.updated');
+  let predictions = path.join(process.cwd(), 'data', 'predictions.json');
   return {
     props: {
       predictions: JSON.parse(require('fs').readFileSync(predictions, 'utf8'))
