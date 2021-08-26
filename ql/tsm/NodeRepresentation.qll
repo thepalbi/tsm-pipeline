@@ -129,6 +129,7 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
     |
       step = "parameter " + p
     )
+    or
     // or
     // // context-sensitive parameters
     // exists(DataFlow::InvokeNode invk, int i, int j, string tag |
@@ -139,7 +140,6 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
     //   i != j and
     //   step = "parameter " + i + " " + j + "='" + tag + "'"
     // )
-    or
     // return values
     (
       nd = base.(DataFlow::FunctionNode).getAReturn() and
