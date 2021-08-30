@@ -180,12 +180,12 @@ def compareWithKS(code, ksEmbs, knownLocs):
  
 
 
-def checkLocation(embs, ksLocs, sLocs):
+def checkLocation(embs, ksLocs, locs):
     found  = None
     # print(sLocs)
     md = 0
-    for sLoc in sLocs:
-            sCode = sLoc.read(os.path.join(baseFolder, queryType))
+    for loc in locs:
+            sCode = loc.read(os.path.join(baseFolder, queryType))
             # print(sCode)
             elems = [sCode]                
             d,ksLoc = compareWithKS(sCode, embs, ksLocs)
@@ -193,7 +193,7 @@ def checkLocation(embs, ksLocs, sLocs):
                 md = d
 
             if d > SIMILARITY_THRESHOLD: 
-                print("Match:", sLoc.toString(),  d)
+                print("Match:", loc.toString(),  d)
                 found = ksLoc
                 return (found, d)
             # print(sCode, ksCode)
@@ -299,8 +299,8 @@ if __name__ == '__main__':
     # load locations of knows sinks, and same locations extended to get more context
     knownSinksFilename = "KnownEnc2.csv"
     knownSinksLocStm,knownSinksLocFunc = readKnownLoc(os.path.join(baseFolder, knownSinksFilename))
-
-    predictionsFile = "predictions.json"
+    predictionsFile = "../triager/data/predictions.json"
+    # predictionsFile = "predictions.json"
     data = readJsonPredictions(predictionsFile)
     locDict = dict()
     for elem in data:
@@ -329,15 +329,15 @@ if __name__ == '__main__':
                                     locFunc["startLine"],locFunc["startColumn"], 
                                     locFunc["endLine"], locFunc["endColumn"])
                 locationFunc.db = getDBName(location.db, os.path.join(baseFolder, queryType))
-                # sLoc = location.toString() 
-                sLoc = location
+                strLoc = location.toString() 
+                # sLoc = location
 
                 db = location.db
                 # print(sLoc)
-                if '"col1"' in sLoc.toString():
-                    print("Skip", sLoc)
+                if '"col1"' in strLoc:
+                    print("Skip", strLoc)
                     continue
-                if sLoc == '10' or  sLoc == ' 10':    
+                if strLoc == '10' or  strLoc == ' 10':    
                     continue
             
             
@@ -345,7 +345,7 @@ if __name__ == '__main__':
                 # enclosing stm of all known sinks
                 # result = (location of matching known source, score) 
                 # sLocs = [db+"||"+sLoc]
-                sLocs = [sLoc]
+                sLocs = [location]
                 # print(sLocs)
                 if embsStm is not None:
                     result = checkLocation(embsStm, allLocsStm,  sLocs)
@@ -365,25 +365,25 @@ if __name__ == '__main__':
                 embsFunc, allLocsFunc = loadKnownSinkEmbForRepChunk(repr2, "knownF_", page)
                 page = page + 1
                 # sLocs2 = [locationFunc.toString()]
-                sLocs2 = [locationFunc]
+                fLocs = [locationFunc]
                 # print(sLocs2)
                 # embsFunc, allLocsFunc = loadKnownSinkEmbForRep(repr, knownSinksLocFunc, "knownF_")
-                result2 = checkLocation(embsFunc, allLocsFunc,  sLocs2)
+                result2 = checkLocation(embsFunc, allLocsFunc,  fLocs)
                 # result2=["",1]
                 score2 = result2[1]
                 if(maxScore2<score2):
                     maxScore2 = score2
 
-                locDict[sLoc.toString()] = str(found)  + "= "  + str(score) + ";" + str(score2)  
+                locDict[strLoc] = str(found)  + "= "  + str(score) + ";" + str(score2)  
                 # sLoc = db+"||"+sLoc
-                sCode = sLoc.read(os.path.join(baseFolder, queryType))
+                sCode = location.read(os.path.join(baseFolder, queryType))
                 ksCode = None
                 if found is not None:
                     ksCode = found.read(os.path.join(baseFolder, queryType))
                     print("C1:", sCode)
                     print("C2:", ksCode)
                 else:
-                    print(sLoc.toString()," not found, score", 
+                    print(strLoc," not found, score", 
                     score)
                 print("Result2:", result2[0], ",", result2[1])
             print("maxScore2:",maxScore2)

@@ -130,16 +130,6 @@ string candidateRep(DataFlow::Node nd, int depth, boolean asRhs) {
       step = "parameter " + p
     )
     or
-    // or
-    // // context-sensitive parameters
-    // exists(DataFlow::InvokeNode invk, int i, int j, string tag |
-    //   invk = base.getAnInvocation() and
-    //   nd = invk.getArgument(i) and
-    //   asRhs = true and
-    //   invk.getArgument(j).getStringValue() = tag and
-    //   i != j and
-    //   step = "parameter " + i + " " + j + "='" + tag + "'"
-    // )
     // return values
     (
       nd = base.(DataFlow::FunctionNode).getAReturn() and
