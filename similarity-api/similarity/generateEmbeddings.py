@@ -155,7 +155,7 @@ def generateEmbeddingsForRepr(dictPredRepr, repr):
         hash = hashlib.md5(repr.encode())
         filename = os.path.join(baseFolder, "embs", "sql",  "emb_"+str(page)+"_"+hash.hexdigest()+".pickle" )
         if not os.path.isfile(filename):
-            knownCodeStm = getCodes(locs)
+            knownCodeStm = getCodes(locs, baseFolder, queryType)
                 # print(knownCodeStm)
             embsStm = getVectors(knownCodeStm)
             torch.save(embsStm, filename)
@@ -168,7 +168,7 @@ def generateEmbeddingsForRepr(dictPredRepr, repr):
         hash = hashlib.md5(repr.encode())
         filename = os.path.join(baseFolder, "embs", "sql", "embF_"+str(page)+"_"+hash.hexdigest()+".pickle" )
         if not os.path.isfile(filename):
-            knownCodeStm = getCodes(locs)
+            knownCodeStm = getCodes(locs, baseFolder, queryType)
                 # print(knownCodeStm)
             embsFunc = getVectors(knownCodeStm)
             torch.save(embsFunc, filename)
