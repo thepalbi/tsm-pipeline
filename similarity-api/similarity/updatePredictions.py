@@ -210,36 +210,6 @@ def chunks(lst, n):
 
 import hashlib
 
-def generateAndSaveEmbeddings(knownSinksLocStm,knownSinksLocFunc):
-    for repr in knownSinksLocStm.keys():
-        print(repr)
-        allLocs = list(knownSinksLocStm[repr])
-        page = 0
-        for locs in chunks(allLocs, 50):
-            print(len(locs))
-            knownCodeStm = getCodes(locs, baseFolder, queryType)
-            # print(knownCodeStm)
-            embsStm = getVectors(knownCodeStm)
-            hash = hashlib.md5(repr.encode())
-            filename = os.path.join(baseFolder, "sql", "embs", "knownStm_"+str(page)+"_"+hash.hexdigest()+".pickle" )
-            torch.save(embsStm, filename)
-            page = page + 1
-
-    for repr in knownSinksLocFunc.keys():
-        print(repr)
-        allLocs = list(knownSinksLocFunc[repr])
-        page = 0
-        for locs in chunks(allLocs, 50):
-            print(len(locs))
-            knownCodeStm = getCodes(locs, baseFolder, queryType)
-            # print(knownCodeStm)
-            embsStm = getVectors(knownCodeStm)
-            hash = hashlib.md5(repr.encode())
-            filename = os.path.join(baseFolder, "sql", "embs", "knownF_"+str(page)+"_"+hash.hexdigest()+".pickle" )
-            torch.save(embsStm, filename)
-            page = page + 1
-
-
 from location import Location
 import glob
 
