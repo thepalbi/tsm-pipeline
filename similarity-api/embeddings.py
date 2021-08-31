@@ -4,13 +4,16 @@ import json
 # from similarity import generateAndSaveEmbeddings, Location
 from similarity import getSimilarSinks, readJsonPredictions, Location
 
+
+""" 
+This program just test that the embeddings are working properly
+Use this before running server.py that also uses `getSimilarSinks` 
+"""
 if __name__ == "__main__":
     # testing embeddings for negative examples
     predictionsFile = "../triager/data/predictions.json.updated"
     dictPredRepr = readJsonPredictions(predictionsFile)
 
-    # generateAndSaveEmbeddings(dictPredRepr)
-    # exit()
     locationStm = Location("g/chaibio/chaipcr", "frontend/javascripts/libs/angular-sanitize.js",
                 468, 7, 468, 69)
     locationFunc = Location("g/chaibio/chaipcr", "frontend/javascripts/libs/angular-sanitize.js",
