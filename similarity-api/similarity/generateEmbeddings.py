@@ -45,7 +45,7 @@ def generateAndSaveEmbeddingsForPredictions(dictPredRepr, baseFolder, queryType)
 
 
 class EmbbedingsGenerator:
-    def __init(self, baseFolder, queryType, max_len = MAX_LEN, chunk_size = CHUNK_SIZE):
+    def __init__(self, baseFolder, queryType, max_len = MAX_LEN, chunk_size = CHUNK_SIZE):
         self.baseFolder = baseFolder
         self.queryType = queryType
         self.chunk_size = chunk_size
