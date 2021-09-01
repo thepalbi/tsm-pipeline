@@ -9,7 +9,5 @@ if __name__ == "__main__":
     baseFolder = "./dbs"
     queryType = "sql" 
 
-    dictPredRepr = readJsonPredictions(predictionsFile)
-
-    generateAndSaveEmbeddingsForPredictions(dictPredRepr, baseFolder, queryType)
+    generateAndSaveEmbeddingsForPredictions(predictionsFile, baseFolder, queryType)
     exit()

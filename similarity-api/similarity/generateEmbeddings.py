@@ -14,6 +14,7 @@ from .location import getCodes
 import glob
 import hashlib
 
+from .similarityWithEmb import readJsonPredictions
 from typing import List
 
 MAX_LEN = 512
@@ -35,7 +36,9 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def generateAndSaveEmbeddingsForPredictions(dictPredRepr, baseFolder, queryType):
+def generateAndSaveEmbeddingsForPredictions(predictionsFile, baseFolder, queryType):
+    dictPredRepr = readJsonPredictions(predictionsFile)
+
     embbedingsGenerator = EmbbedingsGenerator(baseFolder, queryType, MAX_LEN, CHUNK_SIZE)        
     # Generate and save embeddings for set of sinks for each repr
     print(len(dictPredRepr.keys()))
