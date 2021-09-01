@@ -52,95 +52,95 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-""" Reads the embeddings for a repr. Since the embeddings are organized by chunks 
-    we concatenate the chunks into a single tensor
-    In case of memory issues, we may need to read only a part of the embeddings 
-""" 
-def loadKnownSinkEmbForRep(repr, dictPredRepr, prefix):
-    # print(knownSinksLocStm.keys())
-    # repr = '"'+repr+'"'
-    if repr in dictPredRepr.keys(): 
-        allLocs = list(dictPredRepr[repr])
-        # locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
-        # locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
-        page = 0
-        embsStm = None
-        for locs in chunks(allLocs, 50):
-            # print(knownCodeStm)
-            hash = hashlib.md5(repr.encode())
-            filename = os.path.join(baseFolder, "embs", "sql", prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
-            embsStm1 = torch.load(filename)
-            # print(repr, embsStm1)
-            page = page + 1
-            if embsStm is None:
-                embsStm = embsStm1
-            else:
-                embsStm = torch.cat((embsStm, embsStm1),0).cpu()
-        return embsStm, allLocs
-    print(repr, " not found")
-    return None, None
+class EmbeddingsReader: 
+    def __init__(self, predictionsFile, baseFolder, chunk_size):
+        self.baseFolder = baseFolder
+        self.chunk_size = chunk_size
+        self.dictPredRepr = readJsonPredictions(predictionsFile)
+
+    """ Reads the embeddings for a repr. Since the embeddings are organized by chunks 
+        we concatenate the chunks into a single tensor
+        In case of memory issues, we may need to read only a part of the embeddings 
+    """ 
+    def loadKnownSinkEmbForRep(self, repr, prefix):
+        # print(knownSinksLocStm.keys())
+        # repr = '"'+repr+'"'
+        if repr in self.dictPredRepr.keys(): 
+            allLocs = list(self.dictPredRepr[repr])
+            # locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
+            # locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
+            page = 0
+            embsStm = None
+            for locs in chunks(allLocs, 50):
+                # print(knownCodeStm)
+                hash = hashlib.md5(repr.encode())
+                filename = os.path.join(self.baseFolder, "embs", "sql", prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
+                embsStm1 = torch.load(filename)
+                # print(repr, embsStm1)
+                page = page + 1
+                if embsStm is None:
+                    embsStm = embsStm1
+                else:
+                    embsStm = torch.cat((embsStm, embsStm1),0).cpu()
+            return embsStm, allLocs
+        print(repr, " not found")
+        return None, None
+
+    # query a candidate (that exists in the repr) against the set of other candidates for the repr 
+    def query_from_candidates(self, locCodes, code_vecs, pos):
+        # calculate
+        # test using cosine:  
+        code_vec_np = code_vecs.detach().numpy()
+        similarity = cosine_similarity( [code_vec_np[pos]], code_vec_np)
+        scores = torch.tensor(similarity)
+
+        print("pos in embedding: ", pos)
+        print("scores:", scores)
+        # print(probs)
+        # print(ids)
+        # print(list([(float(x),locCodes[y]) for x,y in zip(scores[0], range(len(locCodes)))]))
+        return list([(float(x),locCodes[y]) for x,y in zip(scores[0], range(len(locCodes)))])
 
 
-
-def query_from_candidates(locCodes,code_vecs, pos):
-    # calculate
-    # test using cosine:  
-    code_vec_np = code_vecs.detach().numpy()
-    similarity = cosine_similarity( [code_vec_np[pos]], code_vec_np)
-    scores = torch.tensor(similarity)
-
-    print("pos in embedding: ", pos)
-    print("scores:", scores)
-    # print(probs)
-    # print(ids)
-    # print(list([(float(x),locCodes[y]) for x,y in zip(scores[0], range(len(locCodes)))]))
-    return list([(float(x),locCodes[y]) for x,y in zip(scores[0], range(len(locCodes)))])
-
-
-def checkLocation(embs, locs, queryLoc):
-    print("query:" , queryLoc)
-    pos = locs.index(queryLoc)
-    results = query_from_candidates(locs, embs, pos)
-    # print(results)
-    return results
- 
-
-
-def getSimilarSinks(locationStm, locationFunc, repr):
-    embsAllStm, allLocs = loadKnownSinkEmbForRep(repr, dictPredRepr, "emb_")
-    embsAllFunc, allLocs = loadKnownSinkEmbForRep(repr, dictPredRepr, "embF_")
-    # sourceLocStm = locationStm.toStringFlat()
-    # sourceLocFunc = locationFunc.toStringFlat()
-    sourceLocStm = locationStm
-    sourceLocFunc = locationFunc
-
-    selectedLocs = set()
+    def checkLocation(self, embs, locs, queryLoc):
+        print("query:" , queryLoc)
+        pos = locs.index(queryLoc)
+        results = self.query_from_candidates(locs, embs, pos)
+        # print(results)
+        return results
     
-    allLocs = list(dictPredRepr[repr])
-    locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
-    locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
 
-    print("Negative example: ", sourceLocStm )
-    resultStm = checkLocation(embsAllStm, locsStm, sourceLocStm)
-    resultFunc = checkLocation(embsAllFunc, locsFunc, sourceLocFunc)
-    for i in range(0,len(allLocs)):
-        scoreStm, locS = resultStm[i]
-        scoreFunc, locF = resultFunc[i]
-        avgScore = (scoreStm+scoreFunc)/2
-        # print(allLocs[i], avgScore)
-        if avgScore > 0.92:
-            # print(allLocs[i])
-            selectedLocs.add((allLocs[i][0],avgScore))
+    def getSimilarSinks(self, locationStm, locationFunc, repr):
+        embsAllStm, allLocs = self.loadKnownSinkEmbForRep(repr,  "emb_")
+        embsAllFunc, allLocs = self.loadKnownSinkEmbForRep(repr, "embF_")
+        sourceLocStm = locationStm
+        sourceLocFunc = locationFunc
 
-    print("Highlighted ", len(selectedLocs), "/", len(dictPredRepr[repr]))
-    print(selectedLocs)
-    # return selectedLocs
-    return selectedLocs
+        selectedLocs = set()
+        
+        allLocs = list(self.dictPredRepr[repr])
+        locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
+        locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
+
+        print("Negative example: ", sourceLocStm )
+        resultStm = self.checkLocation(embsAllStm, locsStm, sourceLocStm)
+        resultFunc = self.checkLocation(embsAllFunc, locsFunc, sourceLocFunc)
+        for i in range(0,len(allLocs)):
+            scoreStm, locS = resultStm[i]
+            scoreFunc, locF = resultFunc[i]
+            avgScore = (scoreStm+scoreFunc)/2
+            # print(allLocs[i], avgScore)
+            if avgScore > 0.92:
+                # print(allLocs[i])
+                selectedLocs.add((allLocs[i][0],avgScore))
+
+        print("Highlighted ", len(selectedLocs), "/", len(self.dictPredRepr[repr]))
+        print(selectedLocs)
+        return selectedLocs
 
 
-baseFolder = "./dbs"
-
+# baseFolder = "./dbs"
 # testing embeddings for negative examples
-predictionsFile = "../triager/data/predictions.json.updated"
-dictPredRepr = readJsonPredictions(predictionsFile)
+# predictionsFile = "../triager/data/predictions.json.updated"
+# dictPredRepr = readJsonPredictions(predictionsFile)
  

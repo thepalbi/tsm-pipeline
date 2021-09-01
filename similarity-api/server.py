@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 import os
 
-from similarity import getSimilarSinks, Location
+from similarity import  EmbeddingsReader, Location
 
 app = Flask(__name__)
 CORS(app)
@@ -33,7 +33,7 @@ def unserializeLocation(sLoc):
 def calculate():
     body = request.get_json(force=True)
     locStm, locFunc, repr = unserializeJsonBody(body)
-    similar = getSimilarSinks(locStm, locFunc, repr)
+    similar = embeddingsReader.getSimilarSinks(locStm, locFunc, repr)
     print(similar)
     response_to_serialize = [
         {
@@ -46,5 +46,10 @@ def calculate():
 
 
 if __name__ == "__main__":
+    predictionsFile = "../triager/data/predictions.json.updated"
+    baseFolder = "./dbs"
+
+    embeddingsReader = EmbeddingsReader(predictionsFile, baseFolder, 50)
+
     app.run(host=os.getenv('IP', '0.0.0.0'),
             port=int(os.getenv('PORT', 4444)), debug=True)

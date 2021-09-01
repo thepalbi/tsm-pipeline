@@ -2,7 +2,7 @@ import os
 import json
 
 # from similarity import generateAndSaveEmbeddings, Location
-from similarity import getSimilarSinks, readJsonPredictions, Location
+from similarity import  EmbeddingsReader, Location
 
 
 """ 
@@ -12,7 +12,9 @@ Use this before running server.py that also uses `getSimilarSinks`
 if __name__ == "__main__":
     # testing embeddings for negative examples
     predictionsFile = "../triager/data/predictions.json.updated"
-    dictPredRepr = readJsonPredictions(predictionsFile)
+    baseFolder = "./dbs"
+
+    embeddingsReader = EmbeddingsReader(predictionsFile, baseFolder, 50)
 
     locationStm = Location("g/chaibio/chaipcr", "frontend/javascripts/libs/angular-sanitize.js",
                 468, 7, 468, 69)
@@ -33,5 +35,5 @@ if __name__ == "__main__":
     repr = "(parameter 0 (member run *))"
 
 
-    similar = getSimilarSinks(locStm, locFunc, repr)
+    similar = embeddingsReader.getSimilarSinks(locStm, locFunc, repr)
     print(similar)
