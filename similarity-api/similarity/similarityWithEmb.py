@@ -53,8 +53,9 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 class EmbeddingsReader: 
-    def __init__(self, predictionsFile, baseFolder, chunk_size):
+    def __init__(self, predictionsFile, baseFolder, queryType,  chunk_size):
         self.baseFolder = baseFolder
+        self.queryType = queryType
         self.chunk_size = chunk_size
         self.dictPredRepr = readJsonPredictions(predictionsFile)
 
@@ -74,7 +75,7 @@ class EmbeddingsReader:
             for locs in chunks(allLocs, 50):
                 # print(knownCodeStm)
                 hash = hashlib.md5(repr.encode())
-                filename = os.path.join(self.baseFolder, "embs", "sql", prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
+                filename = os.path.join(self.baseFolder, "embs", self.queryType, prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
                 embsStm1 = torch.load(filename)
                 # print(repr, embsStm1)
                 page = page + 1

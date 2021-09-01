@@ -13,8 +13,9 @@ if __name__ == "__main__":
     # testing embeddings for negative examples
     predictionsFile = "../triager/data/predictions.json.updated"
     baseFolder = "./dbs"
+    queryType = "sql"
 
-    embeddingsReader = EmbeddingsReader(predictionsFile, baseFolder, 50)
+    embeddingsReader = EmbeddingsReader(predictionsFile, baseFolder, queryType, 50)
 
     locationStm = Location("g/chaibio/chaipcr", "frontend/javascripts/libs/angular-sanitize.js",
                 468, 7, 468, 69)

@@ -48,8 +48,9 @@ def calculate():
 if __name__ == "__main__":
     predictionsFile = "../triager/data/predictions.json.updated"
     baseFolder = "./dbs"
+    queryType = "sql"
 
-    embeddingsReader = EmbeddingsReader(predictionsFile, baseFolder, 50)
+    embeddingsReader = EmbeddingsReader(predictionsFile, baseFolder, queryType, 50)
 
     app.run(host=os.getenv('IP', '0.0.0.0'),
             port=int(os.getenv('PORT', 4444)), debug=True)
