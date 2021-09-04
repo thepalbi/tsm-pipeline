@@ -15,6 +15,11 @@ from location import getCodes
 
 from typing import List
 
+"""
+Read the csv file of known sinks produced with the query Known-Enc.ql
+Applying that query to a set of DBs produces the csv file that is read 
+with this function 
+"""
 def readKnownLoc(file_loc:str):
     knownSinks = open(file_loc, 'r', errors='replace', encoding='utf-8').readlines()
 
@@ -24,14 +29,6 @@ def readKnownLoc(file_loc:str):
     counter = 0
     for line in knownSinks:
         counter = counter + 1
-        if line.startswith("g_"):
-            db = line.strip()
-            print(db)
-            continue
-        if line.startswith("DB="):
-            db = line[3:].strip()
-            print(db)
-            continue
         if line.startswith('"col1",'):
             continue
         if not line.startswith("\""):
@@ -44,45 +41,49 @@ def readKnownLoc(file_loc:str):
             continue
         if "10'" in line:    
             continue
+        if line.startswith("g_"):
+            db = line.strip()
+            print(db)
+            continue
+        if line.startswith("DB="):
+            db = line[3:].strip()
+            print(db)
+            continue
         try:
-            columns = line.split(",")
-            path = columns[1]
-            repr = columns[6]
-            startLine = int(columns[7])
-            startColumn = int(columns[8])
-            endLine = int(columns[9])
-            endColumn = int(columns[10])
-            funcStartLine = int(columns[11])
-            funcStartColumn = int(columns[12])
-            location = Location(db, path, startLine, startColumn, endLine, endColumn)
-            locationFunc = Location(db, path, funcStartLine, funcStartColumn, endLine, endColumn)
-            urlStm = location.toString()
-            # urlStm = db+"||"+url
-            # knownsStm.append(urlStm)
+            repr, location, locationFunc = extractKnownSinkInfo(db, line)
             if repr not in knownsStm.keys():
                 knownsStm[repr] = set()
-            # knownsStm[repr].add(urlStm)
             knownsStm[repr].add(location)
-            # temporary (until I can compute enclosing functions) get a few lines before the enclosing statement
-            urlFunc = locationFunc.toString()
-            # knownsFunc.append(db+"||"+urlFunc)
-            # knownsFunc.append(fakeEnclosingStm(location).toString())
             if repr not in knownsFunc.keys():
                 knownsFunc[repr] = set()
-            # knownsFunc[repr].add(urlFunc)
             knownsFunc[repr].add(locationFunc)
             
             # print(location, repr)
         except Exception as e:
             print(e)
             print(counter, ' ', line)
-            print(columns)
+            # print(columns)
             #raise
          
     print(len(knownsStm.keys()))
     return (knownsStm, knownsFunc)
 
+def extractKnownSinkInfo(db, line):
+    columns = line.split(",")
+    path = columns[1]
+    repr = columns[6]
+    startLine = int(columns[7])
+    startColumn = int(columns[8])
+    endLine = int(columns[9])
+    endColumn = int(columns[10])
+    funcStartLine = int(columns[11])
+    funcStartColumn = int(columns[12])
+    location = Location(db, path, startLine, startColumn, endLine, endColumn)
+    locationFunc = Location(db, path, funcStartLine, funcStartColumn, endLine, endColumn)
+    return repr,location,locationFunc
 
+
+# load all embeddings for a given repr into one tensor 
 def loadKnownSinkEmbForRep(repr,knownSinksLocStm, prefix):
     repr = '"'+repr+'"'
     if repr in knownSinksLocStm.keys(): 
@@ -106,6 +107,7 @@ def loadKnownSinkEmbForRep(repr,knownSinksLocStm, prefix):
         return embsStm, allLocs
     return None, None
 
+# load  only one page of precomputed  embeddings  for a given repr into one tensor 
 def loadKnownSinkEmbForRepChunk(repr, prefix, page):
     if repr in knownSinksLocStm.keys(): 
         allLocs = list(knownSinksLocStm[repr])[page*50:(page+1)*50]
@@ -137,26 +139,9 @@ def encode(inputs):
     outputs = F.normalize(outputs, p=2, dim=1)
     return outputs
     
-def getVectors(codes):
-    # build dataset
-    inputs = tokenizer(codes,return_tensors='pt',max_length=MAX_LEN, padding=True,truncation=True)['input_ids']
-
-    dataset = TensorDataset(inputs)
-    dataloader = DataLoader(dataset, sampler=SequentialSampler(dataset), batch_size=32)   
-    # obtain embeddings
-    embeddings = []
-    count = 0
-    for batch in tqdm(dataloader):
-        count += 1
-        print(count)
-        emb = encode(batch[0])
-        embeddings.append(emb)
-    
-    embeddings = torch.cat(embeddings,0).cpu()
-
-    return embeddings
-
-def query_from_candidates(query,locCodes,code_vecs):
+# given a query code, get the similairy results against a set of precomputed embedings
+# return a list of n element [(location, score)] with the most similar sink
+def query_from_candidates(query,locCodes,code_vecs, n):
     # obtain query embeddings
     inputs = tokenizer(query,return_tensors='pt', max_length=MAX_LEN, padding=True,truncation=True)['input_ids']
     query_vec = encode(inputs).cpu()
@@ -169,39 +154,34 @@ def query_from_candidates(query,locCodes,code_vecs):
     # scores = torch.tensor(similarity)
     scores=torch.einsum("ab,cb->ac",query_vec,code_vecs)[0]
     # search
-    probs, ids = scores.topk(1)
+    probs, ids = scores.topk(n)
     return list([(float(x),locCodes[int(y)]) for x,y in zip(probs, ids)])
 
-
+# given a query code, get the similairy results against a set of precomputed known sink embeddings
+# return a tuple (location, score) with the most similar sink
 def compareWithKS(code, ksEmbs, knownLocs):
-    result = query_from_candidates(code,knownLocs, ksEmbs)[0]
+    result = query_from_candidates(code,knownLocs, ksEmbs,1)[0]
     print(result[0], ",", result[1])
     return result
  
 
-
-def checkLocation(embs, ksLocs, locs):
+def getMostSimilarKnownSink(embs, ksLocs, loc):
     found  = None
     # print(sLocs)
-    md = 0
-    for loc in locs:
-            sCode = loc.read(os.path.join(baseFolder, queryType))
-            # print(sCode)
-            elems = [sCode]                
-            d,ksLoc = compareWithKS(sCode, embs, ksLocs)
-            if d > md:
-                md = d
+    sCode = loc.read(os.path.join(baseFolder, queryType))
+    # print(sCode)
+    d,ksLoc = compareWithKS(sCode, embs, ksLocs)
 
-            if d > SIMILARITY_THRESHOLD: 
-                print("Match:", loc.toString(),  d)
-                found = ksLoc
-                return (found, d)
-            # print(sCode, ksCode)
-            # print(sLoc, ksLoc)
-                #     print("Not Match:", sLoc, ksLoc)
-                # else:
-                    # print("Match:", sCode, ksCode)
-    return (None, md)
+    if d > SIMILARITY_THRESHOLD: 
+        print("Match:", loc.toString(),  d)
+        found = ksLoc
+        return (found, d)
+    # print(sCode, ksCode)
+    # print(sLoc, ksLoc)
+        #     print("Not Match:", sLoc, ksLoc)
+        # else:
+            # print("Match:", sCode, ksCode)
+    return (None, d)
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
@@ -213,23 +193,6 @@ import hashlib
 from location import Location
 import glob
 
-def getDBName(project, projectPrefix):
-    # if project[0:2]=="g/":
-    #     project = project[2:]
-
-    projectPrefix =  os.path.join(projectPrefix, project.replace('\r', '').replace('\n', '').replace("/","_"))
-    # print(projectPrefix)
-    projectCandidate = []
-    if("/" in project):
-        projectCandidate = glob.glob(projectPrefix+"*", recursive=True)
-    if len(projectCandidate)==1:
-        return os.path.basename(projectCandidate[0])
-    if len(projectCandidate)>1:
-            projectCandidate = glob.glob(projectPrefix+"_A*", recursive=True)
-            return os.path.basename(projectCandidate[0])
-    # should throw exception
-    return project
-
         
 def readJsonPredictions(fileName):
     locs = [] 
@@ -239,20 +202,14 @@ def readJsonPredictions(fileName):
 
 
 if __name__ == '__main__':
-    baseFolderKS = "/persistent2/experiments/"
     baseFolder = "/persistent/dbs"
-    baseModel = "/persistent2/CodeBERT/GraphCodeBERT/clonedetection/"
-
     queryType = "sql" 
-    db = "jordanbertasso_vulnerable-web-app_9ea5fa8"
-    inputCVS = "inputs4.csv"
-    outputFileName = db + '.json'
-
-    if len(sys.argv)>1:
-        db = sys.argv[1]
-        inputCVS = sys.argv[2]
-
-    outputFileName = db + '.json'
+    knownSinksFilename = "KnownEnc2.csv"
+    predictionsFile = "../triager/data/predictions.json"
+    SIMILARITY_THRESHOLD=0.90
+    MAX_LEN = 512
+    chunk_size = 50
+    # predictionsFile = "predictions.json"
 
     # load precomputed model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -262,83 +219,69 @@ if __name__ == '__main__':
     model.to(device)
     model.eval()
     
-    SIMILARITY_THRESHOLD=0.90
-    MAX_LEN = 512
 
     print("Read known sinks")
     # load locations of knows sinks, and same locations extended to get more context
-    knownSinksFilename = "KnownEnc2.csv"
     knownSinksLocStm,knownSinksLocFunc = readKnownLoc(os.path.join(baseFolder, knownSinksFilename))
-    predictionsFile = "../triager/data/predictions.json"
-    # predictionsFile = "predictions.json"
     data = readJsonPredictions(predictionsFile)
     locDict = dict()
     for elem in data:
         loc = elem["locationEnclosingStm"]
         repr = elem["repr"]
-        page  = 0
         repr2 = '"'+repr+'"'
         maxScore1 = 0
         maxScore2 = 0
         originalScore = elem["score"]
+        # print(loc)                        
 
         if repr2 in knownSinksLocStm.keys(): 
             allLocs = list(knownSinksLocStm[repr2])
             print(repr2, len(allLocs))
-            for locs in chunks(allLocs, 50):
-                embsStm, allLocsStm = loadKnownSinkEmbForRepChunk(repr2, "knownStm_", page)
-                # print(loc)
-                path = loc["path"] 
-                project = loc["projectName"]
-                location = Location(project, path, 
-                                    loc["startLine"],loc["startColumn"], 
-                                    loc["endLine"], loc["endColumn"])
-                location.db = getDBName(location.db, os.path.join(baseFolder, queryType))
-                locFunc = elem["locationEnclosingFunc"]
-                locationFunc = Location(project, path, 
-                                    locFunc["startLine"],locFunc["startColumn"], 
-                                    locFunc["endLine"], locFunc["endColumn"])
-                locationFunc.db = getDBName(location.db, os.path.join(baseFolder, queryType))
-                strLoc = location.toString() 
-                # sLoc = location
+            path = loc["path"] 
+            project = loc["projectName"]
+            location = Location(project, path, 
+                                loc["startLine"],loc["startColumn"], 
+                                loc["endLine"], loc["endColumn"])
+            locFunc = elem["locationEnclosingFunc"]
+            locationFunc = Location(project, path, 
+                                locFunc["startLine"],locFunc["startColumn"], 
+                                locFunc["endLine"], locFunc["endColumn"])
+            strLoc = location.toString() 
+            db = location.db
 
-                db = location.db
-                # print(sLoc)
-                if '"col1"' in strLoc:
-                    print("Skip", strLoc)
-                    continue
-                if strLoc == '10' or  strLoc == ' 10':    
-                    continue
-            
-            
-                # compute distance between the enclosing stm of a sink candidate and a the 
-                # enclosing stm of all known sinks
-                # result = (location of matching known source, score) 
-                # sLocs = [db+"||"+sLoc]
-                sLocs = [location]
-                # print(sLocs)
+            if '"col1"' in strLoc:
+                print("Skip", strLoc)
+                continue
+            if strLoc == '10' or  strLoc == ' 10':    
+                continue
+
+            # read the embddings in chunks to make sure they fit in memory
+            page = 0
+            for locs in chunks(allLocs, chunk_size):
+                embsStm, allLocsStm = loadKnownSinkEmbForRepChunk(repr2, "knownStm_", page)
+                # compute distance between the enclosing stm and the closest sink candidate 
                 if embsStm is not None:
-                    result = checkLocation(embsStm, allLocsStm,  sLocs)
+                    result = getMostSimilarKnownSink(embsStm, allLocsStm,  location)
                 else:
                     print("Is None for ", repr)
                     result = ["",originalScore]
                     continue
+
                 found = result[0] 
                 score = result[1]
+
+                # compute maximum score for enclosing stm
                 if(maxScore1<score):
                     maxScore1 = score
             print("maxScore1:",maxScore1)
-            # This is simillar to enclosing stm but starting 5 lines before to give more context
-            # sLocs2 = [db+"||"+extendLocation(sLoc)]
+
+            # read the embddings in chunks to make sure they fit in memory
             page = 0
             for locs in chunks(allLocs, 50):
                 embsFunc, allLocsFunc = loadKnownSinkEmbForRepChunk(repr2, "knownF_", page)
                 page = page + 1
-                # sLocs2 = [locationFunc.toString()]
-                fLocs = [locationFunc]
-                # print(sLocs2)
-                # embsFunc, allLocsFunc = loadKnownSinkEmbForRep(repr, knownSinksLocFunc, "knownF_")
-                result2 = checkLocation(embsFunc, allLocsFunc,  fLocs)
+                # compute distance between the enclosing stm and the closest sink candidate 
+                result2 = getMostSimilarKnownSink(embsFunc, allLocsFunc,  locationFunc)
                 # result2=["",1]
                 score2 = result2[1]
                 if(maxScore2<score2):
@@ -364,7 +307,6 @@ if __name__ == '__main__':
             newScore = ( originalScore + (maxScore1+maxScore2)/2) /2 
  
         elem["score"] = newScore
-    print(locDict)    
-    json.dump( locDict, open( outputFileName, 'w' ) )
+    # print(locDict)    
     json.dump( data, open( predictionsFile+'.updated', 'w' ) )
 
