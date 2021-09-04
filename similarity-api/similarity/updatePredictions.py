@@ -29,6 +29,16 @@ def readKnownLoc(file_loc:str):
     counter = 0
     for line in knownSinks:
         counter = counter + 1
+        # I have to clean this but in case of changes it is necessary to regenerate the 
+        # embeddings to keep the embeddings and the code in sink
+        if line.startswith("g_"):
+            db = line.strip()
+            print(db)
+            continue
+        if line.startswith("DB="):
+            db = line[3:].strip()
+            print(db)
+            continue
         if line.startswith('"col1",'):
             continue
         if not line.startswith("\""):
@@ -41,14 +51,7 @@ def readKnownLoc(file_loc:str):
             continue
         if "10'" in line:    
             continue
-        if line.startswith("g_"):
-            db = line.strip()
-            print(db)
-            continue
-        if line.startswith("DB="):
-            db = line[3:].strip()
-            print(db)
-            continue
+
         try:
             repr, location, locationFunc = extractKnownSinkInfo(db, line)
             if repr not in knownsStm.keys():
@@ -95,7 +98,7 @@ def loadKnownSinkEmbForRep(repr,knownSinksLocStm, prefix):
             for locs in chunks(allLocs, 50):
                 # print(knownCodeStm)
                 hash = hashlib.md5(repr.encode())
-                filename = os.path.join(baseFolder, "sql", "embs", prefix + str(page)+"_"+hash.hexdigest()+".pickle" )
+                filename = os.path.join(baseFolder, queryType, "embs", prefix + str(page)+"_"+hash.hexdigest()+".pickle" )
                 embsStm1 = torch.load( filename)
                 page = page + 1
                 if embsStm is None:
@@ -108,21 +111,22 @@ def loadKnownSinkEmbForRep(repr,knownSinksLocStm, prefix):
     return None, None
 
 # load  only one page of precomputed  embeddings  for a given repr into one tensor 
-def loadKnownSinkEmbForRepChunk(repr, prefix, page):
+def loadKnownSinkEmbForRepChunk(repr, prefix, page, chunk_size):
     if repr in knownSinksLocStm.keys(): 
-        allLocs = list(knownSinksLocStm[repr])[page*50:(page+1)*50]
+        allLocs = list(knownSinksLocStm[repr])[page*chunk_size:(page+1)*chunk_size]
         print(repr, len(allLocs))
         # page = 0
         embsStm = None
         try:
             hash = hashlib.md5(repr.encode())
-            filename = os.path.join(baseFolder, "sql", "embs", prefix + str(page)+"_"+hash.hexdigest()+".pickle" )
+            filename = os.path.join(baseFolder, queryType, "embs", prefix + str(page)+"_"+hash.hexdigest()+".pickle" )
             embsStm1 = torch.load( filename)
             page = page + 1
             if embsStm is None:
                 embsStm = embsStm1
             else:
                 embsStm = torch.cat((embsStm, embsStm),0)
+            print(embsStm.size())
         except: 
             print("There was a problem loading embeddings")
         return embsStm, allLocs
@@ -159,10 +163,10 @@ def query_from_candidates(query,locCodes,code_vecs, n):
 
 # given a query code, get the similairy results against a set of precomputed known sink embeddings
 # return a tuple (location, score) with the most similar sink
-def compareWithKS(code, ksEmbs, knownLocs):
-    result = query_from_candidates(code,knownLocs, ksEmbs,1)[0]
-    print(result[0], ",", result[1])
-    return result
+# def compareWithKS(code, ksEmbs, knownLocs):
+#     result = query_from_candidates(code,knownLocs, ksEmbs,1)[0]
+#     print(result[0], ",", result[1])
+#     return result
  
 
 def getMostSimilarKnownSink(embs, ksLocs, loc):
@@ -170,7 +174,8 @@ def getMostSimilarKnownSink(embs, ksLocs, loc):
     # print(sLocs)
     sCode = loc.read(os.path.join(baseFolder, queryType))
     # print(sCode)
-    d,ksLoc = compareWithKS(sCode, embs, ksLocs)
+    d, ksLoc = query_from_candidates(sCode, ksLocs, embs, 1)[0]
+    # d,ksLoc = compareWithKS(sCode, embs, ksLocs)
 
     if d > SIMILARITY_THRESHOLD: 
         print("Match:", loc.toString(),  d)
@@ -225,6 +230,7 @@ if __name__ == '__main__':
     knownSinksLocStm,knownSinksLocFunc = readKnownLoc(os.path.join(baseFolder, knownSinksFilename))
     data = readJsonPredictions(predictionsFile)
     locDict = dict()
+
     for elem in data:
         loc = elem["locationEnclosingStm"]
         repr = elem["repr"]
@@ -256,9 +262,12 @@ if __name__ == '__main__':
                 continue
 
             # read the embddings in chunks to make sure they fit in memory
+            # note that this is very innneficient: 
+            # each sink from the prediction is compared (in chunks) agains all known sinks for the repr
+            # a possible optimization is to group several sinks from the prediction together  
             page = 0
             for locs in chunks(allLocs, chunk_size):
-                embsStm, allLocsStm = loadKnownSinkEmbForRepChunk(repr2, "knownStm_", page)
+                embsStm, allLocsStm = loadKnownSinkEmbForRepChunk(repr2, "knownStm_", page, chunk_size)
                 # compute distance between the enclosing stm and the closest sink candidate 
                 if embsStm is not None:
                     result = getMostSimilarKnownSink(embsStm, allLocsStm,  location)
@@ -278,7 +287,7 @@ if __name__ == '__main__':
             # read the embddings in chunks to make sure they fit in memory
             page = 0
             for locs in chunks(allLocs, 50):
-                embsFunc, allLocsFunc = loadKnownSinkEmbForRepChunk(repr2, "knownF_", page)
+                embsFunc, allLocsFunc = loadKnownSinkEmbForRepChunk(repr2, "knownF_", page, chunk_size)
                 page = page + 1
                 # compute distance between the enclosing stm and the closest sink candidate 
                 result2 = getMostSimilarKnownSink(embsFunc, allLocsFunc,  locationFunc)
