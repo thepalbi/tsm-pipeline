@@ -49,8 +49,6 @@ import semmle.javascript.security.dataflow.Xss
 import semmle.javascript.security.dataflow.XxeCustomizations
 import semmle.javascript.security.dataflow.ZipSlipCustomizations
 
-
-
 predicate isKnownSink(DataFlow::Node nd) {
   nd instanceof BrokenCryptoAlgorithm::Sink
   or
@@ -149,54 +147,52 @@ predicate isKnownSink(DataFlow::Node nd) {
   exists(DataFlow::PropWrite pw | isKnownSink(pw.getBase()) | nd = pw.getRhs())
 }
 
-
 // external predicate knownSink(string nd, string url, string q, string rep);
-
 // string buildURL(DataFlow::Node nd) {
 //     result =
 //       "file://" + nd.getFile().getAbsolutePath() + ":" + nd.getStartLine() + ":" +
 //         nd.getStartColumn() + ":" + nd.getEndLine() + ":" + nd.getEndColumn()
 //   }
-
 //   string buildURLFromLocation(Location nd) {
 //     result =
 //       "file://" + nd.getFile().getAbsolutePath() + ":" + nd.getStartLine() + ":" +
 //         nd.getStartColumn() + ":" + nd.getEndLine() + ":" + nd.getEndColumn()
 //   }
-
 //   string buildURLFromTwoLocations(Location nd1, Location nd2) {
 //     result =
 //       "file://" + nd1.getFile().getAbsolutePath() + ":" + nd1.getStartLine() + ":" +
 //                   nd1.getStartColumn() + ":" + nd2.getEndLine() + ":" + nd2.getEndColumn()
 //   }
-
 // DataFlow::Node fromUrl(string url) {
-//     exists( DataFlow::Node nd| 
+//     exists( DataFlow::Node nd|
 //         url = buildURL(nd)
 //         and result = nd
 //     )
 // }
-
 // from string nm, string nurl,  string repr, DataFlow::Node nd, string ls,  string lf
 //     where knownSink(nm, nurl, "SqlInjectionWorse", repr) and nd = fromUrl(nurl) and
-//     ls = buildURLFromLocation(nd.getEnclosingExpr().getEnclosingStmt().getLocation()) 
+//     ls = buildURLFromLocation(nd.getEnclosingExpr().getEnclosingStmt().getLocation())
 //     and
-//     lf = buildURLFromTwoLocations(nd.getContainer().getLocation(), 
-//                                   nd.getEnclosingExpr().getEnclosingStmt().getLocation())  
-// select nd, ls,  lf, repr 
-
+//     lf = buildURLFromTwoLocations(nd.getContainer().getLocation(),
+//                                   nd.getEnclosingExpr().getEnclosingStmt().getLocation())
+// select nd, ls,  lf, repr
 import tsm.CanonicalReps
 
-from DataFlow::Node nd, File f, int startLine, int endLine, int startColumn, int endColumn, string rep, 
-  int stmtStartLine, int stmtEndLine, int stmtStartColumn, int stmtEndColumn, 
-  int funcStartLine, int funcStartColumn 
+from
+  DataFlow::Node nd, File f, int startLine, int endLine, int startColumn, int endColumn, string rep,
+  int stmtStartLine, int stmtEndLine, int stmtStartColumn, int stmtEndColumn, int funcStartLine,
+  int funcStartColumn
 where
-isKnownSink(nd) and
-rep = getconcatrep(nd, true) and
-nd.hasLocationInfo(f.getAbsolutePath(), startLine, startColumn, endLine, endColumn) and
-nd.getEnclosingExpr().getEnclosingStmt().getLocation().hasLocationInfo(f.getAbsolutePath(), stmtStartLine, stmtStartColumn, stmtEndLine, stmtEndColumn) and
-nd.getContainer().getLocation().hasLocationInfo(f.getAbsolutePath(), funcStartLine, funcStartColumn, _, _)
-select f.getAbsolutePath(), f.getRelativePath(), startLine, startColumn, endLine, endColumn, 
-    rep,
-    stmtStartLine, stmtStartColumn, stmtEndLine, stmtEndColumn,
-    funcStartLine, funcStartColumn 
+  isKnownSink(nd) and
+  rep = getconcatrep(nd, true) and
+  nd.hasLocationInfo(f.getAbsolutePath(), startLine, startColumn, endLine, endColumn) and
+  nd.getEnclosingExpr()
+      .getEnclosingStmt()
+      .getLocation()
+      .hasLocationInfo(f.getAbsolutePath(), stmtStartLine, stmtStartColumn, stmtEndLine,
+        stmtEndColumn) and
+  nd.getContainer()
+      .getLocation()
+      .hasLocationInfo(f.getAbsolutePath(), funcStartLine, funcStartColumn, _, _)
+select f.getAbsolutePath(), f.getRelativePath(), startLine, startColumn, endLine, endColumn, rep,
+  stmtStartLine, stmtStartColumn, stmtEndLine, stmtEndColumn, funcStartLine, funcStartColumn
