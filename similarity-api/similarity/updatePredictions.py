@@ -111,9 +111,9 @@ def loadKnownSinkEmbForRep(repr,knownSinksLocStm, prefix):
     return None, None
 
 # load  only one page of precomputed  embeddings  for a given repr into one tensor 
-def loadKnownSinkEmbForRepChunk(repr, prefix, page, chunk_size):
-    if repr in knownSinksLocStm.keys(): 
-        allLocs = list(knownSinksLocStm[repr])[page*chunk_size:(page+1)*chunk_size]
+def loadKnownSinkEmbForRepChunk(repr, knownSinksLoc, prefix, page, chunk_size):
+    if repr in knownSinksLoc.keys(): 
+        allLocs = list(knownSinksLoc[repr])[page*chunk_size:(page+1)*chunk_size]
         print(repr, len(allLocs))
         # page = 0
         embsStm = None
@@ -125,7 +125,7 @@ def loadKnownSinkEmbForRepChunk(repr, prefix, page, chunk_size):
             if embsStm is None:
                 embsStm = embsStm1
             else:
-                embsStm = torch.cat((embsStm, embsStm),0)
+                embsStm = torch.cat((embsStm, embsStm1),0)
             print(embsStm.size())
         except: 
             print("There was a problem loading embeddings")
@@ -206,6 +206,33 @@ def readJsonPredictions(fileName):
         return data
 
 
+def processOneLocation(location, knownSinksLoc, prefix, allLocs, repr, chunk_size):
+    maxScore = 0
+    maxLoc = None
+    page = 0
+    for locs in chunks(allLocs, chunk_size):
+        print(page, " ", repr, " ", prefix)
+        embs, allLocsChunk = loadKnownSinkEmbForRepChunk(repr, knownSinksLoc,  prefix, page, chunk_size)
+        page = page + 1
+        # compute distance between the enclosing stm and the closest sink candidate 
+        if embs is not None:
+            result = getMostSimilarKnownSink(embs, allLocsChunk,  location)
+        else:
+            print("Is None for ", repr)
+            result = (location,originalScore)
+            return result
+
+        found = result[0] 
+        score = result[1]
+
+        # compute maximum score for enclosing stm
+        if(maxScore<score):
+            maxScore = score
+            maxLoc = found
+
+    print("maxScore:",maxScore)
+    return (maxLoc, maxScore)
+
 if __name__ == '__main__':
     baseFolder = "/persistent/dbs"
     queryType = "sql" 
@@ -229,7 +256,7 @@ if __name__ == '__main__':
     # load locations of knows sinks, and same locations extended to get more context
     knownSinksLocStm,knownSinksLocFunc = readKnownLoc(os.path.join(baseFolder, knownSinksFilename))
     data = readJsonPredictions(predictionsFile)
-    locDict = dict()
+    # locDict = dict()
 
     for elem in data:
         loc = elem["locationEnclosingStm"]
@@ -265,50 +292,9 @@ if __name__ == '__main__':
             # note that this is very innneficient: 
             # each sink from the prediction is compared (in chunks) agains all known sinks for the repr
             # a possible optimization is to group several sinks from the prediction together  
-            page = 0
-            for locs in chunks(allLocs, chunk_size):
-                embsStm, allLocsStm = loadKnownSinkEmbForRepChunk(repr2, "knownStm_", page, chunk_size)
-                # compute distance between the enclosing stm and the closest sink candidate 
-                if embsStm is not None:
-                    result = getMostSimilarKnownSink(embsStm, allLocsStm,  location)
-                else:
-                    print("Is None for ", repr)
-                    result = ["",originalScore]
-                    continue
-
-                found = result[0] 
-                score = result[1]
-
-                # compute maximum score for enclosing stm
-                if(maxScore1<score):
-                    maxScore1 = score
-            print("maxScore1:",maxScore1)
-
-            # read the embddings in chunks to make sure they fit in memory
-            page = 0
-            for locs in chunks(allLocs, 50):
-                embsFunc, allLocsFunc = loadKnownSinkEmbForRepChunk(repr2, "knownF_", page, chunk_size)
-                page = page + 1
-                # compute distance between the enclosing stm and the closest sink candidate 
-                result2 = getMostSimilarKnownSink(embsFunc, allLocsFunc,  locationFunc)
-                # result2=["",1]
-                score2 = result2[1]
-                if(maxScore2<score2):
-                    maxScore2 = score2
-
-                locDict[strLoc] = str(found)  + "= "  + str(score) + ";" + str(score2)  
-                # sLoc = db+"||"+sLoc
-                sCode = location.read(os.path.join(baseFolder, queryType))
-                ksCode = None
-                if found is not None:
-                    ksCode = found.read(os.path.join(baseFolder, queryType))
-                    print("C1:", sCode)
-                    print("C2:", ksCode)
-                else:
-                    print(strLoc," not found, score", 
-                    score)
-                print("Result2:", result2[0], ",", result2[1])
-            print("maxScore2:",maxScore2)
+            (loc1, maxScore1) = processOneLocation(location, knownSinksLocStm, "knownStm_", allLocs, repr2, chunk_size)
+            
+            (loc2, maxScore2) = processOneLocation(location, knownSinksLocFunc,  "knownF_", allLocs, repr2, chunk_size)
 
         if originalScore == 1:
             newScore = (maxScore1+maxScore2)/2 
