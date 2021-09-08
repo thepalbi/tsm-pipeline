@@ -333,7 +333,7 @@ export class App extends React.Component<AppProps, AppState> {
 
   private banPrediction(predId: string) {
     const bannedPredictions = new Map(this.state.bannedPredictions);
-    bannedPredictions.set(predId, true);
+    bannedPredictions.set(predId, !bannedPredictions.get(predId));
 
     const enabledPredictions: PredictionInfo[] = [];
     for (const pred of this.props.predictions)
