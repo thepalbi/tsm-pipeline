@@ -75,8 +75,8 @@ class EmbeddingsReader:
                 hash = hashlib.md5(repr.encode())
                 filename = os.path.join(self.baseFolder, "embs", self.queryType, prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
                 embsStm = torch.load( filename)
-            except: 
-                print("There was a problem loading embeddings")
+            except Exception as e:
+                print(f"There was a problem loading embeddings: {e}")
             return embsStm, allLocs
         print(repr, " not found")
         return None, None
