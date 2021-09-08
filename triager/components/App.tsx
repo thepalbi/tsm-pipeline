@@ -4,6 +4,12 @@ import Highlight from 'react-highlight';
 import styles from './App.module.css';
 import { v4 as uuid } from 'uuid';
 
+declare var process: {
+  env: {
+    NEXT_PUBLIC_SIMILARITY_SERVER: string
+  }
+};
+
 type LocationProps = {
   projectName: string;
   path: string;
@@ -119,7 +125,12 @@ function Prediction(props: PredictionProps) {
   return (
     <li>
       <BanPredictionButton state={props.banned} onClick={props.onClick} />
-      <button onClick={e => props.similarOnClick()}>ban similar</button>
+      {
+        process.env.NEXT_PUBLIC_SIMILARITY_SERVER ?
+          <button onClick={e => props.similarOnClick()}>ban similar</button>
+          :
+          <span />
+      }
       <Location {...props.location} />: <Representation repr={props.repr} />, <Score score={props.score} />
       <Snippet {...props.snippet} isBanned={props.banned} />
     </li>
@@ -282,13 +293,16 @@ export class App extends React.Component<AppProps, AppState> {
     };
   }
   private banSimilarPredictions(predId: string, loc: LocationProps, locStmt: LocationProps, locFunc: LocationProps, repr: string) {
+    if (!process.env.NEXT_PUBLIC_SIMILARITY_SERVER)
+      return;
+
     console.log("Banning similar to: %s - %s", repr, predId);
     let reqBody = {
       locStm: locStmt,
       locFunc: locFunc,
       repr: repr
     }
-    fetch("http://localhost:4444/similar", {
+    fetch(`${process.env.NEXT_PUBLIC_SIMILARITY_SERVER}/similar`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
