@@ -26,7 +26,8 @@ Given a sink candidate describe by a pair (enclosing statement, enclosing functi
 It is worth noticing that this function does not require the use of CodeBert models as it is already precomputed, even for the  sink candidate used for the query. 
 
 These functions are use by `server.py` which is a web service used by the UX for getting similar candidates of a banned example.  
-## Computing embeddings for known sources
+
+## Computing embeddings for known sinks
 
 We also generate embeddings for a set of known sinks.
 In order to so that we generate a `csv` that a set of codeql queries (e.g., SqlInjection, NoSqlInjection, TaintedPath, etc) and a set of training databases collects a set of known sinks, locations together with the corresponding enclosing statement and enclosing function locations.    
