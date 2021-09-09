@@ -117,7 +117,6 @@ type PredictionProps = {
   score: number;
   snippet: SnippetProps;
   banned: boolean;
-  similarBanned: boolean;
   toggleThisPrediction: () => void;
   toggleSimilarPredictions: () => void;
 }
@@ -128,7 +127,7 @@ function Prediction(props: PredictionProps) {
       <ToggleThisPredictionButton banned={props.banned} toggleBanned={props.toggleThisPrediction} />
       {
         process.env.NEXT_PUBLIC_SIMILARITY_SERVER ?
-          <ToggleSimilarPredictionsButton banned={props.similarBanned} toggleBanned={props.toggleSimilarPredictions} />
+          <ToggleSimilarPredictionsButton banned={props.banned} toggleBanned={props.toggleSimilarPredictions} />
           :
           <span />
       }
@@ -261,15 +260,18 @@ type TriagerSimilarResponseItem = {
 type AppState = {
   // indicates for each representation whether it is enabled or not
   enabledReprs: Map<string, boolean>;
-  // all predictions whose representation is enabled
-  enabledPredictions: PredictionInfo[];
+  // all predictions whose representation is enabled, that is, their representation is enabled
+  // and their score exceeds the minimum score
+  enabledPredictions: PredictionId[];
   // indicates for each prediction whether it is banned or not
   bannedPredictions: Map<PredictionId, boolean>;
+  // cache associating each prediction with all other predictions it is similar to
+  similarPredictionsCache: Map<PredictionId, Set<PredictionId>>;
   // first prediction to show (1-based)
   from: number;
   // last prediction to show (1-based)
   to: number;
-  // minimum score for a prediction to be included
+  // minimum score for a prediction to be enabled
   minScore: number;
   // whether or not to display banned predictions
   hideBannedPredictions: boolean;
@@ -287,15 +289,16 @@ export class App extends React.Component<AppProps, AppState> {
     for (const repr of props.reprs)
       enabledReprs.set(repr.repr, repr.count < 0.1 * numPredictions);
 
-    const enabledPredictions: PredictionInfo[] = [];
+    const enabledPredictions: PredictionId[] = [];
     for (const pred of props.predictions)
       if (enabledReprs.get(pred.repr) && pred.score >= minScore)
-        enabledPredictions.push(pred);
+        enabledPredictions.push(pred.id);
 
     this.state = {
       enabledReprs,
-      bannedPredictions: new Map(),
       enabledPredictions,
+      bannedPredictions: new Map(),
+      similarPredictionsCache: new Map(),
       from: 1,
       to: Math.min(100, enabledPredictions.length),
       minScore,
@@ -303,42 +306,52 @@ export class App extends React.Component<AppProps, AppState> {
     };
   }
 
-  private toggleSimilarPredictions(predId: PredictionId) {
-    if (!process.env.NEXT_PUBLIC_SIMILARITY_SERVER)
-      return;
-
-    for (const pred of this.props.predictions) {
-      if (pred.id === predId) {
-        const { repr, locationEnclosingStm: locStm, locationEnclosingFunc: locFunc } = pred;
-        fetch(`${process.env.NEXT_PUBLIC_SIMILARITY_SERVER}/similar`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({ repr, locStm, locFunc }),
-          mode: "cors"
-        })
-          .then(resp => resp.json() as Promise<TriagerSimilarResponseItem[]>)
-          .then(parsedResponse => {
-            this.doBanSimilarPredictions(predId, parsedResponse)
-          })
-          .catch(err => {
-            console.error("Error calling triager backend: %s", err);
-          })
-        break;
-      }
-    }
+  getPredictionInfo(id: PredictionId): PredictionInfo {
+    return this.props.predictions.find(p => p.id === id);
   }
 
-  private doBanSimilarPredictions(predId: PredictionId, similarResponseItems: TriagerSimilarResponseItem[]) {
-    let similarLocs = new Set(similarResponseItems.map(s => locString(s.location)));
-    const bannedPredictions = new Map(this.state.bannedPredictions);
-    bannedPredictions.set(predId, true);
-    for (const pred of this.props.predictions) {
-      if (similarLocs.has(locString(pred.location))) {
-        bannedPredictions.set(pred.id, true);
+  private async getSimilarPredictions(predictionId: PredictionId) : Promise<Set<PredictionId>> {
+    if (this.state.similarPredictionsCache.has(predictionId))
+      return this.state.similarPredictionsCache.get(predictionId);
+
+    if (!process.env.NEXT_PUBLIC_SIMILARITY_SERVER)
+      return new Set();
+
+    const { repr, locationEnclosingStm: locStm, locationEnclosingFunc: locFunc } = this.getPredictionInfo(predictionId);
+    try {
+      const resp = await fetch(`${process.env.NEXT_PUBLIC_SIMILARITY_SERVER}/similar`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ repr, locStm, locFunc }),
+        mode: "cors"
+      });
+      const responseItems: TriagerSimilarResponseItem[] = await resp.json();
+      const similarLocs = new Set(responseItems.map(s => locString(s.location)));
+      const similarPredictions = new Set<PredictionId>();
+      for (const prediction of this.props.predictions) {
+        if (similarLocs.has(locString(prediction.location)))
+          similarPredictions.add(prediction.id);
       }
+      for (const similarPrediction of similarPredictions) {
+        this.state.similarPredictionsCache.set(similarPrediction, similarPredictions);
+      }
+      return similarPredictions;
+    } catch (err) {
+      console.error(`Error calling triager backend: {err}.`);
+    }
+
+    return new Set();
+  }
+
+  private async toggleSimilarPredictions(predId: PredictionId) {
+    const bannedPredictions = new Map(this.state.bannedPredictions);
+    const newState = !bannedPredictions.get(predId);
+    bannedPredictions.set(predId, newState);
+    for (const similarPredId of await this.getSimilarPredictions(predId)) {
+      bannedPredictions.set(similarPredId, newState);
     }
 
     this.setState({
@@ -359,10 +372,10 @@ export class App extends React.Component<AppProps, AppState> {
     const enabledReprs = new Map(this.state.enabledReprs);
     enabledReprs.set(repr, !enabledReprs.get(repr));
 
-    const enabledPredictions: PredictionInfo[] = [];
+    const enabledPredictions: PredictionId[] = [];
     for (const pred of this.props.predictions)
       if (enabledReprs.get(pred.repr) && pred.score >= this.state.minScore)
-        enabledPredictions.push(pred);
+        enabledPredictions.push(pred.id);
 
     this.setState({
       enabledReprs,
@@ -373,10 +386,10 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   private setMinScore(minScore: number) {
-    const enabledPredictions: PredictionInfo[] = [];
+    const enabledPredictions: PredictionId[] = [];
     for (const pred of this.props.predictions)
       if (this.state.enabledReprs.get(pred.repr) && pred.score >= minScore)
-        enabledPredictions.push(pred);
+        enabledPredictions.push(pred.id);
 
     this.setState({
       enabledPredictions,
@@ -420,12 +433,13 @@ export class App extends React.Component<AppProps, AppState> {
     let numPredictions = this.state.enabledPredictions.length;
     let bannedPredictionsCount = this.state.bannedPredictions.size;
     let predictions = this.state.enabledPredictions.slice();
+    let self = this;
     let predictionProps = predictions.map(p => {
       return {
-        ...p,
-        banned: !!this.state.bannedPredictions.get(p.id),
-        toggleThisPrediction: () => this.togglePrediction(p.id),
-        toggleSimilarPredictions: () => this.toggleSimilarPredictions(p.id)
+        ...self.getPredictionInfo(p),
+        banned: !!this.state.bannedPredictions.get(p),
+        toggleThisPrediction: () => this.togglePrediction(p),
+        toggleSimilarPredictions: () => this.toggleSimilarPredictions(p)
       };
     });
     predictionProps.sort((a, b) => b.score - a.score);
