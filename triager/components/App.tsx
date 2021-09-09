@@ -207,8 +207,10 @@ function RepresentationSelectionList(props: RepresentationSelectionListProps) {
   );
 }
 
+type PredictionId = string;
+
 export type PredictionInfo = {
-  id: string;
+  id: PredictionId;
   location: LocationProps;
   locationEnclosingStm: LocationProps;
   locationEnclosingFunc: LocationProps;
@@ -235,7 +237,7 @@ export class AppProps {
 
     // Populate predictions identifiers
     predictions.forEach((p) => {
-      p.id = uuid();
+      p.id = uuid() as PredictionId;
     });
 
     for (const pred of Array.from(predictions.values())) {
@@ -262,7 +264,7 @@ type AppState = {
   // all predictions whose representation is enabled
   enabledPredictions: PredictionInfo[];
   // indicates for each prediction whether it is banned or not
-  bannedPredictions: Map<string, boolean>;
+  bannedPredictions: Map<PredictionId, boolean>;
   // first prediction to show (1-based)
   from: number;
   // last prediction to show (1-based)
@@ -301,7 +303,7 @@ export class App extends React.Component<AppProps, AppState> {
     };
   }
 
-  private toggleSimilarPredictions(predId: string) {
+  private toggleSimilarPredictions(predId: PredictionId) {
     if (!process.env.NEXT_PUBLIC_SIMILARITY_SERVER)
       return;
 
@@ -329,7 +331,7 @@ export class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private doBanSimilarPredictions(predId: string, similarResponseItems: TriagerSimilarResponseItem[]) {
+  private doBanSimilarPredictions(predId: PredictionId, similarResponseItems: TriagerSimilarResponseItem[]) {
     let similarLocs = new Set(similarResponseItems.map(s => locString(s.location)));
     const bannedPredictions = new Map(this.state.bannedPredictions);
     bannedPredictions.set(predId, true);
@@ -344,7 +346,7 @@ export class App extends React.Component<AppProps, AppState> {
     })
   }
 
-  private togglePrediction(predId: string) {
+  private togglePrediction(predId: PredictionId) {
     const bannedPredictions = new Map(this.state.bannedPredictions);
     bannedPredictions.set(predId, !bannedPredictions.get(predId));
 
