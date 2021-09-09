@@ -21,7 +21,7 @@ Given a `predcitions.json` file, the query type (e.g, `Sql`) `createEmbeddings.p
 ## Querying similar sink candidates
 Once embedgins are precomputed  for the prediction file we can use then to query similar examples. 
 
-Given a sink candidate describe by a pair (enclosing statement, enclosing function), the function `getSimilarSinks` (and simirlarly `getSimilarSinksPaginated`, a version with less memory requirements) and its repr, yield the set of locations of the sinks that are simillar for that repr.
+Given a sink candidate describe by a pair (enclosing statement, enclosing function) and its repr, the function `getSimilarSinks` (and similarly `getSimilarSinksPaginated`, a version with less memory requirements) yield the set of locations of the sinks that are similar for that repr.
 
 It is worth noticing that this function does not require the use of CodeBert models as it is already precomputed, even for the  sink candidate used for the query. 
 
