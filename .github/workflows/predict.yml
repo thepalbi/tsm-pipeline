@@ -269,6 +269,7 @@ jobs:
       - name: Build report
         run: |
           cd triager
+          echo 'NEXT_PUBLIC_SIMILARITY_SERVER=' >.env.local
           npm install
           npm run build
           npm run export
