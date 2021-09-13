@@ -53,9 +53,8 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 class EmbeddingsReader: 
-    def __init__(self, predictionsFile, baseFolder, queryType,  chunk_size, threshold = 0.92):
-        self.baseFolder = baseFolder
-        self.queryType = queryType
+    def __init__(self, predictionsFile, embeddingsFolder, chunk_size, threshold = 0.92):
+        self.embeddingsFolder = embeddingsFolder
         self.chunk_size = chunk_size
         self.dictPredRepr = readJsonPredictions(predictionsFile)
         self.threshold = threshold
@@ -73,7 +72,7 @@ class EmbeddingsReader:
             embsStm = None
             try:
                 hash = hashlib.md5(repr.encode())
-                filename = os.path.join(self.baseFolder, "embs", self.queryType, prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
+                filename = os.path.join(self.embeddingsFolder, prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
                 embsStm = torch.load( filename)
             except Exception as e:
                 print(f"There was a problem loading embeddings: {e}")
@@ -97,7 +96,7 @@ class EmbeddingsReader:
             for locs in chunks(allLocs, 50):
                 # print(knownCodeStm)
                 hash = hashlib.md5(repr.encode())
-                filename = os.path.join(self.baseFolder, "embs", self.queryType, prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
+                filename = os.path.join(self.embeddingsFolder, prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
                 embsStm1 = torch.load(filename)
                 # print(repr, embsStm1)
                 page = page + 1
@@ -190,10 +189,14 @@ class EmbeddingsReader:
         relativePos = pos % self.chunk_size
         # load page with the embedding for that enclosing stm and get embedding
         embsAllStm, locsStm = self.loadKnownSinkEmbForRepPage(repr,  "emb_", page)
+        if embsAllStm is None:
+            return selectedLocs
         code_vec_np = embsAllStm.detach().numpy()
         embStm = code_vec_np[relativePos]
         # load page with the embedding for that enclosing func and get embedding
         embsAllFunc, locsFunc = self.loadKnownSinkEmbForRepPage(repr, "embF_", page)
+        if embsAllFunc is None:
+            return selectedLocs
         code_vec_np = embsAllFunc.detach().numpy()
         embFunc = code_vec_np[relativePos]
 
