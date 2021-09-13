@@ -37,7 +37,7 @@ jobs:
         with:
           repository: github/codeql
           path: codeql-lib
-          ref: max-schaefer/tsm-experiments
+          ref: lgtm.com
 
       - name: Download CodeQL
         uses: dsaltares/fetch-gh-release-asset@939be9e72e81fe7009b6112bc96abde38bf7b68f
@@ -179,7 +179,7 @@ jobs:
         with:
           repository: github/codeql
           path: codeql-lib
-          ref: max-schaefer/tsm-experiments
+          ref: lgtm.com
 
       - name: Download CodeQL
         uses: dsaltares/fetch-gh-release-asset@939be9e72e81fe7009b6112bc96abde38bf7b68f
