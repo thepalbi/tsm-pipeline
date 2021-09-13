@@ -1,0 +1,19 @@
+{
+    "locStm": {
+        "projectName": "g/LMBoyle/eatDaBurger",
+        "path": "config/orm.js",
+        "startLine": 45,
+        "startColumn": 35,
+        "endLine": 45,
+        "endColumn": 38
+    },
+    "locFunc": {
+        "projectName": "g/LMBoyle/eatDaBurger",
+        "path": "config/orm.js",
+        "startLine": 45,
+        "startColumn": 35,
+        "endLine": 45,
+        "endColumn": 38
+    },
+    "repr": "(parameter 0 (member end (local res)))"
+}
