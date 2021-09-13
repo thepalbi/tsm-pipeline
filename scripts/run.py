@@ -85,7 +85,11 @@ def runTSM(project_list, codeql_cli, tsm_ql, query_name, clean):
         "--solver=CBC", "--project-list", f'{project_list}',
         "--steps=generate_entities,generate_model,optimize", "run"]
     print("-Invoking TSM on specified projects: " + ' '.join(command))
-    subprocess.check_call(command, text=True)
+    try:
+        subprocess.check_output(command, text=True, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        print(f"TSM failed with error code {e.returncode}, producing the following output:\n{e.output}")
+        sys.exit(e.returncode)
     print("-Combining TSM results")
     combine_scores_path = str(Path(__file__).absolute().parent.parent / "code" / "misc" / "combinescores.py")
     # N.B. --project-dir parameter is misnamed, its value should be results-dir
