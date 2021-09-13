@@ -36,10 +36,10 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def generateAndSaveEmbeddingsForPredictions(predictionsFile, baseFolder, queryType, outputFolder):
+def generateAndSaveEmbeddingsForPredictions(predictionsFile, baseFolder, outputFolder):
     dictPredRepr = readJsonPredictions(predictionsFile)
 
-    embbedingsGenerator = EmbbedingsGenerator(baseFolder, queryType, outputFolder, MAX_LEN, CHUNK_SIZE)
+    embbedingsGenerator = EmbbedingsGenerator(baseFolder, outputFolder, MAX_LEN, CHUNK_SIZE)
     # Generate and save embeddings for set of sinks for each repr
     print(len(dictPredRepr.keys()))
     for repr in dictPredRepr.keys():
@@ -48,9 +48,8 @@ def generateAndSaveEmbeddingsForPredictions(predictionsFile, baseFolder, queryTy
 
 
 class EmbbedingsGenerator:
-    def __init__(self, baseFolder, queryType, outputFolder, max_len = MAX_LEN, chunk_size = CHUNK_SIZE):
+    def __init__(self, baseFolder, outputFolder, max_len = MAX_LEN, chunk_size = CHUNK_SIZE):
         self.baseFolder = baseFolder
-        self.queryType = queryType
         self.outputFolder = outputFolder
         self.max_len = max_len
         self.chunk_size = chunk_size

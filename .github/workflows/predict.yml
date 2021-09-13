@@ -334,8 +334,7 @@ jobs:
           ./similarity-api/createEmbeddings.py \
             --predictions "predictions/${{ steps.sanitize-name.outputs.sanitized_name }}-predictions.json" \
             --databases databases \
-            --output embeddings \
-            --query-type "${{ github.event.inputs.query_name }}"
+            --output embeddings
 
       - name: Upload embeddings
         uses: actions/upload-artifact@v2
