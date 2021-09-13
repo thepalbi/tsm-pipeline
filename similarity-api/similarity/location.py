@@ -86,9 +86,9 @@ class Location:
         return self.db
 
 
-def getCodes(locs, baseFolder, queryType):
+def getCodes(locs, baseFolder):
     result = []
     for ksLoc in locs:
-        ksCode = ksLoc.read(os.path.join(baseFolder, queryType))
+        ksCode = ksLoc.read(os.path.join(baseFolder))
         result.append(ksCode)
     return result

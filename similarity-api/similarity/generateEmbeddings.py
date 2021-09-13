@@ -36,10 +36,10 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def generateAndSaveEmbeddingsForPredictions(predictionsFile, baseFolder, queryType):
+def generateAndSaveEmbeddingsForPredictions(predictionsFile, baseFolder, queryType, outputFolder):
     dictPredRepr = readJsonPredictions(predictionsFile)
 
-    embbedingsGenerator = EmbbedingsGenerator(baseFolder, queryType, MAX_LEN, CHUNK_SIZE)        
+    embbedingsGenerator = EmbbedingsGenerator(baseFolder, queryType, outputFolder, MAX_LEN, CHUNK_SIZE)
     # Generate and save embeddings for set of sinks for each repr
     print(len(dictPredRepr.keys()))
     for repr in dictPredRepr.keys():
@@ -48,11 +48,12 @@ def generateAndSaveEmbeddingsForPredictions(predictionsFile, baseFolder, queryTy
 
 
 class EmbbedingsGenerator:
-    def __init__(self, baseFolder, queryType, max_len = MAX_LEN, chunk_size = CHUNK_SIZE):
+    def __init__(self, baseFolder, queryType, outputFolder, max_len = MAX_LEN, chunk_size = CHUNK_SIZE):
         self.baseFolder = baseFolder
         self.queryType = queryType
-        self.chunk_size = chunk_size
+        self.outputFolder = outputFolder
         self.max_len = max_len
+        self.chunk_size = chunk_size
         self.model, self.tokenizer = loadPrecomputedModel()
 
     def encode(self, inputs):
@@ -88,10 +89,10 @@ class EmbbedingsGenerator:
         for locs in chunks(locsStm, self.chunk_size):
             print(len(locs))
             hash = hashlib.md5(repr.encode())
-            filename = os.path.join(self.baseFolder, "embs", "sql",  "emb_"+str(page)+"_"+hash.hexdigest()+".pickle" )
+            filename = os.path.join(self.outputFolder,  "emb_"+str(page)+"_"+hash.hexdigest()+".pickle" )
             if not os.path.isfile(filename):
-                knownCodeStm = getCodes(locs, self.baseFolder, self.queryType)
-                    # print(knownCodeStm)
+                os.makedirs(os.path.dirname(filename), exist_ok=True)
+                knownCodeStm = getCodes(locs, self.baseFolder)
                 embsStm = self.getVectors(knownCodeStm)
                 torch.save(embsStm, filename)
             else: 
@@ -101,10 +102,9 @@ class EmbbedingsGenerator:
         for locs in chunks(locsFunc, self.chunk_size):
             print(len(locs))
             hash = hashlib.md5(repr.encode())
-            filename = os.path.join(self.baseFolder, "embs", "sql", "embF_"+str(page)+"_"+hash.hexdigest()+".pickle" )
+            filename = os.path.join(self.outputFolder, "embF_"+str(page)+"_"+hash.hexdigest()+".pickle" )
             if not os.path.isfile(filename):
-                knownCodeStm = getCodes(locs, self.baseFolder, self.queryType)
-                    # print(knownCodeStm)
+                knownCodeStm = getCodes(locs, self.baseFolder)
                 embsFunc = self.getVectors(knownCodeStm)
                 torch.save(embsFunc, filename)
             else:
