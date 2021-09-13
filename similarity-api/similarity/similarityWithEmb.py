@@ -209,7 +209,7 @@ class EmbeddingsReader:
             code_vec_np = embsAllStm.detach().numpy()
             resultStm = self.query_from_candidates(locsStm, code_vec_np, embStm)
             code_vec_np = embsAllFunc.detach().numpy()
-            resultFunc = self.query_from_candidates(locsStm, code_vec_np, embFunc)
+            resultFunc = self.query_from_candidates(locsFunc, code_vec_np, embFunc)
 
             # resultStm = self.checkLocation(embsAllStm, locsStm, sourceLocStm)
             # resultFunc = self.checkLocation(embsAllFunc, locsFunc, sourceLocFunc)
