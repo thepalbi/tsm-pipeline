@@ -119,11 +119,14 @@ class EmbeddingsReader:
         embFunc = code_vec_np[relativePos]
         return embStm, embFunc
 
-    def get_similar_sinks(self, embStm, embFunc):
+    def get_similar_sinks(self, embStm, embFunc, repr):
         """
         Gets sinks similar to the given pair of statement and function embeddings.
         """
         selectedLocs = set()
+
+        if repr not in self.dictPredRepr:
+            return selectedLocs
 
         allLocs = list(self.dictPredRepr[repr])
         page = 0

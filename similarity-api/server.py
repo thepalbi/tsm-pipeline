@@ -46,13 +46,14 @@ def calculate():
     locStm, _, repr = unserializeJsonBody(body)
 
     similar = set()
-    embStm, embFunc = get_embeddings_reader(
-        locStm).get_embeddings(locStm, repr)
-    if embStm is not None and embFunc is not None:
-        print("Negative example: ", locStm)
-        for embeddings_reader in get_all_embeddings_readers():
-            similar = similar.update(
-                embeddings_reader.get_similar(embStm, embFunc))
+    embeddings_reader = get_embeddings_reader(locStm)
+    if embeddings_reader is not None:
+        embStm, embFunc = embeddings_reader.get_embeddings(locStm, repr)
+        if embStm is not None and embFunc is not None:
+            print("Negative example: ", locStm)
+            for embeddings_reader in get_all_embeddings_readers():
+                similar = similar.update(
+                    embeddings_reader.get_similar_sinks(embStm, embFunc, repr))
 
     print(similar)
     response_to_serialize = [
