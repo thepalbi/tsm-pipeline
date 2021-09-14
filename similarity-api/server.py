@@ -35,8 +35,8 @@ def unserializeLocation(sLoc):
 @app.route('/similar', methods=['POST'])
 def calculate():
     body = request.get_json(force=True)
-    locStm, locFunc, repr = unserializeJsonBody(body)
-    similar = embeddingsReader.getSimilarSinks(locStm, locFunc, repr)
+    locStm, _, repr = unserializeJsonBody(body)
+    similar = embeddingsReader.getSimilarSinks(locStm, repr)
     print(similar)
     response_to_serialize = [
         {
