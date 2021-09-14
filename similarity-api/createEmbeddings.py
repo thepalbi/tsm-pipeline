@@ -6,7 +6,7 @@ import os
 from similarity import generateAndSaveEmbeddingsForPredictions
 
 if __name__ == "__main__":
-    # createEmbeddings.py [--predictions FILE] [--databases DIR] [--output DIR]
+    # createEmbeddings.py [--predictions FILE] [--databases DIR] [--output DIR] [--chunk-size NUMBER]
     parser = argparse.ArgumentParser(
         description='Create embeddings for the given predictions.')
     here = os.path.dirname(__file__)
@@ -16,7 +16,9 @@ if __name__ == "__main__":
                         default=os.path.join(here, 'dbs/sql'))
     parser.add_argument('--output', type=str, help='Path to the directory under which the embeddings should be stored.',
                         default=os.path.join(here, 'dbs/embs/sql'))
+    parser.add_argument('--chunk-size', type=int, help='Number of predictions to process in one batch.',
+                        default=50)
     args = parser.parse_args()
 
     generateAndSaveEmbeddingsForPredictions(
-        args.predictions, args.databases, args.output)
+        args.predictions, args.databases, args.output, args.chunk_size)

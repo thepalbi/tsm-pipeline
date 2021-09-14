@@ -4,9 +4,10 @@ set -e
 
 MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 WORKFLOW_RUN_ID=$1
+CHUNK_SIZE=$2
 
-if [ -z "$WORKFLOW_RUN_ID" ]; then
-  echo "Usage: $0 <workflow run id>"
+if [ -z "$WORKFLOW_RUN_ID" ] || [ -z "$CHUNK_SIZE" ]; then
+  echo "Usage: $0 <workflow run id> <chunk size>"
   exit 1
 fi
 
@@ -16,7 +17,7 @@ gh run download "$WORKFLOW_RUN_ID" -D "$DEST_DIR" -n _results
 echo "Copying predictions.json file to the dashboard data directory"
 cp "$DEST_DIR/predictions/predictions.json" "$MYDIR/../triager/data/predictions.json"
 echo "Starting similarity server"
-"$MYDIR/../similarity-api/server.py" --split-predictions --predictions "$DEST_DIR" --embeddings "$DEST_DIR" &
+"$MYDIR/../similarity-api/server.py" --split-predictions --predictions "$DEST_DIR" --embeddings "$DEST_DIR" --chunk-size "$CHUNK_SIZE" &
 SERVER_PID=$!
 echo "Starting triaging webapp"
 cd "$MYDIR/../triager"

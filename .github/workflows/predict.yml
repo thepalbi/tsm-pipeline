@@ -25,6 +25,11 @@ on:
           Defaults to `lgtm.com`.
         required: false
         default: "lgtm.com"
+      chunk_size:
+        description: >
+          Chunk size to use when computing embeddings.
+        required: false
+        default: "50"
 jobs:
   train:
     name: Train on ${{ matrix.project }}
@@ -334,7 +339,8 @@ jobs:
           ./similarity-api/createEmbeddings.py \
             --predictions "predictions/${{ steps.sanitize-name.outputs.sanitized_name }}-predictions.json" \
             --databases databases \
-            --output embeddings
+            --output embeddings \
+            --chunk-size ${{ github.event.inputs.chunk_size }}
 
       - name: Upload embeddings
         uses: actions/upload-artifact@v2

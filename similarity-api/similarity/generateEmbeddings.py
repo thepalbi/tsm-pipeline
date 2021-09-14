@@ -36,10 +36,10 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def generateAndSaveEmbeddingsForPredictions(predictionsFile, baseFolder, outputFolder):
+def generateAndSaveEmbeddingsForPredictions(predictionsFile, baseFolder, outputFolder, chunk_size=CHUNK_SIZE):
     dictPredRepr = readJsonPredictions(predictionsFile)
 
-    embbedingsGenerator = EmbbedingsGenerator(baseFolder, outputFolder, MAX_LEN, CHUNK_SIZE)
+    embbedingsGenerator = EmbbedingsGenerator(baseFolder, outputFolder, MAX_LEN, chunk_size)
     # Generate and save embeddings for set of sinks for each repr
     print(len(dictPredRepr.keys()))
     for repr in dictPredRepr.keys():

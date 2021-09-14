@@ -73,7 +73,7 @@ def calculate():
 
 
 if __name__ == "__main__":
-    # server.py [--split-predictions] [--predictions FILE|DIR] [--embeddings DIR]
+    # server.py [--split-predictions] [--predictions FILE|DIR] [--embeddings DIR] [--chunk-size NUMBER]
     parser = argparse.ArgumentParser(
         description='Create a web server providing embedding-based similarity information for the given predictions.')
     here = os.path.dirname(__file__)
@@ -83,12 +83,14 @@ if __name__ == "__main__":
                         default=os.path.join(here, '../triager/data/predictions.json.updated'))
     parser.add_argument('--embeddings', type=str, help='Directory under which the corresponding embeddings are stored.',
                         default=os.path.join(here, 'dbs/embs/sql'))
+    parser.add_argument('--chunk-size', type=int, help='Number of predictions stored in one batch.',
+                        default=50)
     args = parser.parse_args()
 
     merged_predictions = not args.split_predictions
     if merged_predictions:
         embeddingsReaders = {
-            '*': EmbeddingsReader(args.predictions, args.embeddings, 50)
+            '*': EmbeddingsReader(args.predictions, args.embeddings, args.chunk_size)
         }
     else:
         embeddingsReaders = {}
@@ -102,7 +104,7 @@ if __name__ == "__main__":
                     print(
                         f"Creating embeddings reader for f{key} with predictions in {predictions} and embeddings under {embeddings}")
                     embeddingsReaders[key] = EmbeddingsReader(
-                        predictions, embeddings, 50)
+                        predictions, embeddings, args.chunk_size)
 
     app.run(host=os.getenv('IP', '0.0.0.0'),
             port=int(os.getenv('PORT', 4444)), debug=True)
