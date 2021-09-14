@@ -80,34 +80,6 @@ class EmbeddingsReader:
         print(repr, " not found")
         return None, None
 
-    """ Reads the embeddings for a repr. Since the embeddings are organized by chunks 
-        we concatenate the chunks into a single tensor
-        In case of memory issues, we may need to read only a part of the embeddings 
-    """ 
-    def loadKnownSinkEmbForRep(self, repr, prefix):
-        # print(knownSinksLocStm.keys())
-        # repr = '"'+repr+'"'
-        if repr in self.dictPredRepr.keys(): 
-            allLocs = list(self.dictPredRepr[repr])
-            # locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
-            # locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
-            page = 0
-            embsStm = None
-            for locs in chunks(allLocs, 50):
-                # print(knownCodeStm)
-                hash = hashlib.md5(repr.encode())
-                filename = os.path.join(self.embeddingsFolder, prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
-                embsStm1 = torch.load(filename)
-                # print(repr, embsStm1)
-                page = page + 1
-                if embsStm is None:
-                    embsStm = embsStm1
-                else:
-                    embsStm = torch.cat((embsStm, embsStm1),0).cpu()
-            return embsStm, allLocs
-        print(repr, " not found")
-        return None, None
-
     # query a candidate (that exists in the repr) against the set of other candidates for the repr 
     def query_from_candidates(self, locCodes, code_vecs, emb):
         # calculate
