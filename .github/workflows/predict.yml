@@ -353,11 +353,13 @@ jobs:
 
       - name: Put all of them into a single directory
         run: |
-          mkdir combined
-          cp -r *-embeddings *-predictions predictions combined
+          mkdir _results
+          cp -r *-embeddings *-predictions predictions _results
 
       - name: Upload predictions and embeddings
         uses: actions/upload-artifact@v2
         with:
-          name: "combined"
-          path: "combined"
+          # important: the name must be lexicographically small, since the CLI can only download
+          # the first 100 artifacts in lexiographic order
+          name: "_results"
+          path: "_results"

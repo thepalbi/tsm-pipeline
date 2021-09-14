@@ -30,13 +30,15 @@ These functions are used by [`server.py`](server.py) which is a web service used
 
 It can be used in two modes: with merged predictions (the default) or with split predictions. In merged mode, the server expects a single `predictions.json` file containing all sink candidates, and a single folder in which all embeddings are stored. In split mode, it expects a folder in which predictions are stored organized by project, and a parent folder under which folders containing embeddings for each project are stored.
 
-The `combined.zip` file produced by the `predict.yml` workflow can be used in split mode, as follows:
+The `_results.zip` file produced by the `predict.yml` workflow can be used in split mode, as follows:
 
-- Download the `combined` artifact produced by the workflow and unzip it into a folder. (Note that you need to create that folder yourself and unzip the downloaded artifact inside it.)
+- Download the `_results` artifact produced by the workflow and unzip it into a folder. (Note that you need to create that folder yourself and unzip the downloaded artifact inside it.)
 - Copy the `predictions/predictions.json` file over `triager/data/predictions.json` in this repo.
-- Start the server: `similarity/server.py --split-predictions --predictions /path/to/folder --embeddings /path/to/folder`.
+- Start the server: `similarity-api/server.py --split-predictions --predictions /path/to/folder --embeddings /path/to/folder`.
 - Start the triaging webapp: `cd triager && npm run dev`
 - The webapp is now accessible through `http://localhost:3005/`.
+
+The above is automated by the `triage-locally.sh` script.
 
 Note that the workflow may fail to create embeddings for some (many) projects due to running out of memory. No similarity information is available for predictions on those projects, so if you try to "ban similar" it will only ban the prediction itself.
 
