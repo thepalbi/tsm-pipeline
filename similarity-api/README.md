@@ -26,8 +26,6 @@ Given a sink candidate described by a pair (enclosing statement, enclosing funct
 
 It is worth noticing that this function does not require the use of CodeBERT models as it is already precomputed, even for the sink candidate used for the query.
 
-The alternative function `getSimilarSinksPaginated` with less memory requirements perform a similar task but it computes the similarity between the sink candidate and each chunk. In this way only a chunk of embeddings needs to be held in memory.
-
 These functions are used by [`server.py`](server.py) which is a web service used by the UX for getting similar candidates of a banned example.  
 
 ## Computing embeddings for known sinks

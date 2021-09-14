@@ -36,7 +36,7 @@ def unserializeLocation(sLoc):
 def calculate():
     body = request.get_json(force=True)
     locStm, locFunc, repr = unserializeJsonBody(body)
-    similar = embeddingsReader.getSimilarSinksPaginated(locStm, locFunc, repr)
+    similar = embeddingsReader.getSimilarSinks(locStm, locFunc, repr)
     print(similar)
     response_to_serialize = [
         {

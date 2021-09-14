@@ -120,61 +120,13 @@ class EmbeddingsReader:
         # print(ids)
         # print(list([(float(x),locCodes[y]) for x,y in zip(scores[0], range(len(locCodes)))]))
         return list([(float(x),locCodes[y]) for x,y in zip(scores[0], range(len(locCodes)))])
-
-
-    def checkLocation(self, embs, locs, queryLoc):
-        print("query:" , queryLoc)
-        pos = locs.index(queryLoc)
-        print("pos in embedding: ", pos)
-
-        code_vec_np = embs.detach().numpy()
-        emb = code_vec_np[pos]
-        results = self.query_from_candidates(locs, code_vec_np, emb)
-
-        # print(results)
-        return results
     
     """ 
     Given a repr and the enclosing STM + enclosing Function of a candidate sink
-    return the set of candidate sinks (for the same repr) that has similar code
-    Important: Assumes locationStm in embsAllStm and locationFunc in embsAllFunc 
-    """     
-    def getSimilarSinks(self, locationStm, locationFunc, repr):
-        embsAllStm, allLocs = self.loadKnownSinkEmbForRep(repr,  "emb_")
-        embsAllFunc, allLocs = self.loadKnownSinkEmbForRep(repr, "embF_")
-        sourceLocStm = locationStm
-        sourceLocFunc = locationFunc
-
-        selectedLocs = set()
-        
-        allLocs = list(self.dictPredRepr[repr])
-        locsStm =  [locStm for (loc,locStm,locFunc) in allLocs]
-        locsFunc =  [locFunc for (loc,locStm,locFunc) in allLocs]
-
-        print("Negative example: ", sourceLocStm )
-        resultStm = self.checkLocation(embsAllStm, locsStm, sourceLocStm)
-        resultFunc = self.checkLocation(embsAllFunc, locsFunc, sourceLocFunc)
-        for i in range(0,len(allLocs)):
-            scoreStm, locS = resultStm[i]
-            scoreFunc, locF = resultFunc[i]
-            avgScore = (scoreStm+scoreFunc)/2
-            # print(allLocs[i], avgScore)
-            if avgScore > self.threshold:
-                # print(allLocs[i])
-                selectedLocs.add((allLocs[i][0],avgScore))
-
-        print("Highlighted ", len(selectedLocs), "/", len(self.dictPredRepr[repr]))
-        print(selectedLocs)
-        return selectedLocs
-
-
-    """ 
-    Given a repr and the enclosing STM + enclosing Function of a candidate sink
     return the set of candidate sinks (for the same repr) that has similar code 
-    Paginated version to handle memory contrains.
     Important: Cannot assume locationStm in embsAllStm and locationFunc in embsAllFunc 
     """
-    def getSimilarSinksPaginated(self, locationStm, locationFunc, repr):
+    def getSimilarSinks(self, locationStm, locationFunc, repr):
         sourceLocStm = locationStm
         sourceLocFunc = locationFunc
 
@@ -213,9 +165,6 @@ class EmbeddingsReader:
             resultStm = self.query_from_candidates(locsStm, code_vec_np, embStm)
             code_vec_np = embsAllFunc.detach().numpy()
             resultFunc = self.query_from_candidates(locsFunc, code_vec_np, embFunc)
-
-            # resultStm = self.checkLocation(embsAllStm, locsStm, sourceLocStm)
-            # resultFunc = self.checkLocation(embsAllFunc, locsFunc, sourceLocFunc)
 
             for i in range(0,len(locs)):        
                 scoreStm, locS = resultStm[i]
