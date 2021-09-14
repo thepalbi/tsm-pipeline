@@ -92,15 +92,7 @@ class EmbeddingsReader:
         print("scores:", scores)
         return list([(float(x), locCodes[y]) for x, y in zip(scores[0], range(len(locCodes)))])
 
-    def getSimilarSinks(self, locationStm, repr):
-        """
-        Given a repr and the enclosing STM + enclosing Function of a candidate sink
-        return the set of candidate sinks (for the same repr) that has similar code
-        Important: Cannot assume locationStm in embsAllStm.
-        """
-
-        selectedLocs = set()
-
+    def get_embeddings(self, locationStm, repr):
         allLocs = list(self.dictPredRepr[repr])
         allLocsStm = [locStm for (_, locStm, _) in allLocs]
 
@@ -112,18 +104,22 @@ class EmbeddingsReader:
         embsAllStm, locsStm = self.loadKnownSinkEmbForRepPage(
             repr,  "emb_", page)
         if embsAllStm is None:
-            return selectedLocs
+            return None, None
         code_vec_np = embsAllStm.detach().numpy()
         embStm = code_vec_np[relativePos]
         # load page with the embedding for that enclosing func and get embedding
         embsAllFunc, locsFunc = self.loadKnownSinkEmbForRepPage(
             repr, "embF_", page)
         if embsAllFunc is None:
-            return selectedLocs
+            return None, None
         code_vec_np = embsAllFunc.detach().numpy()
         embFunc = code_vec_np[relativePos]
+        return embStm, embFunc
 
-        print("Negative example: ", locationStm)
+    def get_sinks_similar_to_embedding(self, embStm, embFunc):
+        selectedLocs = set()
+
+        allLocs = list(self.dictPredRepr[repr])
         page = 0
         for locs in chunks(allLocs, self.chunk_size):
             print(page)
@@ -153,3 +149,17 @@ class EmbeddingsReader:
               "/", len(self.dictPredRepr[repr]))
         print(selectedLocs)
         return selectedLocs
+
+    def getSimilarSinks(self, locationStm, repr):
+        """
+        Given a repr and the enclosing STM + enclosing Function of a candidate sink
+        return the set of candidate sinks (for the same repr) that has similar code
+        Important: Cannot assume locationStm in embsAllStm.
+        """
+
+        embStm, embFunc = self.get_embeddings(locationStm, repr)
+        if embStm is None or embFunc is None:
+            return set()
+
+        print("Negative example: ", locationStm)
+        return self.get_sinks_similar_to_embedding(embStm, embFunc)
