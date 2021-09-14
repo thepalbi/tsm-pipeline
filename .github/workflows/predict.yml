@@ -343,22 +343,21 @@ jobs:
           path: "embeddings/*.pickle"
 
   combine_embeddings:
-    name: Combine all sink-candidate embeddings
+    name: Combine all predictions and their embeddings
     needs:
       - create_embeddings
     runs-on: ubuntu-latest
     steps:
-      - name: Download sink-candidate embeddings for individual projects
+      - name: Download predictions and embeddings
         uses: actions/download-artifact@v2
 
-      - name: Combine embeddings
+      - name: Put all of them into a single directory
         run: |
-          mkdir embeddings
-          # TODO: need to combine embeddings across projects
-          cp -r *-embeddings embeddings
+          mkdir combined
+          cp -r *-embeddings *-predictions predictions combined
 
-      - name: Upload embeddings
+      - name: Upload predictions and embeddings
         uses: actions/upload-artifact@v2
         with:
-          name: "embeddings"
-          path: "embeddings"
+          name: "combined"
+          path: "combined"
