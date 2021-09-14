@@ -6,13 +6,13 @@ on:
         description: >
           Name of the query to run (one of NoSql, Sql, Xss, TaintedPath).
         required: true
-        default: "Sql"
+        default: "NoSql"
       training_projects:
         description: >
           A JSON array of projects to train on (specified either as LGTM.com slugs
           or as database names to be downloaded from Azure blob storage).
         required: true
-        default: '["g/CatalystCode/Imaginem-Services"]'
+        default: '["g/bitpay/bitcore"]'
       test_projects:
         description: >
           A JSON array of projects to predict new taint specifications for
