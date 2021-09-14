@@ -32,16 +32,27 @@ def unserializeLocation(sLoc):
     return loc
 
 
+def get_embeddings_reader(locStm):
+    return embeddingsReaders.get('*')
+
+
+def get_all_embeddings_readers():
+    return embeddingsReaders.values()
+
+
 @app.route('/similar', methods=['POST'])
 def calculate():
     body = request.get_json(force=True)
     locStm, _, repr = unserializeJsonBody(body)
 
     similar = set()
-    embStm, embFunc = embeddingsReader.get_embeddings(locStm, repr)
+    embStm, embFunc = get_embeddings_reader(
+        locStm).get_embeddings(locStm, repr)
     if embStm is not None and embFunc is not None:
         print("Negative example: ", locStm)
-        similar = embeddingsReader.get_similar_sinks(embStm, embFunc)
+        for embeddings_reader in get_all_embeddings_readers():
+            similar = similar.update(
+                embeddings_reader.get_similar(embStm, embFunc))
 
     print(similar)
     response_to_serialize = [
@@ -65,7 +76,9 @@ if __name__ == "__main__":
                         default=os.path.join(here, 'dbs/embs/sql'))
     args = parser.parse_args()
 
-    embeddingsReader = EmbeddingsReader(args.predictions, args.embeddings, 50)
+    embeddingsReaders = {
+        '*': EmbeddingsReader(args.predictions, args.embeddings, 50)
+    }
 
     app.run(host=os.getenv('IP', '0.0.0.0'),
             port=int(os.getenv('PORT', 4444)), debug=True)
