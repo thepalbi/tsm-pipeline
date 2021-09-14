@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 from flask import request
 from flask import Flask
 from flask import jsonify
@@ -32,8 +34,12 @@ def unserializeLocation(sLoc):
     return loc
 
 
+merged_predictions = True
+
+
 def get_embeddings_reader(locStm):
-    return embeddingsReaders.get('*')
+    key = '*' if merged_predictions else locStm.db.replace('/', '_')
+    return embeddingsReaders.get(key)
 
 
 def get_all_embeddings_readers():
@@ -52,8 +58,8 @@ def calculate():
         if embStm is not None and embFunc is not None:
             print("Negative example: ", locStm)
             for embeddings_reader in get_all_embeddings_readers():
-                similar = similar.update(
-                    embeddings_reader.get_similar_sinks(embStm, embFunc, repr))
+                similar.update(embeddings_reader.get_similar_sinks(
+                    embStm, embFunc, repr))
 
     print(similar)
     response_to_serialize = [
@@ -67,19 +73,36 @@ def calculate():
 
 
 if __name__ == "__main__":
-    # server.py [--predictions FILE] [--embeddings DIR]
+    # server.py [--split-predictions] [--predictions FILE|DIR] [--embeddings DIR]
     parser = argparse.ArgumentParser(
         description='Create a web server providing embedding-based similarity information for the given predictions.')
     here = os.path.dirname(__file__)
-    parser.add_argument('--predictions', type=str, help='Path to the predictions file.',
+    parser.add_argument('--split-predictions', action='store_true',
+                        help='Predictions are stored separately for each project.')
+    parser.add_argument('--predictions', type=str, help='Predictions file or directory if --split-predictions is specified.',
                         default=os.path.join(here, '../triager/data/predictions.json.updated'))
-    parser.add_argument('--embeddings', type=str, help='Path to the directory under which the corresponding embeddings are stored.',
+    parser.add_argument('--embeddings', type=str, help='Directory under which the corresponding embeddings are stored.',
                         default=os.path.join(here, 'dbs/embs/sql'))
     args = parser.parse_args()
 
-    embeddingsReaders = {
-        '*': EmbeddingsReader(args.predictions, args.embeddings, 50)
-    }
+    merged_predictions = not args.split_predictions
+    if merged_predictions:
+        embeddingsReaders = {
+            '*': EmbeddingsReader(args.predictions, args.embeddings, 50)
+        }
+    else:
+        embeddingsReaders = {}
+        for file in os.listdir(args.predictions):
+            if file.endswith('-predictions'):
+                key = file[:-len('-predictions')]
+                predictions = os.path.join(
+                    args.predictions, file, file + '.json')
+                embeddings = os.path.join(args.embeddings, key + '-embeddings')
+                if os.path.isfile(predictions) and os.path.isdir(embeddings):
+                    print(
+                        f"Creating embeddings reader for f{key} with predictions in {predictions} and embeddings under {embeddings}")
+                    embeddingsReaders[key] = EmbeddingsReader(
+                        predictions, embeddings, 50)
 
     app.run(host=os.getenv('IP', '0.0.0.0'),
             port=int(os.getenv('PORT', 4444)), debug=True)
