@@ -22,9 +22,9 @@ Given a set of CodeQL databases, a `predictions.json` file and the query type (e
 
 Once all embeddings are precomputed for the prediction file, we can use them to query similar examples.
 
-Given a sink candidate described by a pair (enclosing statement, enclosing function) and its repr, the function `getSimilarSinks` yields the set of locations of the sinks that are similar for that repr. This function loads the precomputed embeddings for the repr and computes the similarity to the sink candidate using cosine similarity.
+Given a sink candidate described by its position and its repr, the function `get_embeddings` yields a pair of embeddings for the candidate, one representing the enclosing statement and one the enclosing function. Given such a pair of embeddings, the function `get_similar_sinks` computes the set of locations of the sinks that have similar embeddings. This function loads the precomputed embeddings for the repr and computes the similarity to the sink candidate using cosine similarity.
 
-It is worth noticing that this function does not require the use of CodeBERT models as it is already precomputed, even for the sink candidate used for the query.
+It is worth noticing that these functions do not require the use of CodeBERT models as it is already precomputed, even for the sink candidate used for the query.
 
 These functions are used by [`server.py`](server.py) which is a web service used by the UX for getting similar candidates of a banned example.  
 

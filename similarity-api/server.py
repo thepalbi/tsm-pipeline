@@ -36,7 +36,13 @@ def unserializeLocation(sLoc):
 def calculate():
     body = request.get_json(force=True)
     locStm, _, repr = unserializeJsonBody(body)
-    similar = embeddingsReader.getSimilarSinks(locStm, repr)
+
+    similar = set()
+    embStm, embFunc = embeddingsReader.get_embeddings(locStm, repr)
+    if embStm is not None and embFunc is not None:
+        print("Negative example: ", locStm)
+        similar = embeddingsReader.get_similar_sinks(embStm, embFunc)
+
     print(similar)
     response_to_serialize = [
         {

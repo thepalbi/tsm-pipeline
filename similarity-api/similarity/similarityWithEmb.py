@@ -93,6 +93,9 @@ class EmbeddingsReader:
         return list([(float(x), locCodes[y]) for x, y in zip(scores[0], range(len(locCodes)))])
 
     def get_embeddings(self, locationStm, repr):
+        """
+        Reads the statement and function embeddings for a sink identified by its repr and its location.
+        """
         allLocs = list(self.dictPredRepr[repr])
         allLocsStm = [locStm for (_, locStm, _) in allLocs]
 
@@ -116,7 +119,10 @@ class EmbeddingsReader:
         embFunc = code_vec_np[relativePos]
         return embStm, embFunc
 
-    def get_sinks_similar_to_embedding(self, embStm, embFunc):
+    def get_similar_sinks(self, embStm, embFunc):
+        """
+        Gets sinks similar to the given pair of statement and function embeddings.
+        """
         selectedLocs = set()
 
         allLocs = list(self.dictPredRepr[repr])
@@ -149,17 +155,3 @@ class EmbeddingsReader:
               "/", len(self.dictPredRepr[repr]))
         print(selectedLocs)
         return selectedLocs
-
-    def getSimilarSinks(self, locationStm, repr):
-        """
-        Given a repr and the enclosing STM + enclosing Function of a candidate sink
-        return the set of candidate sinks (for the same repr) that has similar code
-        Important: Cannot assume locationStm in embsAllStm.
-        """
-
-        embStm, embFunc = self.get_embeddings(locationStm, repr)
-        if embStm is None or embFunc is None:
-            return set()
-
-        print("Negative example: ", locationStm)
-        return self.get_sinks_similar_to_embedding(embStm, embFunc)
