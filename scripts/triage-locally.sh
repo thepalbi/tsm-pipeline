@@ -4,10 +4,10 @@ set -e
 
 MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 WORKFLOW_RUN_ID=$1
-CHUNK_SIZE=$2
+CHUNK_SIZE=${2:-1}
 
-if [ -z "$WORKFLOW_RUN_ID" ] || [ -z "$CHUNK_SIZE" ]; then
-  echo "Usage: $0 <workflow run id> <chunk size>"
+if [ -z "$WORKFLOW_RUN_ID" ]; then
+  echo "Usage: $0 <workflow run id> [<chunk size>]"
   exit 1
 fi
 

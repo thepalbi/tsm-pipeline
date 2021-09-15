@@ -29,7 +29,7 @@ on:
         description: >
           Chunk size to use when computing embeddings.
         required: false
-        default: "50"
+        default: "1"
 jobs:
   train:
     name: Train on ${{ matrix.project }}
