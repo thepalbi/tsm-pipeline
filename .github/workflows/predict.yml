@@ -25,6 +25,11 @@ on:
           Defaults to `lgtm.com`.
         required: false
         default: "lgtm.com"
+      chunk_size:
+        description: >
+          Chunk size to use when computing embeddings.
+        required: false
+        default: "1"
 jobs:
   train:
     name: Train on ${{ matrix.project }}
@@ -167,7 +172,7 @@ jobs:
           path: "allscores_*.txt"
 
   predict:
-    name: Predict new sinks
+    name: Predict new sinks for ${{ matrix.project }}
     needs:
       - combine_scores
     runs-on: ubuntu-latest
@@ -296,3 +301,71 @@ jobs:
       - name: Finish
         run: |
           echo 'Triaging dashboard deployed to https://github.github.io/ml-ql-taint-specification-mining'
+
+  create_embeddings:
+    name: Compute embeddings of sink candidates for ${{ matrix.project }}
+    needs:
+      - predict
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ${{ fromJSON(github.event.inputs.test_projects || github.event.inputs.training_projects) }}
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v2
+
+      - name: Sanitize project name
+        id: sanitize-name
+        run: |
+          sanitized_name=$(echo ${{ matrix.project }} | sed s/[^a-zA-Z0-9_-]/_/g)
+          echo "::set-output name=sanitized_name::$sanitized_name"
+
+      - name: Download predictions
+        uses: actions/download-artifact@v2
+        with:
+          name: "${{ steps.sanitize-name.outputs.sanitized_name }}-predictions"
+          path: predictions
+
+      - name: Fetch database
+        run: |
+          ./scripts/fetch_database.py databases ${{ matrix.project }}
+
+      - name: Compute embeddings
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r similarity-api/requirements.txt
+          ./similarity-api/createEmbeddings.py \
+            --predictions "predictions/${{ steps.sanitize-name.outputs.sanitized_name }}-predictions.json" \
+            --databases databases \
+            --output embeddings \
+            --chunk-size ${{ github.event.inputs.chunk_size }}
+
+      - name: Upload embeddings
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ steps.sanitize-name.outputs.sanitized_name }}-embeddings"
+          path: "embeddings/*.pickle"
+
+  combine_embeddings:
+    name: Combine all predictions and their embeddings
+    needs:
+      - create_embeddings
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download predictions and embeddings
+        uses: actions/download-artifact@v2
+
+      - name: Put all of them into a single directory
+        run: |
+          mkdir _results
+          cp -r *-embeddings *-predictions predictions _results
+
+      - name: Upload predictions and embeddings
+        uses: actions/upload-artifact@v2
+        with:
+          # important: the name must be lexicographically small, since the CLI can only download
+          # the first 100 artifacts in lexiographic order
+          name: "_results"
+          path: "_results"

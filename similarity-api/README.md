@@ -22,13 +22,25 @@ Given a set of CodeQL databases, a `predictions.json` file and the query type (e
 
 Once all embeddings are precomputed for the prediction file, we can use them to query similar examples.
 
-Given a sink candidate described by a pair (enclosing statement, enclosing function) and its repr, the function `getSimilarSinks` yields the set of locations of the sinks that are similar for that repr. This function loads the precomputed embeddings for the repr and computes the similarity to the sink candidate using cosine similarity.
+Given a sink candidate described by its position and its repr, the function `get_embeddings` yields a pair of embeddings for the candidate, one representing the enclosing statement and one the enclosing function. Given such a pair of embeddings, the function `get_similar_sinks` computes the set of locations of the sinks that have similar embeddings. This function loads the precomputed embeddings for the repr and computes the similarity to the sink candidate using cosine similarity.
 
-It is worth noticing that this function does not require the use of CodeBERT models as it is already precomputed, even for the sink candidate used for the query.
+It is worth noticing that these functions do not require the use of CodeBERT models as it is already precomputed, even for the sink candidate used for the query.
 
-The alternative function `getSimilarSinksPaginated` with less memory requirements perform a similar task but it computes the similarity between the sink candidate and each chunk. In this way only a chunk of embeddings needs to be held in memory.
+These functions are used by [`server.py`](server.py) which is a web service used by the UX for getting similar candidates of a banned example.
 
-These functions are used by [`server.py`](server.py) which is a web service used by the UX for getting similar candidates of a banned example.  
+It can be used in two modes: with merged predictions (the default) or with split predictions. In merged mode, the server expects a single `predictions.json` file containing all sink candidates, and a single folder in which all embeddings are stored. In split mode, it expects a folder in which predictions are stored organized by project, and a parent folder under which folders containing embeddings for each project are stored.
+
+The `_results.zip` file produced by the `predict.yml` workflow can be used in split mode, as follows:
+
+- Download the `_results` artifact produced by the workflow and unzip it into a folder. (Note that you need to create that folder yourself and unzip the downloaded artifact inside it.)
+- Copy the `predictions/predictions.json` file over `triager/data/predictions.json` in this repo.
+- Start the server: `similarity-api/server.py --split-predictions --predictions /path/to/folder --embeddings /path/to/folder`.
+- Start the triaging webapp: `cd triager && npm run dev`
+- The webapp is now accessible through `http://localhost:3005/`.
+
+The above is automated by the `triage-locally.sh` script.
+
+Note that the workflow may fail to create embeddings for some (many) projects due to running out of memory. No similarity information is available for predictions on those projects, so if you try to "ban similar" it will only ban the prediction itself.
 
 ## Computing embeddings for known sinks
 
