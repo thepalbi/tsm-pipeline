@@ -360,7 +360,9 @@ jobs:
       - name: Put all of them into a single directory
         run: |
           mkdir _results
-          cp -r *-embeddings *-predictions predictions _results
+          cp -r *-embeddings _results || true
+          cp -r *-predictions _results || true
+          cp -r predictions _results || true
 
       - name: Upload predictions and embeddings
         uses: actions/upload-artifact@v2
