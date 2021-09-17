@@ -39,8 +39,11 @@ def readJsonPredictions(fileName):
     """
     Creates a dictionary repr -> [loc, stmLoc, funcLoc] out of the prediction json file.
     """
-    with open(fileName, encoding="utf-8") as source:
-        data = json.load(source)
+    with open(fileName, encoding="utf-8") as predictionsFile:
+        source = predictionsFile.read()
+        if source.strip() == "":
+            return dict()
+        data = json.loads(source)
         dictPredRepr = createReprDict(data)
         return dictPredRepr
 
