@@ -67,4 +67,4 @@ jobs:
           ATM_BLOB_STORE_SAS_TOKEN: ${{ secrets.ATM_BLOB_STORE_SAS_TOKEN }}
       run: |
         source env/bin/activate
-        pytest --ignore=codeql-lib --full-trace -v -s
+        pytest --ignore=codeql-lib -v -s
