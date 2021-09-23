@@ -63,7 +63,7 @@ def runTSM(project_list, codeql_cli, tsm_ql, query_name, clean):
     # Fetch databases
     databases = listDatabases(project_list)
     for database in databases:
-        fetchDatabase(database, databasesDirectory)
+        fetchDatabase(database, databasesDirectory, query_name)
     # Write config.json file
     config = "{\n"
     config = config + f'"codeQLExecutable": "{codeql_cli}",\n'

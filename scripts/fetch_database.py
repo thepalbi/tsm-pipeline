@@ -11,6 +11,7 @@ def parseArguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("dest", help="The directory to download project databases to; will be created if it doesn't exist.")
     parser.add_argument("projects", metavar="project", nargs="+", help="Projects whose databases we want to download.")
+    parser.add_argument("query", help="Query type from which the db belongs")
     parsed_arguments = parser.parse_args()
     return parsed_arguments
 
@@ -23,7 +24,19 @@ def database_archive(project_name, dest_dir):
 def database_dir(project_name, dest_dir):
   return os.path.join(f'{dest_dir}', f'{clean(project_name)}')
 
-def fetchDatabaseCommand(project_name, dest_dir):
+def queryToFolder(query):
+  if query == "NoSql":
+      return "nosql_800"
+  if query == "Sql":
+      return "sql_96"
+  if query == "TaintedPath":
+      return "tainted_path_500"
+  if query == "Xss":
+      return "xss_3k"
+  # for other cases we fallback to the folder that hipotically contains all dbs
+  return "all"
+
+def fetchDatabaseCommand(project_name, dest_dir, query):
     database_path = database_archive(project_name, dest_dir)
     # check whether project_name looks like an LGTM slug
     if "/" in project_name:
@@ -41,14 +54,15 @@ def fetchDatabaseCommand(project_name, dest_dir):
     else:
         print(f'Downloading {project_name} from Azure blob storage')
         database_zip = project_name + ".zip"
+        dbFolder = queryToFolder(query)
         command = (
-            f'azcopy copy "https://atmcodeqldata.blob.core.windows.net/atm/javascript-databases/nosql_800_no_evaluation/{database_zip}?${{ATM_BLOB_STORE_SAS_TOKEN}}" '
+            f'azcopy copy "https://atmcodeqldata.blob.core.windows.net/atm/javascript-databases/{dbFolder}/{database_zip}?${{ATM_BLOB_STORE_SAS_TOKEN}}" '
             f'{database_path} --overwrite=true '
             f'--check-md5 FailIfDifferent --from-to=BlobLocal --recursive'
         )
     return command
 
-def fetchDatabase(project_name, dest_dir):
+def fetchDatabase(project_name, dest_dir, query):
     dir = database_dir(project_name, dest_dir)
     archive = database_archive(project_name, dest_dir)
     # Conditionally fetch the database
@@ -60,7 +74,7 @@ def fetchDatabase(project_name, dest_dir):
         '''
         temp_dir = tempfile.mkdtemp()
         # Fetch from Azure blob store or LGTM
-        command = fetchDatabaseCommand(project_name, dest_dir)
+        command = fetchDatabaseCommand(project_name, dest_dir, query)
         try:
             print(f'Fetching {project_name} using command: {command}')
             subprocess.run(command, check=True, text=True, shell=True, capture_output=True)
@@ -102,4 +116,4 @@ if __name__ == "__main__":
   if not os.path.exists(args.dest):
     os.mkdir(args.dest)
   for project in args.projects:
-    fetchDatabase(project, args.dest)
+    fetchDatabase(project, args.dest, args.query)

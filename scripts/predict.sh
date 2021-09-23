@@ -2,8 +2,8 @@
 
 MYDIR=`dirname $0`
 
-if [ $# -ne 3 ]; then
-  echo "Usage: $0 scores_file test_projects output_file"
+if [ $# -ne 4 ]; then
+  echo "Usage: $0 scores_file test_projects output_file query_name"
   exit 1
 fi
 
@@ -12,6 +12,7 @@ set -ex
 scores_file=$1
 test_projects=$2
 output_file=$3
+query_name=$4
 
 if ! [ -f $scores_file ]; then
   echo "scores file $scores_file does not exist"
@@ -34,7 +35,7 @@ cat $query
 
 # run it on all databases
 dbRoot=$MYDIR/databases
-$MYDIR/fetch_database.py $dbRoot $test_projects
+$MYDIR/fetch_database.py $dbRoot $test_projects $query_name
 for db in $dbRoot/*; do
   mkdir -p $db/results
   codeql query run -o $db/results/sink-predictions.bqrs -d $db $query

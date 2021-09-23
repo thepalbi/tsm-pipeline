@@ -70,7 +70,6 @@ class EmbeddingsReader:
         if repr in self.dictPredRepr.keys():
             allLocs = list(self.dictPredRepr[repr])[
                 page*self.chunk_size:(page+1)*self.chunk_size]
-            print(repr, len(allLocs))
             embsStm = None
             try:
                 hash = hashlib.md5(repr.encode())

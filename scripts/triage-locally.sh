@@ -15,7 +15,7 @@ DEST_DIR=`mktemp -d`
 echo "Downloading workflow artifacts to $DEST_DIR"
 gh run download "$WORKFLOW_RUN_ID" -D "$DEST_DIR" -n _results
 echo "Copying predictions.json file to the dashboard data directory"
-cp "$DEST_DIR/predictions/predictions.json" "$MYDIR/../triager/data/predictions.json"
+cp "$DEST_DIR/predictions.json" "$MYDIR/../triager/data/predictions.json"
 echo "Starting similarity server"
 "$MYDIR/../similarity-api/server.py" --split-predictions --predictions "$DEST_DIR" --embeddings "$DEST_DIR" --chunk-size "$CHUNK_SIZE" &
 SERVER_PID=$!

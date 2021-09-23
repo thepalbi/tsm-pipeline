@@ -70,7 +70,7 @@ def readKnownLoc(file_loc:str):
             if repr not in knownsFunc.keys():
                 knownsFunc[repr] = set()
             # knownsFunc[repr].add(urlFunc)
-            knownsStm[repr].add(locationFunc)
+            knownsFunc[repr].add(locationFunc)
             
             # print(location, repr)
         except Exception as e:
@@ -118,25 +118,26 @@ def chunks(lst, n):
 import hashlib
 
 def generateAndSaveEmbeddings(knownSinksLocStm,knownSinksLocFunc):
-    queryType = "sql"
     prefix = "knownStm_"
-    generateEmbeddings(knownSinksLocStm, queryType, prefix)
+    generateEmbeddings(knownSinksLocStm, prefix)
 
     prefix = "knownF_"
-    generateEmbeddings(knownSinksLocFunc, queryType, prefix)
+    generateEmbeddings(knownSinksLocFunc, prefix)
 
-def generateEmbeddings(knownSinksLoc, queryType, prefix):
+def generateEmbeddings(knownSinksLoc, prefix):
     for repr in knownSinksLoc.keys():
-        print(repr)
+        print(repr)        
+
         allLocs = list(knownSinksLoc[repr])
         page = 0
         for locs in chunks(allLocs, 50):
             print(len(locs))
-            knownCodeStm = getCodes(locs, baseFolder, queryType)
+            knownCodeStm = getCodes(locs, baseFolder)
             # print(knownCodeStm)
             embsStm = getVectors(knownCodeStm)
             hash = hashlib.md5(repr.encode())
-            filename = os.path.join(embeddingsBaseFolder, "sql", "embs", prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
+            filename = os.path.join(embeddingsBaseFolder, prefix+str(page)+"_"+hash.hexdigest()+".pickle" )
+            print("Saving: ", filename)
             torch.save(embsStm, filename)
             page = page + 1
 
@@ -147,19 +148,9 @@ import glob
     
 if __name__ == '__main__':
     # baseFolder = "/persistent/dbs"
-    baseFolder = "/home/diegog/repos/microsoft/MSR-collab2020/tsm-js/similarity-api/dbs"
-    embeddingsBaseFolder = "/persistent/dbs/test"
-
-    queryType = "sql" 
-    db = "jordanbertasso_vulnerable-web-app_9ea5fa8"
-    inputCVS = "inputs4.csv"
-    outputFileName = db + '.json'
-
-    if len(sys.argv)>1:
-        db = sys.argv[1]
-        inputCVS = sys.argv[2]
-
-    outputFileName = db + '.json'
+    baseFolder = "/home/diegog/repos/microsoft/MSR-collab2020/tsm-js/similarity-api/dbs/sql"
+    embeddingsBaseFolder = "/persistent/dbs/test/sql/embs"
+    knownSinksFilename = "/persistent/dbs/KnownEnc2.csv"
 
     # load precomputed model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -174,8 +165,7 @@ if __name__ == '__main__':
 
     print("Read known sinks")
     # load locations of knows sinks, and same locations extended to get more context
-    knownSinksFilename = "KnownEncTest.csv" #"KnownEnc2.csv"
-    knownSinksLocStm,knownSinksLocFunc = readKnownLoc(os.path.join(baseFolder, knownSinksFilename))
+    knownSinksLocStm,knownSinksLocFunc = readKnownLoc(knownSinksFilename)
 
     # this is to create embeddings once
     print("Generating embeddings for known sinks")

@@ -58,7 +58,7 @@ class EmbbedingsGenerator:
     def encode(self, inputs):
         outputs = self.model(inputs,attention_mask = inputs.ne(1))[0]
         # Fixed mean pooling
-        outputs = outputs = (outputs*inputs.ne(1).unsqueeze(-1)).sum(1)/inputs.ne(1).sum(-1).unsqueeze(-1)
+        outputs = (outputs*inputs.ne(1).unsqueeze(-1)).sum(1)/inputs.ne(1).sum(-1).unsqueeze(-1)
         # F2 norm 
         outputs = F.normalize(outputs, p=2, dim=1)
         return outputs

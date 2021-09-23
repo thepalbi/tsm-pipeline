@@ -243,6 +243,8 @@ jobs:
           echo "::set-output name=sanitized_name::$sanitized_name"
 
       - name: Predict new sinks
+        env:
+          ATM_BLOB_STORE_SAS_TOKEN: ${{ secrets.ATM_BLOB_STORE_SAS_TOKEN }}
         run: |
           source env/bin/activate
           n=$(compgen -G "allscores_*.txt" | wc -l)
@@ -253,54 +255,14 @@ jobs:
           ./scripts/predict.sh \
             $(compgen -G "allscores_*.txt") \
             "${{ matrix.project }}" \
-            "${{ steps.sanitize-name.outputs.sanitized_name }}-predictions.json"
+            "${{ steps.sanitize-name.outputs.sanitized_name }}-predictions.json" \
+            ${{ github.event.inputs.query_name }}
 
       - name: Upload predictions
         uses: actions/upload-artifact@v2
         with:
           name: "${{ steps.sanitize-name.outputs.sanitized_name }}-predictions"
           path: "${{ steps.sanitize-name.outputs.sanitized_name }}-predictions.json"
-
-  build_report:
-    name: Build report for triaging new sinks
-    needs:
-      - predict
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out this repo
-        uses: actions/checkout@v2
-
-      - name: Download predictions for individual projects
-        uses: actions/download-artifact@v2
-
-      - name: Combine predictions
-        run: |
-          jq -s flatten *-predictions/*.json >triager/data/predictions.json
-
-      - name: Build report
-        run: |
-          cd triager
-          echo 'NEXT_PUBLIC_SIMILARITY_SERVER=' >.env.local
-          npm install
-          npm run build
-          npm run export
-          touch out/.nojekyll
-
-      - name: Deploy report to gh-pages
-        uses: JamesIves/github-pages-deploy-action@4.1.1
-        with:
-          branch: gh-pages
-          folder: triager/out
-
-      - name: Upload predictions
-        uses: actions/upload-artifact@v2
-        with:
-          name: predictions
-          path: triager/data/predictions.json
-
-      - name: Finish
-        run: |
-          echo 'Triaging dashboard deployed to https://github.github.io/ml-ql-taint-specification-mining'
 
   create_embeddings:
     name: Compute embeddings of sink candidates for ${{ matrix.project }}
@@ -329,8 +291,10 @@ jobs:
           path: predictions
 
       - name: Fetch database
+        env:
+          ATM_BLOB_STORE_SAS_TOKEN: ${{ secrets.ATM_BLOB_STORE_SAS_TOKEN }}
         run: |
-          ./scripts/fetch_database.py databases ${{ matrix.project }}
+          ./scripts/fetch_database.py databases ${{ matrix.project }} ${{ github.event.inputs.query_name }}
 
       - name: Compute embeddings
         run: |
@@ -348,21 +312,87 @@ jobs:
           name: "${{ steps.sanitize-name.outputs.sanitized_name }}-embeddings"
           path: "embeddings/*.pickle"
 
+  update_predictions:
+    name: Update the scores of sink candidates for ${{ matrix.project }}
+    needs:
+      - create_embeddings
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ${{ fromJSON(github.event.inputs.test_projects || github.event.inputs.training_projects) }}
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+
+      - name: Sanitize project name
+        id: sanitize-name
+        run: |
+          sanitized_name=$(echo ${{ matrix.project }} | sed s/[^a-zA-Z0-9_-]/_/g)
+          echo "::set-output name=sanitized_name::$sanitized_name"
+
+      - name: Download predictions
+        uses: actions/download-artifact@v2
+        with:
+          name: "${{ steps.sanitize-name.outputs.sanitized_name }}-predictions"
+          path: predictions
+
+      - name: Download embeddings
+        uses: actions/download-artifact@v2
+        with:
+          name: "${{ steps.sanitize-name.outputs.sanitized_name }}-embeddings"
+          path: "embeddings/"
+      
+      - name: Extract ks embeddings files
+        run: | 
+            unzip ./similarity-api/ksEmbs/EmbKnownStm.zip -d ./similarity-api/ksEmbs/ 
+            unzip ./similarity-api/ksEmbs/EmbKnownFunc.zip -d ./similarity-api/ksEmbs/ 
+
+      - name: Update scores
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r similarity-api/requirements.txt
+          python ./similarity-api/updatePredictions.py \
+            --predictions "predictions/${{ steps.sanitize-name.outputs.sanitized_name }}-predictions.json" \
+            --embeddings "embeddings/" \
+            --chunk-size ${{ github.event.inputs.chunk_size }} \
+            --chunk-size-ks 50
+
+      - name: Upload predictions
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ steps.sanitize-name.outputs.sanitized_name }}-predictions"
+          path: "predictions/${{ steps.sanitize-name.outputs.sanitized_name }}-predictions.json"
+
   combine_embeddings:
     name: Combine all predictions and their embeddings
     needs:
-      - create_embeddings
+      - update_predictions
     runs-on: ubuntu-latest
     steps:
       - name: Download predictions and embeddings
         uses: actions/download-artifact@v2
+
+      - name: Combine predictions
+        run: |
+          mkdir predictions
+          jq -s flatten *-predictions/*.json >predictions/predictions.json
 
       - name: Put all of them into a single directory
         run: |
           mkdir _results
           cp -r *-embeddings _results || true
           cp -r *-predictions _results || true
-          cp -r predictions _results || true
+          cp predictions/predictions.json _results || true
+
+      - name: Upload predictions
+        uses: actions/upload-artifact@v2
+        with:
+          name: predictions
+          path: predictions
 
       - name: Upload predictions and embeddings
         uses: actions/upload-artifact@v2
@@ -371,3 +401,38 @@ jobs:
           # the first 100 artifacts in lexiographic order
           name: "_results"
           path: "_results"
+
+  build_report:
+    name: Build report for triaging new sinks
+    needs:
+      - combine_embeddings
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v2
+
+      - name: Download predictions for individual projects
+        uses: actions/download-artifact@v2
+
+      - name: Copy predictions to triager
+        run: |
+          cp predictions/predictions.json triager/data
+
+      - name: Build report
+        run: |
+          cd triager
+          echo 'NEXT_PUBLIC_SIMILARITY_SERVER=' >.env.local
+          npm install
+          npm run build
+          npm run export
+          touch out/.nojekyll
+
+      - name: Deploy report to gh-pages
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          branch: gh-pages
+          folder: triager/out
+
+      - name: Finish
+        run: |
+          echo 'Triaging dashboard deployed to https://github.github.io/ml-ql-taint-specification-mining'
