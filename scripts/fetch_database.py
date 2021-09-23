@@ -77,6 +77,14 @@ def fetchDatabase(project_name, dest_dir):
 
             # the tmp directory now contains a single subdirectory; move it to the final location
             shutil.move(os.path.join(temp_dir, contents[0]), dir)
+
+            # databases downloaded from LGTM have their source archive zipped, databases from Azure blob store don't
+            # to simplify downstream handling we always zip the archive
+            src_archive_dir = os.path.join(dir, 'src')
+            if not os.path.exists(os.path.join(dir, 'src.zip')) and os.path.isdir(src_archive_dir):
+                print(f'Zipping source archive for {project_name}')
+                shutil.make_archive(os.path.join(dir, 'src'), 'zip', src_archive_dir)
+                shutil.rmtree(src_archive_dir)
         except subprocess.CalledProcessError as e:
             print(f'Command {e.cmd} failed with return code {e.returncode}: {e.stderr}')
             return False
