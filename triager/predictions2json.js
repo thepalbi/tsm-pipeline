@@ -3,7 +3,6 @@
 const cp = require('child_process');
 const path = require('path');
 const readline = require('readline');
-const enc = { encoding: 'utf8' };
 const StreamZip = require('node-stream-zip');
 
 const dbRoot = process.argv[2];
@@ -62,8 +61,9 @@ async function getSnippet(db, filePath, startLine, startColumn, endLine, endColu
   for (const projectName of projectNames) {
     const db = path.resolve(dbRoot, projectName.replace(/\//g, '_'));
     const bqrs = path.resolve(db, 'results', 'sink-predictions.bqrs');
-    let out = cp.execFileSync('codeql', ['bqrs', 'decode', '--format=json', bqrs], enc);
-    let results = JSON.parse(out);
+    const json = path.resolve(db, 'results', 'sink-predictions.json');
+    cp.execFileSync('codeql', ['bqrs', 'decode', '--format=json', `--output=${json}`, bqrs]);
+    const results = JSON.parse(fs.readFileSync(json, 'utf8'));
     for (const tuple of results['#select'].tuples) {
       const prediction = {
         location: {
