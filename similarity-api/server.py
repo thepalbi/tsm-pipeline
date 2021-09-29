@@ -46,20 +46,23 @@ def get_all_embeddings_readers():
     return embeddingsReaders.values()
 
 
-@app.route('/similar', methods=['POST'])
-def calculate():
-    body = request.get_json(force=True)
-    locStm, _, repr = unserializeJsonBody(body)
-
+def get_similar(locStm, repr):
     similar = set()
     embeddings_reader = get_embeddings_reader(locStm)
     if embeddings_reader is not None:
         embStm, embFunc = embeddings_reader.get_embeddings(locStm, repr)
         if embStm is not None and embFunc is not None:
-            print("Negative example: ", locStm)
             for embeddings_reader in get_all_embeddings_readers():
                 similar.update(embeddings_reader.get_similar_sinks(
                     embStm, embFunc, repr))
+    return similar
+
+
+@app.route('/similar', methods=['POST'])
+def calculate():
+    body = request.get_json(force=True)
+    locStm, _, repr = unserializeJsonBody(body)
+    similar = get_similar(locStm, repr)
 
     print(similar)
     response_to_serialize = [
@@ -70,6 +73,28 @@ def calculate():
         for (loc, score) in similar
     ]
     return jsonify(response_to_serialize)
+
+
+def setup_merged_embeddings_reader(predictions, embeddings, chunk_size):
+    global embeddingsReaders, merged_predictions
+    merged_predictions = True
+    embeddingsReaders = {
+        '*': EmbeddingsReader(predictions, embeddings, chunk_size)
+    }
+
+
+def setup_split_embeddings_readers(predictions, embeddings, chunk_size):
+    global embeddingsReaders, merged_predictions
+    merged_predictions = False
+    embeddingsReaders = {}
+    for file in os.listdir(predictions):
+        if file.endswith('-predictions'):
+            key = file[:-len('-predictions')]
+            predictions_json = os.path.join(predictions, file, file + '.json')
+            embeddings_dir = os.path.join(embeddings, key + '-embeddings')
+            if os.path.isfile(predictions_json) and os.path.isdir(embeddings_dir):
+                embeddingsReaders[key] = EmbeddingsReader(
+                    predictions_json, embeddings_dir, chunk_size)
 
 
 if __name__ == "__main__":
@@ -87,24 +112,12 @@ if __name__ == "__main__":
                         default=50)
     args = parser.parse_args()
 
-    merged_predictions = not args.split_predictions
-    if merged_predictions:
-        embeddingsReaders = {
-            '*': EmbeddingsReader(args.predictions, args.embeddings, args.chunk_size)
-        }
+    if not args.split_predictions:
+        setup_merged_embeddings_reader(
+            args.predictions, args.embeddings, args.chunk_size)
     else:
-        embeddingsReaders = {}
-        for file in os.listdir(args.predictions):
-            if file.endswith('-predictions'):
-                key = file[:-len('-predictions')]
-                predictions = os.path.join(
-                    args.predictions, file, file + '.json')
-                embeddings = os.path.join(args.embeddings, key + '-embeddings')
-                if os.path.isfile(predictions) and os.path.isdir(embeddings):
-                    print(
-                        f"Creating embeddings reader for f{key} with predictions in {predictions} and embeddings under {embeddings}")
-                    embeddingsReaders[key] = EmbeddingsReader(
-                        predictions, embeddings, args.chunk_size)
+        setup_split_embeddings_readers(
+            args.predictions, args.embeddings, args.chunk_size)
 
     app.run(host=os.getenv('IP', '0.0.0.0'),
             port=int(os.getenv('PORT', 4444)), debug=True)

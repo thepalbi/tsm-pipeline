@@ -91,7 +91,7 @@ class EmbeddingsReader:
         similarity = cosine_similarity([emb], code_vecs)
         scores = torch.tensor(similarity)
 
-        print("scores:", scores)
+        # print("scores:", scores)
         return list([(float(x), locCodes[y]) for x, y in zip(scores[0], range(len(locCodes)))])
 
     def get_embeddings(self, locationStm, repr):
@@ -133,7 +133,7 @@ class EmbeddingsReader:
         allLocs = list(self.dictPredRepr[repr])
         page = 0
         for locs in chunks(allLocs, self.chunk_size):
-            print(page)
+            # print(page)
             embsAllStm, _ = self.loadKnownSinkEmbForRepPage(
                 repr,  "emb_", page)
             embsAllFunc, _ = self.loadKnownSinkEmbForRepPage(
@@ -156,7 +156,7 @@ class EmbeddingsReader:
                     selectedLocs.add((locs[i][0], avgScore))
             page = page + 1
 
-        print("Highlighted ", len(selectedLocs),
-              "/", len(self.dictPredRepr[repr]))
-        print(selectedLocs)
+        # print("Highlighted ", len(selectedLocs),
+        #       "/", len(self.dictPredRepr[repr]))
+        # print(selectedLocs)
         return selectedLocs
