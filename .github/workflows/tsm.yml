@@ -1,4 +1,4 @@
-name: Predict taint specifications
+name: Run TSM
 on:
   workflow_dispatch:
     inputs:
