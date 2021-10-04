@@ -1,0 +1,97 @@
+projectName,path,startLine,startColumn,endLine,endColumn,repr,query
+Mermade-openapi-webconverter,api.js,194,10,194,27,(parameter 0 (member post *)),endpoint injection
+Mermade-openapi-webconverter,api.js,280,10,280,26,(parameter 0 (member post *)),endpoint injection
+adaptlearning-adapt_authoring,Gruntfile.js,181,22,181,40,(parameter 0 (member write *)),TaintedPath
+adaptlearning-adapt_authoring,Gruntfile.js,200,22,200,35,(parameter 0 (member write *)),TaintedPath
+adaptlearning-adapt_authoring,Gruntfile.js,218,17,218,23,(parameter 0 (member render *)),TaintedPath
+adaptlearning-adapt_authoring,Gruntfile.js,252,29,252,41,(parameter 0 (member exists *)),TaintedPath
+adaptlearning-adapt_authoring,Gruntfile.js,255,29,255,39,(parameter 0 (member exists *)),TaintedPath
+adaptlearning-adapt_authoring,Gruntfile.js,266,26,266,38,(parameter 0 (member write *)),TaintedPath
+adaptlearning-adapt_authoring,Gruntfile.js,267,26,267,36,(parameter 0 (member write *)),TaintedPath
+adaptlearning-adapt_authoring,Gruntfile.js,269,24,269,66,(parameter 0 (member write *)),TaintedPath
+adaptlearning-adapt_authoring,Gruntfile.js,316,24,316,33,(parameter 0 (member write *)),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-coffee.js,1,1486,1,1486,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-coffee.js,1,1830,1,1830,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-coffee.js,1,2225,1,2247,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-coffee.js,1,2275,1,2287,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-css.js,1,1486,1,1486,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-css.js,1,1830,1,1830,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-css.js,1,2225,1,2247,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-css.js,1,2275,1,2287,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-html.js,1,1486,1,1486,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-html.js,1,1830,1,1830,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-html.js,1,2225,1,2247,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-html.js,1,2275,1,2287,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-javascript.js,1,1486,1,1486,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-javascript.js,1,1830,1,1830,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-javascript.js,1,2225,1,2247,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-javascript.js,1,2275,1,2287,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-json.js,1,1486,1,1486,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-json.js,1,1830,1,1830,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-json.js,1,2225,1,2247,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-json.js,1,2275,1,2287,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-lua.js,1,1486,1,1486,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-lua.js,1,1830,1,1830,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-lua.js,1,2225,1,2247,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-lua.js,1,2275,1,2287,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-php.js,1,1486,1,1486,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-php.js,1,1830,1,1830,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-php.js,1,2225,1,2247,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-php.js,1,2275,1,2287,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-xml.js,1,1486,1,1486,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-xml.js,1,1830,1,1830,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-xml.js,1,2225,1,2247,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-xml.js,1,2275,1,2287,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-xquery.js,1,1486,1,1486,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-xquery.js,1,1830,1,1830,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-xquery.js,1,2225,1,2247,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,frontend/src/libraries/ace/worker-xquery.js,1,2275,1,2287,(parameter 0 (member require (global))),TaintedPath
+adaptlearning-adapt_authoring,lib/assetmanager.js,761,34,761,46,(parameter 0 (member createReadStream *)),TaintedPath
+adaptlearning-adapt_authoring,lib/assetmanager.js,809,34,809,55,(parameter 0 (member createReadStream *)),TaintedPath
+adaptlearning-adapt_authoring,lib/assetmanager.js,850,36,850,48,(parameter 0 (member createReadStream *)),TaintedPath
+adaptlearning-adapt_authoring,lib/outputmanager.js,697,60,697,69,(parameter 0 (member createReadStream *)),TaintedPath
+adaptlearning-adapt_authoring,lib/outputmanager.js,827,62,827,71,(parameter 0 (member createReadStream *)),TaintedPath
+adaptlearning-adapt_authoring,lib/rest.js,133,19,133,41,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,lib/usermanager.js,822,29,822,33,(parameter 0 (member send *)),ReflectedXss
+adaptlearning-adapt_authoring,lib/usermanager.js,854,27,854,40,(parameter 0 (member send *)),ReflectedXss
+adaptlearning-adapt_authoring,lib/usermanager.js,856,43,856,55,(parameter 0 (member send *)),ReflectedXss
+adaptlearning-adapt_authoring,plugins/auth/local/index.js,285,25,285,34,(parameter 0 (member send *)),ReflectedXss
+adaptlearning-adapt_authoring,plugins/auth/local/index.js,287,41,287,53,(parameter 0 (member send *)),ReflectedXss
+adaptlearning-adapt_authoring,plugins/content/themepreset/index.js,56,19,56,61,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,plugins/output/adapt/importsource.js,470,29,470,58,(parameter 0 (member update *)),TaintedPath
+adaptlearning-adapt_authoring,plugins/output/adapt/outputHelpers.js,26,14,26,21,(parameter 0 (member open *)),TaintedPath
+adaptlearning-adapt_authoring,routes/import/index.js,11,13,11,32,(parameter 0 (member post *)),endpoint injection
+adaptlearning-adapt_authoring,routes/import/index.js,27,13,27,27,(parameter 0 (member post *)),endpoint injection
+adaptlearning-adapt_authoring,routes/import/index.js,57,13,57,21,(parameter 0 (member post *)),endpoint injection
+adaptlearning-adapt_authoring,routes/preview/index.js,41,18,41,25,(parameter 0 (member sendFile *)),TaintedPath
+adaptlearning-adapt_authoring,test/lib.assetmanager.js,127,11,127,22,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.assetmanager.js,21,11,21,22,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.auth.js,107,11,107,28,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.auth.js,154,17,154,28,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.auth.js,195,17,195,28,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.auth.js,207,21,207,32,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.auth.js,226,11,226,23,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.auth.js,56,11,56,22,(parameter 0 (member post *)),endpoint injection
+adaptlearning-adapt_authoring,test/lib.auth.js,71,11,71,22,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.contentmanager.js,22,11,22,22,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.contentmanager.js,241,15,241,42,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.contentmanager.js,50,11,50,31,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.contentmanager.js,64,13,64,33,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.contentmanager.js,83,11,83,49,(parameter 0 (member post *)),CSRF
+adaptlearning-adapt_authoring,test/lib.rest.js,24,14,24,25,(parameter 0 (member post *)),CSRF
+coding-blocks-online-judge,routes/api.js,10,13,10,21,(parameter 0 (member post *)),endpoint injection
+coding-blocks-online-judge,routes/api.js,32,13,32,20,(parameter 0 (member post *)),endpoint injection
+coding-blocks-online-judge,routes/api.js,65,13,65,42,(parameter 0 (member post *)),endpoint injection
+ericmaino-powertweet,PowerTweetWeb/Scripts/Office/MicrosoftAjax.js,5,81194,5,81221,(parameter 0 (member open *)),ClientSideRedirect
+ericmaino-powertweet,PowerTweetWeb/Scripts/Office/MicrosoftAjax.js,5,81232,5,81450,(parameter 0 (member write *)),DomBasedXss
+ericmaino-powertweet,PowerTweetWeb/Scripts/jquery-1.9.1.js,7143,14,7143,42,(parameter 0 (member write *)),DomBasedXss
+krishnaji-web3-server,src/libs/app.ts,29,10,29,29,(parameter 0 (member post *)),endpoint injection
+krishnaji-web3-server,test/api/contract.ts,100,42,100,69,(parameter 0 (member post *)),CSRF
+krishnaji-web3-server,test/api/contract.ts,106,42,106,65,(parameter 0 (member post *)),CSRF
+krishnaji-web3-server,test/api/contract.ts,50,42,50,69,(parameter 0 (member post *)),CSRF
+krishnaji-web3-server,test/api/contract.ts,64,42,64,69,(parameter 0 (member post *)),CSRF
+krishnaji-web3-server,test/api/contract.ts,74,42,74,69,(parameter 0 (member post *)),CSRF
+krishnaji-web3-server,test/api/contract.ts,90,42,90,69,(parameter 0 (member post *)),CSRF
+paldepind-functional-frontend-architecture,examples/autocomplete/js/build/test-build.js,496,42,496,45,(parameter 0 (member readFileSync *)),TaintedPath
+paldepind-functional-frontend-architecture,examples/autocomplete/js/build/test-build.js,727,40,727,45,(parameter 0 (member existsSync *)),TaintedPath
+paldepind-functional-frontend-architecture,examples/autocomplete/js/build/test-build.js,728,38,728,43,(parameter 0 (member readFileSync *)),TaintedPath

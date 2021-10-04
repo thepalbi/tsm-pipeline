@@ -1,0 +1,11 @@
+- 193 predictions involve arguments to `path.join` and similar; those are paths, but not really sinks
+- a few results are in minified code; unless it's very clear, I have marked those as false positives
+- similar for cases where complicated application logic (e.g., custom events) are involved
+- the following six results could be considered true positives:
+    - 3dsNode-3dsNode,apps/media.js,77,29,77,44,(parameter 1 (member emit *)),TaintedPath
+    - 3dsNode-3dsNode,apps/media.js,83,28,83,43,(parameter 1 (member emit *)),TaintedPath
+    - 3dsNode-3dsNode,apps/media.js,88,28,88,43,(parameter 1 (member emit *)),TaintedPath
+    - 3dsNode-3dsNode,apps/remote.js,84,39,84,58,(parameter 1 (member emit *)),TaintedPath
+    - 3dsNode-3dsNode,apps/remote.js,90,38,90,57,(parameter 1 (member emit *)),TaintedPath
+    - 3dsNode-3dsNode,apps/remote.js,95,38,95,57,(parameter 1 (member emit *)),TaintedPath
+  However, I excluded them because they seem very application-specific (custom events for passing file paths around).
