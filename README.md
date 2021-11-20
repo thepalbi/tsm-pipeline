@@ -73,7 +73,7 @@ These steps can be executed individually or all together in an end-to-end runner
 
 The files `nosqlinjection_projects.txt`, `sqlinjection_projects.txt`, and `nosql_projects.txt` contains each one a a list of databases to be fetched from the LGTM site.
 
-To get projects for LGTM site you can run `python3 -m misc.scrape -dld [project-slug] -o [projectsFolder]` where`project-slug` is one database listed in the three aforementioned files (e.g. `1046224544/fontend`). The result of the script is a zip file (e.g., `projectsFolder/1046224544-fontend.zip`) which will be placed in the folder `projectsFolder` that must exist beforehand.
+To get projects for LGTM site you can run `python3 -m misc.scrape -dld [project-slug] -o [projectsFolder]` where `project-slug` is one database listed in the three aforementioned files (e.g. `1046224544/fontend`). The result of the script is a zip file (e.g., `projectsFolder/1046224544-fontend.zip`) which will be placed in the folder `projectsFolder` that must exist beforehand.
 
 Finally unzip the zip file corresponding to the downloaded database (e.g., `projectsFolder/1046224544-fontend.zip`)
 
