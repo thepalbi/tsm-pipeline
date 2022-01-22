@@ -1,10 +1,10 @@
 {
 
-  "codeQLExecutable": "/Users/diegog/repos/tools/semmle/codeql/codeql",
-  "codeQLSourcesRoot": "/Users/diegog/repos/microsoft/MSR-collab2020/ml-ql-taint-specification-mining/ql",
-  "workingDirectory": "/Users/diegog/repos/microsoft/MSR-collab2020/ml-ql-taint-specification-mining/wrk",
-  "resultsDirectory": "/Users/diegog/repos/microsoft/MSR-collab2020/ml-ql-taint-specification-mining/results",
-  "searchPath": "/Users/diegog/repos/microsoft/codeql",
-  "worseLibSearchPath": "/Users/diegog/repos/microsoft/codeql",
-  "logsDirectory" : "/Users/diegog/repos/microsoft/MSR-collab2020/ml-ql-taint-specification-mining/logs" 
+  "codeQLExecutable": "/tesis/codeql-cli-v2.5.2/codeql",
+  "codeQLSourcesRoot": "/tesis/ts-js-diego/ql",
+  "workingDirectory": "/tesis/wd/work",
+  "resultsDirectory": "/tesis/wd/results",
+  "searchPath": "/tesis/ts-js-diego/lib-worse/codeql",
+  "worseLibSearchPath": "/tesis/ts-js-diego/lib-worse/codeql/javascript/ql/src",
+  "logsDirectory" : "/tesis/wd/log" 
 }

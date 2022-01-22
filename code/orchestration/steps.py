@@ -73,9 +73,6 @@ class OrchestrationStep:
         return constraints_dir, models_dir, logs_dir
     
     def get_existing_working_directories(self, query_name, working_dir):
-        projects_folder = os.path.join(working_dir, "data")
-        projects = glob(os.path.join(projects_folder, self.orchestrator.project_name))
-
         project_name = name = self.orchestrator.project_name
         
         if not self.orchestrator.run_single:

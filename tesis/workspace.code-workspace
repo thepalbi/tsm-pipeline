@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../lib-worse/codeql"
+		},
+		{
+			"name": "[w3c_echidna_bbf4637 source archive]",
+			"uri": "codeql-zip-archive://0-38/tesis/dbs/w3c_echidna_bbf4637/src.zip"
+		}
+	],
+	"settings": {}
+}
