@@ -6,6 +6,7 @@ import logging
 import tempfile
 import os
 import sys
+import shutil
 
 log = logging.getLogger("database-creator")
 log.addHandler(logging.StreamHandler(sys.stdout))
@@ -55,7 +56,8 @@ def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
     run_process(create_commands, cwd=temp_dir)
 
     log.info(
-        "database created at [%s], please cleanup [%s] after", cached_entry_path, temp_dir)
+        "database created at [%s]", cached_entry_path)
+    shutil.rmtree(temp_dir)
 
 
 # TODO: Improve this

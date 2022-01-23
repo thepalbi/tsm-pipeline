@@ -22,6 +22,6 @@ if __name__ == "__main__":
         log.info("Not cached, creating db")
         # the second arg of this API sounds funny, change it
         create_database(parsed_key, cache)
-        log.info("Created!")
+        log.info("Created! %s", parsed_key.get_path(cache.root_dir))
     else:
-        log.info("Cached!")
+        log.info("Cached! %s", parsed_key.get_path(cache.root_dir))
