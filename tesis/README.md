@@ -3,7 +3,9 @@
 - Install virutal env, configure it, and install pip `requirements.txt` file:
 ```bash
 cd code
-python3.9 -m pip install virtualenv
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt-get install python3.10 python3.10-venv
+python3.10 -m venv env
 source env/bin/activate
 pip install -r requirements.txt
 ```
