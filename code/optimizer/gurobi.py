@@ -118,7 +118,7 @@ class GenerateModelStep(OrchestrationStep):
         return \
             (SINGLE_STEP_NAME in ctx) and ctx[SINGLE_STEP_NAME] == "optimize" or \
             (COMMAND_NAME in ctx) and ctx[COMMAND_NAME] == "clean" or \
-            (STEP_NAMES in ctx) and not self.name() in ctx[STEP_NAMES]
+            (SINGLE_STEP_NAME not in ctx and STEP_NAMES in ctx) and not self.name() in ctx[STEP_NAMES]
 
     def run(self, ctx: Context) -> Context:
         # TODO: Implement --mode=combined model generation

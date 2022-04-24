@@ -17,6 +17,21 @@ The expected format for database keys is:
 <github username>/<github repo name>/<commit hash>
 ```
 
+## Running notes
+### 24-04-2022
+- Got this query running: `tsm-atm-pipeline/src/tsm/evaluation/TaintedPathWorseTSM.ql`
+- Pude hacer un corrida e2e con el proyecto de abajo
+```
+python main.py \
+    --steps generate_entities,generate_model,optimize \
+    --project-dir /tesis/dbs/2.5.2/AdguardTeam/Scriptlets/25df590 \
+    --query-type Path \
+    --query-name TaintedPathWorse \
+    --solver CBC \
+    run
+```
+
+
 ## Notes
 - lib-worse commit that doens't work: 2d618d6b92. Error:
 - trying commits a1c38b78a9bf7ad7efc9d3559a93e9415bbdd182 found in Diego's vscode workspace
