@@ -1,15 +1,21 @@
 ## Environment setup
-- [Installing Python3.9 on an Ubuntu machine](https://linuxize.com/post/how-to-install-python-3-9-on-ubuntu-20-04/)
-- Install virutal env, configure it, and install pip `requirements.txt` file:
+- [Install NodeJS](https://nodejs.org/es/download/current/)
+- Install Python, virutal env, configure it, and install pip `requirements.txt` file:
 ```bash
 cd code
 sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt-get install python3.10 python3.10-venv
+sudo apt-get install python3.10 python3.10-venv build-essential
 python3.10 -m venv env
 source env/bin/activate
 pip install -r requirements.txt
 ```
 - Install CBC solver: `sudo apt-get install coinor-cbc`
+
+## Downdloading a db
+The expected format for database keys is:
+```
+<github username>/<github repo name>/<commit hash>
+```
 
 ## Notes
 - lib-worse commit that doens't work: 2d618d6b92. Error:

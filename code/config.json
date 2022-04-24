@@ -1,10 +1,10 @@
 {
 
-  "codeQLExecutable": "/tesis/codeql-cli-v2.5.2/codeql",
-  "codeQLSourcesRoot": "/tesis/ts-js-diego/ql",
-  "workingDirectory": "/tesis/wd/work",
-  "resultsDirectory": "/tesis/wd/results",
-  "searchPath": "/tesis/ts-js-diego/lib-worse/codeql",
-  "worseLibSearchPath": "/tesis/ts-js-diego/lib-worse/codeql/javascript/ql/src",
-  "logsDirectory" : "/tesis/wd/log" 
+  "codeQLExecutable": "/tesis/clis/codeqlcli-v2.5.2/codeql",
+  "codeQLSourcesRoot": "/tesis/repos/tsm-pipeline/ql",
+  "workingDirectory": "/tesis/tmp/wd",
+  "resultsDirectory": "/tesis/tmp/results",
+  "searchPath": "/tesis/repos/tsm-pipeline/lib-worse/codeql",
+  "worseLibSearchPath": "/tesis/repos/tsm-pipeline/lib-worse/codeql/javascript/ql/src",
+  "logsDirectory" : "/tesis/tmp/log" 
 }
