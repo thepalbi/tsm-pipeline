@@ -7,6 +7,10 @@ import tempfile
 import os
 import sys
 import shutil
+import requests
+
+class GHRepoNotExistentException(Exception):
+    pass
 
 log = logging.getLogger("database-creator")
 log.addHandler(logging.StreamHandler(sys.stdout))
@@ -23,6 +27,11 @@ def get_temp_filename() -> str:
 
 
 def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
+    # Check if database exists
+    res = requests.get("https://github.com/%s/%s" % (parsed_key.gh_user, parsed_key.gh_repo))
+    if res.status_code == 404:
+        raise GHRepoNotExistentException()
+
     # clone repository
     # https://github.com/github/codeql-cli-binaries.git
     temp_dir = os.path.join(local_tmp, get_temp_filename())

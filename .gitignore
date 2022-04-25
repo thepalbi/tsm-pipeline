@@ -132,3 +132,6 @@ tsm-atm-pipeline/test/path/path.testproj/trap/*
 tsm-atm-pipeline/test/xss/xss.testproj/db-javascript/*
 tsm-atm-pipeline/test/xss/xss.testproj/trap/*
 
+# CBC files
+code/sol.txt
+
