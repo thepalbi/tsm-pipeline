@@ -8,6 +8,9 @@ fi
 # Used for legacy method of fetching project databases
 # --project-dir /tesis/dbs/2.5.2/AdguardTeam/Scriptlets/25df590 \
 
+# Run the TSM learning pipeline for the provided project list. This will have the following characteristics:
+# - Use CBC as solver
+# - Run the whole orchestrator for each project individually
 python main.py \
     --steps generate_entities,generate_model,optimize \
     --project.cache_dir /tesis/dbs \
@@ -16,3 +19,6 @@ python main.py \
     --query-name TaintedPathWorse \
     --solver CBC \
     run
+
+# Combine scores generated for all the results above
+python -m misc.combinescores --results-dir /tesis/tmp/results/ --query-name TaintedPathWorse --out averaged-results.txt

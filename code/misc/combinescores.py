@@ -95,11 +95,13 @@ if __name__ == '__main__':
 
     parser.add_argument("--multiple", dest="multiple", action='store_true', help='Use the result of a run of one combined result')
 
-    parser.add_argument("--out", dest="out", tpye=str, required=True, help="Output file to write averaged results.")
+    parser.add_argument("--out", dest="out", type=str, required=True, help="Output file to write averaged results.")
 
     parsed_arguments = parser.parse_args()
     query_name = parsed_arguments.query_name
     results_dir = parsed_arguments.results_dir
     out_file = parsed_arguments.out
 
+    # TODO: Add some feature to just combine scores from certain projects dbs. If not, it might take ones from another run
+    # because of using the glob feature
     combine_scores(query_name, results_dir, parsed_arguments.multiple, out_file)
