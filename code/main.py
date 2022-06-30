@@ -172,6 +172,7 @@ if __name__ == '__main__':
     for project in all_projects:       
         logging.info(f"Running orchestrator-{parsed_arguments.command} on project: {project}")
         project_name = os.path.basename(project)
+        # TODO: Fix poject name, which is just becoming here the project db hash
         orchestrator = Orchestrator(project, project_name, 
                             parsed_arguments.query_type,
                             parsed_arguments.query_name, 
