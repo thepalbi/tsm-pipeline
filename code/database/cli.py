@@ -1,5 +1,5 @@
 import argparse
-from .cache import DatabasesCache
+from .cache import DatabasesCache, NotCachedError, parse_key
 from .creator import create_database
 import logging
 import sys
@@ -16,12 +16,13 @@ if __name__ == "__main__":
                         help="Cache root dir", required=True, type=str)
     args = parser.parse_args()
 
+    # TODO: Extract CodeQL CLI version programatically
     cache = DatabasesCache(args.cache_root, "2.5.2")
-    parsed_key, cached_db = cache.get(args.key)
-    if cached_db is None:
+    try:
+        _, cached_db = cache.get(args.key)
+        log.info("Cached! %s", cached_db)
+    except NotCachedError:
         log.info("Not cached, creating db")
-        # the second arg of this API sounds funny, change it
-        create_database(parsed_key, cache)
-        log.info("Created! %s", parsed_key.get_path(cache.root_dir))
-    else:
-        log.info("Cached! %s", parsed_key.get_path(cache.root_dir))
+        parsed_key = parse_key(args.key)
+        caching_dir = create_database(parsed_key, cache)
+        log.info("Created! %s", caching_dir)

@@ -54,11 +54,13 @@ def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
     # create database in cached directory
     cached_entry_path = parsed_key.get_path(cache.root_dir)
     create_commands = [
+        # TODO: Maybe this shouldn't depend of this global_config
         global_config.codeql_executable,
         "database",
         "create",
         cached_entry_path,
         # Parameterize this
+        # Are this CodeQL sources used for creating the database correct?
         "--search-path=/tesis/ts-js-diego/ql:/tesis/ts-js-diego/lib-worse/codeql/javascript/ql",
         "--language=javascript"
     ]
@@ -68,6 +70,8 @@ def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
         "database created at [%s]", cached_entry_path)
     shutil.rmtree(temp_dir)
 
+    return cached_entry_path
+
 
 # TODO: Improve this
 def run_process(command_and_arguments, cwd=None):
@@ -76,7 +80,7 @@ def run_process(command_and_arguments, cwd=None):
     log.debug("command issued: %s",
               " ".join(command_and_arguments))
     try:
-        output = subprocess.run(
+        subprocess.run(
             command_and_arguments, capture_output=True, shell=True, check=True, text=True, cwd=cwd)
     except subprocess.CalledProcessError as call_error:
         print("FAIL: Command was ", call_error.cmd, ", return code=", call_error.returncode,
@@ -85,5 +89,3 @@ def run_process(command_and_arguments, cwd=None):
             "Error when executing codeql:\n%s", call_error.stderr)
         raise Exception(
             f'FAIL: Error when executing codeql, stderr: {call_error.stderr}')
-
-    log.debug("Output from codeql:\n%s", output)

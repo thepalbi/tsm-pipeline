@@ -29,10 +29,13 @@ def parse_key(key: str) -> Parsedkey:
 class NotCachedError(Exception):
     pass
 
+# TODO: Remove whatsoever from the cache exposing the ParsedKey oustside this package. Cache should just return project
+# database directories.
 class DatabasesCache:
     KEY_SEPARATOR = "/"
 
     def __init__(self, root_dir: str, cli_version: str):
+        self._advertised_root_dir = root_dir
         self.root_dir = os.path.join(root_dir, cli_version)
 
 
@@ -41,6 +44,6 @@ class DatabasesCache:
         resolved_path = parsed_key.get_path(self.root_dir)
         if not os.path.exists(resolved_path):
             # cache miss
-            raise NotCachedError(f"{key} not cached. Try caching it with CLI: db-creator-cli --key {key} --cache-root {self.root_dir}")
+            raise NotCachedError(f"{key} not cached. Try caching it with CLI: python -m database.cli  --key {key} --cache-root {self._advertised_root_dir}")
 
         return parsed_key, resolved_path
