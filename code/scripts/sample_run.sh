@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Simple run of the orchestrator pipeline
+
 if [[ "$1" == "" ]] ; then
     echo "Missing project list file"
     exit 1
