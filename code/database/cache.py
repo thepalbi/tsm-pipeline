@@ -18,7 +18,7 @@ class Parsedkey:
 
 def parse_key(key: str) -> Parsedkey:
     # Expect key to have the following format
-    # /{{ gh_user }}/{{ gh_repo }}/{{ commit_hash }}
+    # {{ gh_user }}/{{ gh_repo }}/{{ commit_hash }}
     splitted_key = key.split(DatabasesCache.KEY_SEPARATOR)
     if not len(splitted_key) == 3:
         raise Exception("database key has incorrect format: %s" % (key))

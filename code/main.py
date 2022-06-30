@@ -76,7 +76,7 @@ parser.add_argument("--single-step", dest="single_step", type=str, default=all_s
 parser.add_argument("--steps", dest="steps", type=str, default=all_steps, metavar="STEPS",
                     help="Runs all orchestrator steps in the comma-separated list STEPS")
 
-parser.add_argument("--project-dir", dest="project_dir", required=True, type=str,
+parser.add_argument("--project-dir", dest="project_dir", required=False, type=str,
                     help="Directory of the CodeQL database")
 parser.add_argument("--query-type", dest="query_type", required=True, type=str, choices=["Xss", "NoSql", "Sql", "Sel", "Path"],
                     help="Type of the query to solve")
@@ -117,7 +117,6 @@ run_parser = subparsers.add_parser("run")
 clean_parser = subparsers.add_parser("clean")
 
 parsed_arguments = parser.parse_args()
-project_dir = os.path.normpath(parsed_arguments.project_dir)
 results_dir = global_config.results_directory
 working_dir = global_config.working_directory
 scores_file = None
@@ -143,6 +142,9 @@ if project_cache_dir is not None:
     # TODO: FIXME and find a way to get the CodeQL CLI version programatically
     project_cache = ProjectDatabaseCache(project_cache_dir, "2.5.2")
     logging.info("Project cache enabled with dir: %s", project_cache_dir)
+else:
+    project_dir = os.path.normpath(parsed_arguments.project_dir)
+
 
 projectListFile = parsed_arguments.projectListFile
 
