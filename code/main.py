@@ -2,11 +2,13 @@ import argparse
 import logging
 import os
 import glob
-import traceback
 import datetime
+
+from typing import TextIO, Iterator
 
 from orchestration.orchestrator import Orchestrator
 from orchestration import global_config
+from database.cache import DatabasesCache as ProjectDatabaseCache, NotCachedError
 
 def create_logging_file_appender():
     new_log_file = os.path.join(global_config.logs_directory, f"tsm_log_{int(datetime.datetime.now().timestamp())}.log")
@@ -15,25 +17,45 @@ def create_logging_file_appender():
     file_appender.setLevel(logging.DEBUG)
     return file_appender
 
-def create_project_list(projectListFile):
-    projectList = open(projectListFile).readlines()
-    resultingProjects = [] 
-    for project in projectList:
-        if(project.startswith("#")):
+LIST_FILE_COMMENT_SYMBOL = "#"
+
+# Parse the project list file, yielding trimmed project identifiers.
+def parse_project_list(list_file: TextIO) -> Iterator[str]:
+    for line in list_file.readlines():
+        if line.startswith(LIST_FILE_COMMENT_SYMBOL):
             continue
-        logging.info(f"Project name: {project}")
-        projectPrefix =  os.path.join(project_dir, project.replace('\r', '').replace('\n', '').replace("/","_"))
-        logging.info(f"Prefix: {projectPrefix}")
-        ## To-do: improve. The project list could be a list of projec names or project folders
-        # I'd better to include a cmd line option
-        if("/" in project):
-            projectCandidate = glob.glob(projectPrefix+"*", recursive=True)
-        else:
-            projectCandidate = glob.glob(projectPrefix, recursive=True)
-            
-        print(projectCandidate)
-        if len(projectCandidate)>0:
-            resultingProjects.append(projectCandidate[0])
+        yield line.replace('\r', '').replace('\n', '')
+
+
+def create_project_list(projectListFile, cache: ProjectDatabaseCache):
+    resultingProjects = [] 
+
+    with open(projectListFile) as list_file:
+        for project in parse_project_list(list_file):
+            if cache is None:
+                # Find project the old way, without using the project cache
+                logging.info(f"Project name: {project}")
+                projectPrefix =  os.path.join(project_dir, project.replace("/","_"))
+                logging.info(f"Prefix: {projectPrefix}")
+                ## To-do: improve. The project list could be a list of projec names or project folders
+                # I'd better to include a cmd line option
+                if("/" in project):
+                    projectCandidate = glob.glob(projectPrefix+"*", recursive=True)
+                else:
+                    projectCandidate = glob.glob(projectPrefix, recursive=True)
+                    
+                if len(projectCandidate)>0:
+                    candidate = projectCandidate[0]
+                    logging.info("Project candidate: %s", candidate)
+                    resultingProjects.append(candidate)
+            else:
+                try:
+                    _, resolved_dir = cache.get(project)
+                except NotCachedError:
+                    raise
+
+                resultingProjects.append(resolved_dir)
+
     return resultingProjects
 
 all_steps = "ALL"
@@ -85,6 +107,11 @@ parser.add_argument("--multiple-projects", dest="multiple", action='store_true',
 parser.add_argument("--solver", dest="solver", required=False, type=str, choices=["gurobi", "CBC"], default="gurobi", 
                     help="Specify which solver to use (default is gurobi)")
 
+# TODO: Improve naming on this
+parser.add_argument("--project.cache_dir", dest="project_cache_dir", required=False, type=str,
+                    help="Directory to use for the project cache. Could have already cached DBs. If this flag is configured, the " +
+                    "DatabaseCache will be used for fetching project DBs.")
+
 subparsers = parser.add_subparsers(dest="command", required=True)
 run_parser = subparsers.add_parser("run")
 clean_parser = subparsers.add_parser("clean")
@@ -110,11 +137,19 @@ if parsed_arguments.no_flow:
 
 logging.info(f"Results folder: {results_dir}")
 
+project_cache = None
+project_cache_dir = parsed_arguments.project_cache_dir
+if project_cache_dir is not None:
+    # TODO: FIXME and find a way to get the CodeQL CLI version programatically
+    project_cache = ProjectDatabaseCache(project_cache_dir, "2.5.2")
+    logging.info("Project cache enabled with dir: %s", project_cache_dir)
+
 projectListFile = parsed_arguments.projectListFile
 
+# Given a project list, retrieve all folders where each project CodeQL database is stored.
 if parsed_arguments.projectListFile is not None:
     run_separate_on_multiple_projects = True
-    projectList = create_project_list(projectListFile)
+    projectList = create_project_list(projectListFile, project_cache)
 else:
     projectList = [project_dir]
 

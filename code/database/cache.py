@@ -26,6 +26,8 @@ def parse_key(key: str) -> Parsedkey:
     (gh_user, gh_repo, gh_commit_hash) = splitted_key
     return Parsedkey(gh_user, gh_repo, gh_commit_hash)
 
+class NotCachedError(Exception):
+    pass
 
 class DatabasesCache:
     KEY_SEPARATOR = "/"
@@ -33,11 +35,12 @@ class DatabasesCache:
     def __init__(self, root_dir: str, cli_version: str):
         self.root_dir = os.path.join(root_dir, cli_version)
 
+
     def get(self, key: str) -> Tuple[Parsedkey, Optional[str]]:
         parsed_key = parse_key(key)
         resolved_path = parsed_key.get_path(self.root_dir)
         if not os.path.exists(resolved_path):
             # cache miss
-            return parsed_key, None
+            raise NotCachedError(f"{key} not cached. Try caching it with CLI: db-creator-cli --key {key} --cache-root {self.root_dir}")
 
         return parsed_key, resolved_path
