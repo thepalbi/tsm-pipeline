@@ -5,77 +5,70 @@ import os
 import re
 import numpy as np
 import pandas as pd
+from collections import defaultdict
+from typing import Dict, List
 
 
+# Create a new defaultdict, specialized on lists
+def list_default_dict() -> Dict[str, List]:
+    return defaultdict(list)
 
-def combine_scores(query, \
-                    project_dir=os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
-                    multiple=False):
-    print(project_dir)
+
+def combine_scores(query: str,
+                    results_dir: str,
+                    multiple: bool,
+                    out_file: str):
     if multiple:
-        files=glob.glob(os.path.join(project_dir) + "/multiple/{0}-*/reprScores.txt".format(query))
+        files=glob.glob(os.path.join(results_dir) + "/multiple/{0}-*/reprScores.txt".format(query))
     else:
-        g=os.path.join(project_dir) + "/*/{0}-*/reprScores.txt".format(query)
+        # Filter by query type, selecting all timestampted result files
+        g=os.path.join(results_dir) + "/*/{0}-*/reprScores.txt".format(query)
         print("g: {0}".format(g))
         files=glob.glob(g)
-        files = list(filter(lambda p: os.path.join(project_dir, "multiple") not in p, files))
-    files.sort()
-    print(files)
+        files = list(filter(lambda p: os.path.join(results_dir, "multiple") not in p, files))
     last_files = list()
-    projectsFiles = dict()
+    projectsFiles = list_default_dict()
+    
+    # Divide results file per project
     for file in files:
-        timestamp = os.path.basename(os.path.dirname(file))
         project = os.path.basename(os.path.dirname(os.path.dirname(file)))
-        if project not in projectsFiles.keys():
-            projectsFiles[project] = list()
         projectsFiles[project].append(file)
     
+    # For each project, select the last produced file
     for project in projectsFiles.keys():
         projectsFiles[project].sort(key=os.path.getmtime)
         last_files.append(projectsFiles[project][-1])
 
+    # Work on last files for each project
     files = last_files
-    print(files)
     files.sort(key=os.path.getmtime)
     n=0
-    allreps=[]
-    src_dict = dict()
-    snk_dict = dict()
-    san_dict = dict()
-    file_src_reprs = dict()
-    file_snk_reprs = dict()
-    file_san_reprs = dict()
+    src_dict = list_default_dict()
+    snk_dict = list_default_dict()
+    san_dict = list_default_dict()
     for reprScoreFile in files:
         if r'results\combined' not in reprScoreFile:
-            print(reprScoreFile)
-            file_src_reprs[reprScoreFile] = []
-            file_snk_reprs[reprScoreFile] = []
-            file_san_reprs[reprScoreFile] = []
             n+=1
             for reprScopeLine in open(reprScoreFile).readlines():
+                # From the project line, parse the repr, taint object type and score
                 repr=re.findall("repr = \"([^\"]+)\"", reprScopeLine)[0]
                 t=re.findall("t = \"([^\"]+)\"", reprScopeLine)[0]
                 res=float(re.findall("result = ([0-9.]+)", reprScopeLine)[0])
+
+                # Add up for each repr, the scores found
                 if t == "src":
-                    src_dict[repr] = src_dict.get(repr, []) + [res]
-                    file_src_reprs[reprScoreFile] = file_src_reprs.get(reprScoreFile, []) + [repr]
-                if t == "snk":
-                    snk_dict[repr] = snk_dict.get(repr, []) + [res]
-                    file_snk_reprs[reprScoreFile] = file_snk_reprs.get(reprScoreFile, []) + [repr]
-                if t == "san":
-                    san_dict[repr] = san_dict.get(repr, []) + [res]
-                    file_san_reprs[reprScoreFile] = file_san_reprs.get(reprScoreFile, []) + [repr]
+                    src_dict[repr].append(res)
+                elif t == "snk":
+                    snk_dict[repr].append(res)
+                elif t == "san":
+                    san_dict[repr].append(res)
 
-
-    print(n)
-
-
-    print(len(src_dict), len(snk_dict), len(san_dict))
-    with open("allscores_{0}_avg.txt".format(query), "w") as scoresfile:
+    with open(out_file, "w") as scoresfile:
         scoresfile.writelines([
             "module TsmRepr {\n",""
             "  float getReprScore(string repr, string t){\n"
             ])
+        # IMPORANT!!!
         # we are currently only writing combined scores for sinks
         # to add sources and sanitizers simple add a similar line with src_dict and san_dict 
         scoresfile.write(" or\n".join(["   repr = \"{0}\" and t = \"{1}\" and result = {2}".format(k, "snk",  "%.10f" 
@@ -88,25 +81,25 @@ def combine_scores(query, \
         "}\n"
         ])
 
-
-
-
-parser = argparse.ArgumentParser()
-logging.basicConfig(level=logging.INFO, format="[%(levelname)s\t%(asctime)s] %(name)s\t%(message)s")
-
-
-parser.add_argument("--project-dir", dest="project_dir", required=True, type=str,
-                    help="Directory of the results score")
-
-parser.add_argument("--query-name", dest="query_name", required=True, type=str,
-                    choices=["NosqlInjectionWorse", "SqlInjectionWorse", "DomBasedXssWorse","TaintedPathWorse"],
-                    help="Name of the query to solve")
-
-parser.add_argument("--multiple", dest="multiple", action='store_true', help='Use the result of a run of one combined result')
-
-parsed_arguments = parser.parse_args()
-query_name = parsed_arguments.query_name
-working_dir = parsed_arguments.project_dir
-
 if __name__ == '__main__':
-    combine_scores(query_name, working_dir, parsed_arguments.multiple)
+    parser = argparse.ArgumentParser()
+    logging.basicConfig(level=logging.INFO, format="[%(levelname)s\t%(asctime)s] %(name)s\t%(message)s")
+
+
+    parser.add_argument("--results-dir", dest="results_dir", required=True, type=str,
+                        help="Directory of the results score")
+
+    parser.add_argument("--query-name", dest="query_name", required=True, type=str,
+                        choices=["NosqlInjectionWorse", "SqlInjectionWorse", "DomBasedXssWorse","TaintedPathWorse"],
+                        help="Name of the query to solve")
+
+    parser.add_argument("--multiple", dest="multiple", action='store_true', help='Use the result of a run of one combined result')
+
+    parser.add_argument("--out", dest="out", tpye=str, required=True, help="Output file to write averaged results.")
+
+    parsed_arguments = parser.parse_args()
+    query_name = parsed_arguments.query_name
+    results_dir = parsed_arguments.results_dir
+    out_file = parsed_arguments.out
+
+    combine_scores(query_name, results_dir, parsed_arguments.multiple, out_file)
