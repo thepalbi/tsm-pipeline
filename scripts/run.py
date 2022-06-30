@@ -38,8 +38,7 @@ def convertQueryName(query_name):
 def listDatabases(project_list):
     with open(project_list) as f:
         databases = f.readlines()
-    databases = [x.strip() for x in databases]
-    return databases
+    return [x.strip() for x in databases]
 
 def runTSM(project_list, codeql_cli, tsm_ql, query_name, clean):
     # Get absolute paths
