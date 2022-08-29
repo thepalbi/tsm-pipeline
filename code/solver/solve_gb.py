@@ -1,13 +1,7 @@
 from .config import SolverConfig
 from orchestration.steps import CONSTRAINTS_DIR_KEY, MODELS_DIR_KEY
 import os
-
-# TODO: set-up proper Python project structure
-from pathlib import Path
-path = str(Path(__file__).parent.parent.absolute() / "cbc_utils")
-import sys
-sys.path.append(path)
-import cbc_utils
+from cbc_utils import solveLpProblemCBC
 
 
 def solve_constraints_combine_model(config: SolverConfig, ctx):
@@ -81,4 +75,4 @@ def solve_constraints_combine_model(config: SolverConfig, ctx):
     print("Done")
 
     resultsFilePath = os.path.join(ctx[MODELS_DIR_KEY], f"results_gb_{config.known_samples_ratio}_{config.lambda_const}_{1}.txt")
-    cbc_utils.solveLpProblemCBC(modelfile_path, resultsFilePath)
+    solveLpProblemCBC(modelfile_path, resultsFilePath)
