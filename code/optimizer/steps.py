@@ -245,7 +245,7 @@ class OptimizeStep(OrchestrationStep):
             self.logger.info("Creating dir %s" % ctx[RESULTS_DIR_KEY])
             os.makedirs(ctx[RESULTS_DIR_KEY])
         else:
-            # file can only exist if we are running gurobi for multiple projects 
+            # file can only exist if we are running for multiple projects 
             assert not self.orchestrator.run_single
 
         results_dir = ctx[RESULTS_DIR_KEY]

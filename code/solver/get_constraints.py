@@ -433,7 +433,7 @@ class ConstraintBuilder:
         return source_sanit, source_sink, sanit_sink
 
     def generate_flow_constraints_from_pairs(self, projectdir: str, global_constant_C, query=None, ctx=dict()):
-        """ Genrate the flow constraints required for the Gurobi model
+        """Generate the flow constraints required for the optimization model
         It gets the potential flows by joining the pairs (src, san) (san, snk) from the progapation graph   
         """
         source_sanit, source_sink, sanit_sink = self.compute_source_sanit_sink_fromPairs(projectdir, ctx)
@@ -489,7 +489,7 @@ class ConstraintBuilder:
                     constraintsfile.write("\n")
 
     def generate_flow_constraints(self, projectdir, global_constant_C, query=None):
-        """Generate the flow constraints required for the Gurobi model.
+        """Generate the flow constraints required for the optimization model.
         It gets the potential flows out of the triples (src, san, snk) from the progapation graph.
         Deprecate due to extremely large csv file from the triples. Replaces by compute_source_sanit_sink_fromPairs   
         """

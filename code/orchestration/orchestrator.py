@@ -2,7 +2,7 @@ import logging
 from typing import List
 
 from generation.data import DataGenerator, GenerateEntitiesStep, GenerateScoresStep, GenerateTSMQueryStep
-from optimizer.gurobi import GenerateModelStep, OptimizeStep, CountRepsStep
+from optimizer import GenerateModelStep, OptimizeStep, CountRepsStep
 
 from orchestration.steps import Context,  RESULTS_DIR_KEY, WORKING_DIR_KEY, SINGLE_STEP_NAME, COMMAND_NAME, STEP_NAMES
 
