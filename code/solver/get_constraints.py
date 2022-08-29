@@ -1,13 +1,8 @@
-from DataParser import readFlows, readEvents, readKnown, readClass, readURL, readFlowsAndReps, readPairs
+from DataParser import readEvents, readKnown, readFlowsAndReps, readPairs
 from Variable import Variable
 from Event import Event
 import Constraint
 import os
-import re
-import shutil
-from .config import SolverConfig
-from typing import Tuple
-import sys
 
 from orchestration.steps import SOURCE_ENTITIES, SINK_ENTITIES, SANITIZER_ENTITIES, \
     SRC_SAN_TUPLES_ENTITIES, SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES
