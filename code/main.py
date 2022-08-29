@@ -104,8 +104,8 @@ parser.add_argument("--no-flow", dest="no_flow", action='store_true', help='Igno
 
 parser.add_argument("--multiple-projects", dest="multiple", action='store_true', help='Combine all projects in the model')
 
-parser.add_argument("--solver", dest="solver", required=False, type=str, choices=["gurobi", "CBC"], default="gurobi", 
-                    help="Specify which solver to use (default is gurobi)")
+parser.add_argument("--solver", dest="solver", required=False, type=str, choices=["gurobi", "CBC"], default="CBC", 
+                    help="Specify which solver to use (default is CBC)")
 
 # TODO: Improve naming on this
 parser.add_argument("--project.cache_dir", dest="project_cache_dir", required=False, type=str,
@@ -168,6 +168,9 @@ if __name__ == '__main__':
         all_projects = [projectList[0]]
 
     hasExecuted = False
+
+    if parsed_arguments.solver == "gurobi":
+        raise Exception("gurobi is deprecated. Use CBC instead!")
 
     for project in all_projects:       
         logging.info(f"Running orchestrator-{parsed_arguments.command} on project: {project}")
