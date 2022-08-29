@@ -17,31 +17,24 @@ The expected format for database keys is:
 <github username>/<github repo name>/<commit hash>
 ```
 
+The database cache CLI supports downloading a list of databases by using the command:
+```
+python -m database.cli  --list <new line separated file of db keys> --cache-root <cache root, /tesis/dbs>
+```
+
+If not a single db can be cached with:
+```
+python -m database.cli  --key <database key> --cache-root /tesis/dbs/
+```
+
 ## Docker setup
 - Enable [docker buildkit](https://docs.docker.com/develop/develop-images/build_enhancements/) for [this](https://www.docker.com/blog/introduction-to-heredocs-in-dockerfiles/)
 
 Last error got from dockerized run:
 ```
-[INFO   2022-06-30 05:25:00,159] DataGenerator  Generating Known data in file=[/bigtmp/wd/data/25df590/25df590-sanitizers-Path.prop.csv]
-[INFO   2022-06-30 05:25:00,159] CodeQLWrapper  Running 'bqrs decode' for bqrs_file=[/dbs/2.5.2/AdguardTeam/Scriptlets/25df590/results/tsm-js/tsm/Path/Known-Path.bqrs] and result_set=[sanitizerPathClasses]
-[DEBUG  2022-06-30 05:25:00,159] CodeQLWrapper  command issued: /cli/codeql bqrs decode /dbs/2.5.2/AdguardTeam/Scriptlets/25df590/results/tsm-js/tsm/Path/Known-Path.bqrs --entities=string,url --result-set sanitizerPathClasses --format=csv --output=/bigtmp/wd/data/25df590/25df590-sanitizers-Path.prop.csv
-[DEBUG  2022-06-30 05:25:00,711] CodeQLWrapper  Output from codeql:
-CompletedProcess(args=['/cli/codeql bqrs decode /dbs/2.5.2/AdguardTeam/Scriptlets/25df590/results/tsm-js/tsm/Path/Known-Path.bqrs --entities=string,url --result-set sanitizerPathClasses --format=csv --output=/bigtmp/wd/data/25df590/25df590-sanitizers-Path.prop.csv'], returncode=0, stdout='', stderr='')
-[INFO   2022-06-30 05:25:00,712] CodeQLWrapper  Running 'database analyze' for project=[/dbs/2.5.2/AdguardTeam/Scriptlets/25df590] and query_file=[/ql/tsm/Path/PropagationGraph-25df590-Path.ql]
-[DEBUG  2022-06-30 05:25:00,712] CodeQLWrapper  command issued: /cli/codeql database analyze /dbs/2.5.2/AdguardTeam/Scriptlets/25df590 /ql/tsm/Path/PropagationGraph-25df590-Path.ql --format=csv --logdir=/bigtmp/log/wrapper_logs --output=/results/logs//js-results.csv --search-path=/seach_path --threads=0 --external=knownSource=/bigtmp/wd/data/25df590/25df590-sources-Path.prop.csv --external=knownSink=/bigtmp/wd/data/25df590/25df590-sinks-Path.prop.csv --external=knownSanitizer=/bigtmp/wd/data/25df590/25df590-sanitizers-Path.prop.csv
-[ERROR  2022-06-30 05:25:02,936] CodeQLWrapper  Error when executing codeql:
-Running queries.
-ERROR: Ambiguous dependency: codeql-javascript (/ql/qlpack.yml:1,1-1)
-A fatal error occurred: Could not resolve library path for /ql
+./scripts/docker_run.sh /bigtmp/path-sample-run.txt
 
-result candidates = ['/results/25df590/TaintedPathWorse-1656558072', '/results/25df590/TaintedPathWorse-1650831042', '/results/25df590/TaintedPathWorse-1650830993', '/results/25df590/TaintedPathWorse-1656556806', '/results/25df590/TaintedPathWorse-1656554010', '/results/25df590/TaintedPathWorse-1656556153', '/results/25df590/TaintedPathWorse-1656550689']
-Result candidates exist
-results folder = /results/25df590/TaintedPathWorse-1656558072
-FAIL: Command was  ['/cli/codeql database analyze /dbs/2.5.2/AdguardTeam/Scriptlets/25df590 /ql/tsm/Path/PropagationGraph-25df590-Path.ql --format=csv --logdir=/bigtmp/log/wrapper_logs --output=/results/logs//js-results.csv --search-path=/seach_path --threads=0 --external=knownSource=/bigtmp/wd/data/25df590/25df590-sources-Path.prop.csv --external=knownSink=/bigtmp/wd/data/25df590/25df590-sinks-Path.prop.csv --external=knownSanitizer=/bigtmp/wd/data/25df590/25df590-sanitizers-Path.prop.csv'] , return code= 2 , stdout:   , stderr:  Running queries.
-ERROR: Ambiguous dependency: codeql-javascript (/ql/qlpack.yml:1,1-1)
-A fatal error occurred: Could not resolve library path for /ql
-
-FAIL: Error when executing codeql, stderr: Running queries.
+FAIL: Command was  ['/cli/codeql database analyze /dbs/2.5.2/CartoDB/grainstore/a28f8c3 /ql/tsm/Path/PropagationGraph-a28f8c3-Path.ql --format=csv --logdir=/bigtmp/log/wrapper_logs --output=/results/logs//js-results.csv --search-path=/seach_path --threads=0 --external=knownSource=/bigtmp/wd/data/a28f8c3/a28f8c3-sources-Path.prop.csv --external=knownSink=/bigtmp/wd/data/a28f8c3/a28f8c3-sinks-Path.prop.csv --external=knownSanitizer=/bigtmp/wd/data/a28f8c3/a28f8c3-sanitizers-Path.prop.csv'] , return code= 2 , stdout:   , stderr:  Running queries.
 ERROR: Ambiguous dependency: codeql-javascript (/ql/qlpack.yml:1,1-1)
 A fatal error occurred: Could not resolve library path for /ql
 
