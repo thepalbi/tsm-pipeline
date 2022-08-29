@@ -4,14 +4,22 @@ module TsmRepr {
    repr = "(parameter 0 (member createWriteStream *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member end *))" and t = "snk" and result = 0.3125000000 or
    repr = "(parameter 0 (member existsSync *))" and t = "snk" and result = 1.0000000000 or
+   repr = "(parameter 0 (member json *))" and t = "snk" and result = 0.7500000000 or
+   repr = "(parameter 0 (member lstatSync *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member mkdirSync *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member pipe *))" and t = "snk" and result = 0.2500000000 or
    repr = "(parameter 0 (member readFile *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member readFileSync *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member readdir *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member readdirSync *))" and t = "snk" and result = 1.0000000000 or
+   repr = "(parameter 0 (member sendFile *))" and t = "snk" and result = 1.0000000000 or
+   repr = "(parameter 0 (member stat *))" and t = "snk" and result = 1.0000000000 or
+   repr = "(parameter 0 (member statSync *))" and t = "snk" and result = 1.0000000000 or
+   repr = "(parameter 0 (member unlink *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member writeFile *))" and t = "snk" and result = 1.0000000000 or
    repr = "(parameter 0 (member writeFileSync *))" and t = "snk" and result = 1.0000000000 or
-   repr = "(parameter 0 (root https://www.npmjs.com/package/rimraf))" and t = "snk" and result = 1.0000000000
+   repr = "(parameter 0 (root https://www.npmjs.com/package/rimraf))" and t = "snk" and result = 1.0000000000 or
+   repr = "(parameter 1 (member header *))" and t = "snk" and result = 0.2500000000 or
+   repr = "(parameter 1 (member slice *))" and t = "snk" and result = 0.2500000000
    } 
 }

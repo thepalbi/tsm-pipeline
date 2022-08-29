@@ -32,7 +32,7 @@ class CodeQLWrapper:
     def database_query(self,
                          project: str,
                          query_file: str,
-                         search_path: str = global_config.search_path):
+                         search_path: str = global_config.worse_lib_search_path):
         query_file_name = os.path.basename(query_file)
         output_file = os.path.join(project, "results", "tsm-js", "tsm", os.path.splitext(query_file_name)[0])+'.bqrs'
         command_and_arguments = [
@@ -55,7 +55,7 @@ class CodeQLWrapper:
                          project: str,
                          query_file: str,
                          output_file: str, 
-                         search_path: str = global_config.search_path,
+                         search_path: str = global_config.worse_lib_search_path,
                          extra_options = [], 
                          output_format="csv"):
         command_and_arguments = [

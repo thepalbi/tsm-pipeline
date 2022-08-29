@@ -17,6 +17,30 @@ The expected format for database keys is:
 <github username>/<github repo name>/<commit hash>
 ```
 
+The database cache CLI supports downloading a list of databases by using the command:
+```
+python -m database.cli  --list <new line separated file of db keys> --cache-root <cache root, /tesis/dbs>
+```
+
+If not a single db can be cached with:
+```
+python -m database.cli  --key <database key> --cache-root /tesis/dbs/
+```
+
+## Docker setup
+- Enable [docker buildkit](https://docs.docker.com/develop/develop-images/build_enhancements/) for [this](https://www.docker.com/blog/introduction-to-heredocs-in-dockerfiles/)
+
+Last error got from dockerized run:
+```
+./scripts/docker_run.sh /bigtmp/path-sample-run.txt
+
+FAIL: Command was  ['/cli/codeql database analyze /dbs/2.5.2/CartoDB/grainstore/a28f8c3 /ql/tsm/Path/PropagationGraph-a28f8c3-Path.ql --format=csv --logdir=/bigtmp/log/wrapper_logs --output=/results/logs//js-results.csv --search-path=/seach_path --threads=0 --external=knownSource=/bigtmp/wd/data/a28f8c3/a28f8c3-sources-Path.prop.csv --external=knownSink=/bigtmp/wd/data/a28f8c3/a28f8c3-sinks-Path.prop.csv --external=knownSanitizer=/bigtmp/wd/data/a28f8c3/a28f8c3-sanitizers-Path.prop.csv'] , return code= 2 , stdout:   , stderr:  Running queries.
+ERROR: Ambiguous dependency: codeql-javascript (/ql/qlpack.yml:1,1-1)
+A fatal error occurred: Could not resolve library path for /ql
+
+g: /tesis/tmp/results//*/TaintedPathWorse-*/reprScores.txt
+```
+
 ## Running notes
 ### 24-04-2022
 - Got this query running: `tsm-atm-pipeline/src/tsm/evaluation/TaintedPathWorseTSM.ql`
