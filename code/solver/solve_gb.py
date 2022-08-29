@@ -81,9 +81,4 @@ def solve_constraints_combine_model(config: SolverConfig, ctx):
     print("Done")
 
     resultsFilePath = os.path.join(ctx[MODELS_DIR_KEY], f"results_gb_{config.known_samples_ratio}_{config.lambda_const}_{1}.txt")
-    if config.solver == "gurobi":
-        raise Exception("gurobi is deprecated. Use CBC instead!")
-    elif config.solver == "CBC":
-        cbc_utils.solveLpProblemCBC(modelfile_path, resultsFilePath)
-    else:
-        print(f'ERROR: {config.solver} is not a known solver')
+    cbc_utils.solveLpProblemCBC(modelfile_path, resultsFilePath)

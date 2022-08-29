@@ -169,6 +169,9 @@ if __name__ == '__main__':
 
     hasExecuted = False
 
+    if parsed_arguments.solver == "gurobi":
+        raise Exception("gurobi is deprecated. Use CBC instead!")
+
     for project in all_projects:       
         logging.info(f"Running orchestrator-{parsed_arguments.command} on project: {project}")
         project_name = os.path.basename(project)
