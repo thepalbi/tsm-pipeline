@@ -202,7 +202,7 @@ class DataGenerator:
                 self.project_dir,
                 new_propgraph_path,
                 f"{logs_folder}/js-results.csv",
-                global_config.search_path,
+                global_config.worse_lib_search_path,
                 [f"--external=knownSource={ctx[SOURCE_ENTITIES]}",
                 f"--external=knownSink={ctx[SINK_ENTITIES]}",
                 f"--external=knownSanitizer={ctx[SANITIZER_ENTITIES]}"]
