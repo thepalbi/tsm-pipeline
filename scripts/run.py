@@ -69,7 +69,6 @@ def runTSM(project_list, codeql_cli, tsm_ql, query_name, clean):
     config = config + f'"codeQLSourcesRoot": "{tsm_ql}",\n'
     config = config + f'"workingDirectory": "{workingDirectory}",\n'
     config = config + f'"resultsDirectory": "{resultsDirectory}",\n'
-    config = config + f'"searchPath": ".",\n' # TODO: is this redundant?
     config = config + f'"worseLibSearchPath": "{tsm_ql}",\n'
     config = config + f'"logsDirectory": "{logDirectory}"\n'
     config = config + "}"

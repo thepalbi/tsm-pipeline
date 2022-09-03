@@ -8,7 +8,7 @@ from orchestration.steps import SOURCE_ENTITIES, SINK_ENTITIES, SANITIZER_ENTITI
     SRC_SAN_TUPLES_ENTITIES, SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES, RESULTS_DIR_KEY
 from orchestration import global_config
 from .wrapper import CodeQLWrapper
-from compute_metrics import createReprPredicate
+from code.optimizer.compute_metrics import createReprPredicate
 from orchestration import global_config
 
 constaintssolving_dir =  global_config.results_directory

@@ -87,7 +87,6 @@ First, configure the `code/config.json` file. It has the following properties:
   "codeQLSourcesRoot": "absolute path to the `ql` folder in this project",
   "workingDirectory": "absolute path to the working directory",
   "resultsDirectory": "absolute path to the results dir",
-  "searchPath": "absolute path where the CodeQL libraries resides",
   "worseLibSearchPath": "absolute path where the CodeQL libraries (containing the worse version) resides",
   "logsDirectory": "absolute path. Orchestrator's logging directory"
 }
