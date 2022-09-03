@@ -2,15 +2,3 @@
 *.md
 **/__pycache__/
 config.json
-
-echo <<EOF
-{
-  "codeQLExecutable": "/cli",
-  "codeQLSourcesRoot": "/ql",
-  "workingDirectory": "/bigtmp/wd",
-  "resultsDirectory": "/results",
-  "searchPath": "/seach_path",
-  "worseLibSearchPath": "/worse_lib",
-  "logsDirectory" : "/bigtmp/log" 
-}
-EOF

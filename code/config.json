@@ -4,7 +4,6 @@
   "codeQLSourcesRoot": "/tesis/repos/tsm-pipeline/ql",
   "workingDirectory": "/tesis/tmp/wd",
   "resultsDirectory": "/tesis/tmp/results",
-  "searchPath": "/tesis/repos/tsm-pipeline/lib-worse/codeql",
   "worseLibSearchPath": "/tesis/repos/tsm-pipeline/lib-worse/codeql/javascript/ql/src",
   "logsDirectory" : "/tesis/tmp/log" 
 }

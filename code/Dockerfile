@@ -33,7 +33,6 @@ RUN cat <<EOF > config.json
   "codeQLSourcesRoot": "/ql",
   "workingDirectory": "/bigtmp/wd",
   "resultsDirectory": "/results",
-  "searchPath": "/seach_path",
   "worseLibSearchPath": "/worse_lib",
   "logsDirectory" : "/bigtmp/log" 
 }
