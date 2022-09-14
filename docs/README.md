@@ -11,6 +11,8 @@ Running the whole TSM architecture is split in three main phases:
 
 Use dockerized version here.
 
+Use the script [docker_run.sh](../code/scripts/docker_run.sh)
+
 ### 2. Combining the scores of multiple run projects
 
 This involves using the `combinescores.py` script.

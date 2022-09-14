@@ -1,6 +1,6 @@
 import argparse
 from .cache import DatabasesCache, NotCachedError, parse_key
-from .creator import create_database
+from .creator import create_database, get_codeql_version
 import logging
 import sys
 
@@ -30,8 +30,9 @@ if __name__ == "__main__":
                         help="Cache root dir", required=True, type=str)
     args = parser.parse_args()
 
-    # TODO: Extract CodeQL CLI version programatically
-    cache = DatabasesCache(args.cache_root, "2.5.2")
+    codeql_version = get_codeql_version().rstrip('\n')
+    log.info("Using CodeQL version %s", codeql_version)
+    cache = DatabasesCache(args.cache_root, codeql_version)
     if args.list is not None:
         with open(args.list, 'r') as f:
             for key in f.readlines():

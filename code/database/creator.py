@@ -1,4 +1,3 @@
-from genericpath import exists
 from orchestration import global_config
 from .cache import Parsedkey, DatabasesCache
 import subprocess
@@ -8,9 +7,12 @@ import os
 import sys
 import shutil
 import requests
+from utils.process import run_process, RunProcessError
+
 
 class GHRepoNotExistentException(Exception):
     pass
+
 
 log = logging.getLogger("database-creator")
 log.addHandler(logging.StreamHandler(sys.stdout))
@@ -28,7 +30,8 @@ def get_temp_filename() -> str:
 
 def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
     # Check if database exists
-    res = requests.get("https://github.com/%s/%s" % (parsed_key.gh_user, parsed_key.gh_repo))
+    res = requests.get("https://github.com/%s/%s" %
+                       (parsed_key.gh_user, parsed_key.gh_repo))
     if res.status_code == 404:
         raise GHRepoNotExistentException()
 
@@ -73,19 +76,7 @@ def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
     return cached_entry_path
 
 
-# TODO: Improve this
-def run_process(command_and_arguments, cwd=None):
-    # Since we call subprocess with shell=True we need the command to be a single string
-    command_and_arguments = [" ".join(command_and_arguments)]
-    log.debug("command issued: %s",
-              " ".join(command_and_arguments))
-    try:
-        subprocess.run(
-            command_and_arguments, capture_output=True, shell=True, check=True, text=True, cwd=cwd)
-    except subprocess.CalledProcessError as call_error:
-        print("FAIL: Command was ", call_error.cmd, ", return code=", call_error.returncode,
-              ", stdout: ", call_error.stdout, ", stderr: ", call_error.stderr)
-        log.error(
-            "Error when executing codeql:\n%s", call_error.stderr)
-        raise Exception(
-            f'FAIL: Error when executing codeql, stderr: {call_error.stderr}')
+def get_codeql_version() -> str:
+    proc = run_process("%s version --quiet" %
+                       (global_config.codeql_executable))
+    return proc.stdout
