@@ -7,6 +7,8 @@ import os
 import logging
 import shutil
 
+log = logging.getLogger("compute_scores")
+
 
 def getmetrics(actual, predicted, c):
     # Precision
@@ -117,50 +119,39 @@ def do_compute_optimized_repr_scores(trainingsize, config: SolverConfig, ctx):
                 reprscores.write(repConstraint)
 
 
-def createReprPredicate(ctx, project_name: str, query_type: str, reprScoresFiles="reprScores.txt"):
-    tsm_query_folder = os.path.join(global_config.sources_root, "tsm", "query")
-    tsm_repr_pred_file = os.path.join(tsm_query_folder, "tsm_repr_pred.qll")
+def create_getReprScore_query_file(ctx, query_type: str, reprScoresFiles="reprScores.txt"):
+    """
+    create_getReprScore_query_file creates a new query file containing the getReprScore CodeQL function, which
+    let's CodeQL interface with the facts learned through TSM.
+
+    :param _type_ ctx: Orchestrator context
+    :param str query_type: Query type
+    :param str reprScoresFiles: Result learned scores file, defaults to "reprScores.txt"
+    """
+    # <sources root>/tsm/query/tsm_repr_pred.qll
+    get_repr_score_query_file = os.path.join(
+        global_config.sources_root, "tsm", "query", "tsm_repr_pred.qll")
     repr_scores_path = os.path.join(ctx[RESULTS_DIR_KEY], reprScoresFiles)
 
-    print(tsm_repr_pred_file)
-    print(repr_scores_path)
     try:
-        logging.info("Writing: {0}".format(repr_scores_path))
-
-        with open(repr_scores_path, "r", encoding='utf-8') as reprscores:
-            with open(tsm_repr_pred_file, "w", encoding='utf-8') as reprPrFile:
-                reprPrFile.writelines([
+        with open(repr_scores_path, "r", encoding='utf-8') as score_results:
+            with open(get_repr_score_query_file, "w", encoding='utf-8') as out:
+                # TODO: Change this ad-hoc file writing to jinja if much used
+                # https://jinja.palletsprojects.com/en/3.1.x/api/#jinja2.Template
+                out.writelines([
                     "module TsmRepr {",
                     "float getReprScore(string repr, string t){\n"])
-                reprscores = reprscores.readlines()
-                if len(reprscores) > 0:
-                    reprPrFile.writelines(reprscores)
+                score_results = score_results.readlines()
+                if len(score_results) > 0:
+                    out.writelines(score_results)
                 else:
-                    reprPrFile.write(
+                    out.write(
                         '\t result = 0 and (t = "src" or t = "snk" or t = "san") and repr = ""\n')
-                reprPrFile.writelines(["}", "}"])
-        # create a TSM query in the results dir
-        createTSMQuery(ctx, project_name, query_type)
+                out.writelines(["}", "}"])
+
+        # Copy getReprScore query file into results dir as well
+        results_dir = ctx[RESULTS_DIR_KEY]
+        result_query_dir = os.path.join(results_dir, query_type)
+        shutil.copy(get_repr_score_query_file, result_query_dir)
     except Exception as e:
-        print(e)
-
-
-def createTSMQuery(ctx, project_name: str, query_type: str):
-    tsm_folder = os.path.join(global_config.sources_root, "tsm")
-    tsm_query_folder = os.path.join(tsm_folder, "query")
-    tsm_repr_pred_file = os.path.join(tsm_query_folder, "tsm_repr_pred.qll")
-    tsm_query_qll = os.path.join(tsm_query_folder, "tsm.qll")
-    # for tsm_config and tsm we use one query tailored for query_type
-    # this allows to compare against worse version
-    tsm_query = os.path.join(tsm_folder, query_type, "TSM.ql")
-    tsm_config = os.path.join(tsm_folder, query_type, "tsm_config.qll")
-
-    results_dir = ctx[RESULTS_DIR_KEY]
-    query_dir = os.path.join(results_dir, query_type)
-    print(query_dir)
-    if not os.path.exists(query_dir):
-        os.makedirs(query_dir)
-    shutil.copy(tsm_repr_pred_file, query_dir)
-    shutil.copy(tsm_query, query_dir)
-    shutil.copy(tsm_query_qll, query_dir)
-    shutil.copy(tsm_config, query_dir)
+        log.error("Failed to create CodeQL result query file. Err: %s", e)
