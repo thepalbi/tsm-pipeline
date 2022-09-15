@@ -25,6 +25,20 @@ python code/misc/combinescores.py --results-dir <directory with step 1 results> 
 
 ### 3. Evaluation
 
+Por ejemplo tomemeos Tainted Path. Se me ocurre que podría calcular los scores
+```
+def getmetrics(actual, predicted, c):
+    # Precision
+    scores = dict()
+    scores["actual"] = sum(actual)
+    scores["predicted"] = sum(predicted)
+    scores["precision"] = precision_score(actual, predicted)
+    scores["recall"] = recall_score(actual, predicted)
+    scores["f1"] = f1_score(actual, predicted)
+    return scores
+```
+tomando la estrategia que tenemos pensada de `Worse`, `WorseBooste` y `V0` o `GroundTruth`. Para v0, podría tomar un commit upstream de CodeQL, y utilizar las customizations que hay, por ejemplo [esta](https://github.com/github/codeql/blob/main/javascript/ql/lib/semmle/javascript/security/dataflow/TaintedPathQuery.qll) para TaintedPath.
+
 
 ### FAQ
 
