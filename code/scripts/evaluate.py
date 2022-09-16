@@ -1,5 +1,6 @@
 import argparse
 from utils.process import run_process, RunProcessError
+from utils.clis import resolve_codeqlcli_path
 from os import path
 
 if __name__ == "__main__":
@@ -30,14 +31,18 @@ if __name__ == "__main__":
     search_path = ''
     if pa.sources == 'worse':
         search_path = path.join(root_dir, 'lib-worse/codeql')
+        query_file = 'tsm-atm-pipeline/src/tsm/evaluation/TaintedPathWorseTSM.ql'
+        cli_version = '2.5.2'
     else:
-        search_path = '/tesis/v0/'
+        search_path = '/tesis/v0/javascript/ql/lib'
+        query_file = 'tsm-evaluation/tsm-evaluation/src/PathEvaluation.ql'
+        cli_version = '2.10.5'
 
-    query_file = path.join(
-        root_dir, 'tsm-atm-pipeline/src/tsm/evaluation/NosqlInjectionWorseTSM.ql')
+    cli_path = resolve_codeqlcli_path(cli_version)
+    query_file = path.join(root_dir, query_file)
 
     query_cmd = [
-        'codeql query run',
+        '%s query run' % (cli_path),
         '-d %s' % (pa.db),
         '--search-path=%s' % (search_path),
         '--output=%s' % (pa.output),
