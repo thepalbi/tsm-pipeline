@@ -39,6 +39,21 @@ def getmetrics(actual, predicted, c):
 ```
 tomando la estrategia que tenemos pensada de `Worse`, `WorseBooste` y `V0` o `GroundTruth`. Para v0, podría tomar un commit upstream de CodeQL, y utilizar las customizations que hay, por ejemplo [esta](https://github.com/github/codeql/blob/main/javascript/ql/lib/semmle/javascript/security/dataflow/TaintedPathQuery.qll) para TaintedPath.
 
+## Tools
+
+### Cache CLI
+
+The cache CLI can be used to download databases and compile them with a configured CodeQL CLI version, as follows:
+```
+python -m database.cli  --key <repo key> --cache-root <cache root>
+```
+Note the `<cache root>` directory is just a plain directory, where the whole cache is structure is maininted. That is:
+- A subfolder will be created for the current CodeQL CLI version
+- A subfolder will be created for the DB repository owner
+- A subfolder will be created for the DB repository name
+- A subfolder will be created for the DB repository commit
+- Compiled DB is located here
+
 
 ### FAQ
 

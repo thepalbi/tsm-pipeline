@@ -2,12 +2,8 @@ import argparse
 from .cache import DatabasesCache, NotCachedError, parse_key
 from .creator import create_database, get_codeql_version
 import logging
-import sys
 
-log = logging.getLogger("db-creator-cli")
-log.addHandler(logging.StreamHandler(sys.stdout))
-log.setLevel(logging.INFO)
-
+log = logging.getLogger("cache-cli")
 
 def do_cache_key(cache: DatabasesCache, key: str):
     try:
@@ -37,7 +33,7 @@ if __name__ == "__main__":
         with open(args.list, 'r') as f:
             for key in f.readlines():
                 # Clear key from trailing newline
-                key = key.replace('\n', '')
+                key = key.rstrip('\n')
                 do_cache_key(cache, key)
     elif args.key != "":
         do_cache_key(cache, args.key)
