@@ -29,6 +29,7 @@ if __name__ == "__main__":
     print("Root dir configured to: %s" % (root_dir))
 
     search_path = ''
+    # TODO: The below just works for tainted path
     if pa.sources == 'worse':
         search_path = path.join(root_dir, 'lib-worse/codeql')
         query_file = 'tsm-atm-pipeline/src/tsm/evaluation/TaintedPathWorseTSM.ql'

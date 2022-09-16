@@ -49,7 +49,7 @@ python -m scripts.evaluate --db $DB --codeql-source <v0 or worse> --output <file
 ```
 
 After running this for the same DB, in `worse`, `boosted` and `v0`, one can decode the results by doing:
-`./scripts/codeql.sh 2.5.2 bqrs decode -r #select --format csv --output <CSV file to write results to> <BQRS file with query results>`
+`./scripts/codeql.sh 2.5.2 bqrs decode --result-set=#select --format csv --output <CSV file to write results to> <BQRS file with query results>`
 
 <mark>TODO: Implement given the query results from all 3 flavours, calculte resulting scores.</mark>
 <mark>TODO: Implement some way of easily running everything, even for multiple projects</mark>
