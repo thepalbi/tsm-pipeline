@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o pipefail
+
 VERSION=$1
 
 if [[ "$VERSION" == "" ]]; then

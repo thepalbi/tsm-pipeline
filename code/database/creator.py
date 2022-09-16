@@ -1,13 +1,12 @@
-from orchestration import global_config
 from .cache import Parsedkey, DatabasesCache
-import subprocess
 import logging
 import tempfile
 import os
 import sys
 import shutil
 import requests
-from utils.process import run_process, RunProcessError
+from utils.process import run_process
+from utils.clis import resolve_codeqlcli_path
 
 
 class GHRepoNotExistentException(Exception):
@@ -28,7 +27,8 @@ def get_temp_filename() -> str:
     return next(temp_filenames)
 
 
-def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
+def create_database(parsed_key: Parsedkey, cache: DatabasesCache, cli_version: str):
+    codeql_cli_path = resolve_codeqlcli_path(cli_version)
     # Check if database exists
     res = requests.get("https://github.com/%s/%s" %
                        (parsed_key.gh_user, parsed_key.gh_repo))
@@ -57,8 +57,7 @@ def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
     # create database in cached directory
     cached_entry_path = parsed_key.get_path(cache.root_dir)
     create_commands = [
-        # TODO: Maybe this shouldn't depend of this global_config
-        global_config.codeql_executable,
+        codeql_cli_path,
         "database",
         "create",
         cached_entry_path,
@@ -74,9 +73,3 @@ def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
     shutil.rmtree(temp_dir)
 
     return cached_entry_path
-
-
-def get_codeql_version() -> str:
-    proc = run_process("%s version --quiet" %
-                       (global_config.codeql_executable))
-    return proc.stdout
