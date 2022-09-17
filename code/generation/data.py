@@ -9,11 +9,6 @@ from orchestration import global_config
 from .wrapper import CodeQLWrapper
 from orchestration import global_config
 
-constaintssolving_dir =  global_config.results_directory
-logs_folder = os.path.join(constaintssolving_dir, "logs/")
-if not os.path.exists(logs_folder):
-    os.mkdir(logs_folder)
-    
 SOURCES = SINKS = SANITIZERS = "Known"
 
 SUPPORTED_QUERY_TYPES = ["NoSql", "Sql", "Xss", "Sel", "Path"]
@@ -62,6 +57,14 @@ class DataGenerator:
         self.working_dir = working_dir
         self.results_dir = results_dir
         self.generated_data_dir = self._get_generated_data_dir()
+
+        constaintssolving_dir =  global_config.results_directory
+        logs_folder = os.path.join(constaintssolving_dir, "logs/")
+        if not os.path.exists(logs_folder):
+            os.mkdir(logs_folder)
+
+        self.logs_folder = logs_folder
+    
 
     def get_generated_data_dir(self):
         return self._get_generated_data_dir()
@@ -168,7 +171,7 @@ class DataGenerator:
             self.codeql.database_analyze(
                 self.project_dir,
                 new_propgraph_path,
-                f"{logs_folder}/js-results.csv",
+                f"{self.logs_folder}/js-results.csv",
                 global_config.worse_lib_search_path,
                 [f"--external=knownSource={ctx[SOURCE_ENTITIES]}",
                 f"--external=knownSink={ctx[SINK_ENTITIES]}",
@@ -258,7 +261,7 @@ class DataGenerator:
             self.codeql.database_analyze(
                 self.project_dir,
                 query_path,
-                f"{logs_folder}/js-results.csv",
+                f"{self.logs_folder}/js-results.csv",
                 search_path)
 
         self.codeql.bqrs_decode(
