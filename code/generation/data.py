@@ -58,7 +58,7 @@ class DataGenerator:
         self.results_dir = results_dir
         self.generated_data_dir = self._get_generated_data_dir()
 
-        constaintssolving_dir =  global_config.results_directory
+        constaintssolving_dir = global_config.results_directory
         logs_folder = os.path.join(constaintssolving_dir, "logs/")
         if not os.path.exists(logs_folder):
             os.mkdir(logs_folder)
@@ -71,7 +71,7 @@ class DataGenerator:
 
     def _get_generated_data_dir(self):
         generated_data_dir = os.path.join(
-            constaintssolving_dir, f"{self.working_dir}/data/{self.project_name}/")
+            global_config.results_directory, f"{self.working_dir}/data/{self.project_name}/")
         if not os.path.isdir(generated_data_dir):
             self.logger.warn(
                 "Creating directory for generated data at %s", generated_data_dir)
@@ -95,7 +95,7 @@ class DataGenerator:
         
 
     def _get_tsm_bqrs_file(self, filename: str) -> str:
-        return os.path.join(constaintssolving_dir, self.project_dir, "results", "tsm-js", "tsm", filename)
+        return os.path.join(global_config.results_directory, self.project_dir, "results", "tsm-js", "tsm", filename)
 
     def generate_scores(self, query_type: str, combinedScore: bool, kind = "snk") -> Tuple[str, ...]:
         # Run metrics-snk query
