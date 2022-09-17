@@ -150,7 +150,6 @@ projectListFile = parsed_arguments.projectListFile
 
 # Given a project list, retrieve all folders where each project CodeQL database is stored.
 if parsed_arguments.projectListFile is not None:
-    run_separate_on_multiple_projects = True
     projectList = create_project_list(projectListFile, project_cache)
 else:
     projectList = [project_dir]

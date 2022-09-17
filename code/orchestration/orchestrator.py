@@ -84,7 +84,7 @@ class Orchestrator:
             self.possible_steps.append(possible_step(self))
 
     def compute_results_dir(self, new_directory=False):
-        if(not self.combinedScore):
+        if not self.combinedScore:
             name = self.project_name
             if not self.run_single:
                 name = "multiple"

@@ -1,16 +1,17 @@
-from genericpath import exists
-from orchestration import global_config
 from .cache import Parsedkey, DatabasesCache
-import subprocess
 import logging
 import tempfile
 import os
 import sys
 import shutil
 import requests
+from utils.process import run_process
+from utils.clis import resolve_codeqlcli_path
+
 
 class GHRepoNotExistentException(Exception):
     pass
+
 
 log = logging.getLogger("database-creator")
 log.addHandler(logging.StreamHandler(sys.stdout))
@@ -26,9 +27,11 @@ def get_temp_filename() -> str:
     return next(temp_filenames)
 
 
-def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
+def create_database(parsed_key: Parsedkey, cache: DatabasesCache, cli_version: str):
+    codeql_cli_path = resolve_codeqlcli_path(cli_version)
     # Check if database exists
-    res = requests.get("https://github.com/%s/%s" % (parsed_key.gh_user, parsed_key.gh_repo))
+    res = requests.get("https://github.com/%s/%s" %
+                       (parsed_key.gh_user, parsed_key.gh_repo))
     if res.status_code == 404:
         raise GHRepoNotExistentException()
 
@@ -54,8 +57,7 @@ def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
     # create database in cached directory
     cached_entry_path = parsed_key.get_path(cache.root_dir)
     create_commands = [
-        # TODO: Maybe this shouldn't depend of this global_config
-        global_config.codeql_executable,
+        codeql_cli_path,
         "database",
         "create",
         cached_entry_path,
@@ -71,21 +73,3 @@ def create_database(parsed_key: Parsedkey, cache: DatabasesCache):
     shutil.rmtree(temp_dir)
 
     return cached_entry_path
-
-
-# TODO: Improve this
-def run_process(command_and_arguments, cwd=None):
-    # Since we call subprocess with shell=True we need the command to be a single string
-    command_and_arguments = [" ".join(command_and_arguments)]
-    log.debug("command issued: %s",
-              " ".join(command_and_arguments))
-    try:
-        subprocess.run(
-            command_and_arguments, capture_output=True, shell=True, check=True, text=True, cwd=cwd)
-    except subprocess.CalledProcessError as call_error:
-        print("FAIL: Command was ", call_error.cmd, ", return code=", call_error.returncode,
-              ", stdout: ", call_error.stdout, ", stderr: ", call_error.stderr)
-        log.error(
-            "Error when executing codeql:\n%s", call_error.stderr)
-        raise Exception(
-            f'FAIL: Error when executing codeql, stderr: {call_error.stderr}')
