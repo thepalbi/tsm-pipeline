@@ -4,7 +4,7 @@ from glob import glob
 from generation.data import DataGenerator
 from DataParser import compute_rep_count
 
-from code.optimizer.compute_metrics import compute_optimized_repr_scores
+from optimizer.compute_scores import compute_optimized_repr_scores
 from orchestration.steps import OrchestrationStep, Context,\
     CONSTRAINTS_DIR_KEY, MODELS_DIR_KEY, RESULTS_DIR_KEY, WORKING_DIR_KEY, LOGS_DIR_KEY, \
     SOURCE_ENTITIES, SANITIZER_ENTITIES,  SINK_ENTITIES,SRC_SAN_TUPLES_ENTITIES,SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES, \

@@ -1,14 +1,12 @@
 import logging
 import os
 from typing import Tuple
-import glob
 
 from orchestration.steps import OrchestrationStep, Context
 from orchestration.steps import SOURCE_ENTITIES, SINK_ENTITIES, SANITIZER_ENTITIES, \
-    SRC_SAN_TUPLES_ENTITIES, SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES, RESULTS_DIR_KEY
+    SRC_SAN_TUPLES_ENTITIES, SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES
 from orchestration import global_config
 from .wrapper import CodeQLWrapper
-from optimizer.compute_scores import create_getReprScore_query_file
 from orchestration import global_config
 
 constaintssolving_dir =  global_config.results_directory
@@ -38,37 +36,6 @@ class GenerateEntitiesStep(OrchestrationStep):
 
     def name(self) -> str:
         return "generate_entities"
-
-
-class GenerateScoresStep(OrchestrationStep):
-    def populate(self, ctx: Context) -> Context:
-        return ctx
-
-    def run(self, ctx: Context) -> Context:
-        create_getReprScore_query_file(ctx, self.orchestrator.query_type, self.orchestrator.scores_file)
-        self.orchestrator.data_generator.generate_scores(
-            self.orchestrator.query_type,  self.orchestrator.combinedScore, 
-            self.orchestrator.kind)
-        return ctx
-
-    def name(self) -> str:
-        return "generate_scores"
-
-# This step (not included) just create the tsm_repr_pred.qll file
-class GenerateTSMQueryStep(OrchestrationStep):
-    """
-    GenerateTSMQueryStep is an Orchestrator step that having the pipelien ran already, and given the learned results,
-    creates a tsm_repr_pred.qll file containing the core getReprScore QL query.
-    """
-    def populate(self, ctx: Context) -> Context:
-        return ctx
-
-    def run(self, ctx: Context) -> Context:
-        create_getReprScore_query_file(ctx, self.orchestrator.query_type, self.orchestrator.scores_file)
-        return ctx
-
-    def name(self) -> str:
-        return "generate_tsm_query"
 
 
 class DataGenerator:

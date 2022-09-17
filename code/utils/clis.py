@@ -1,6 +1,8 @@
 from os.path import join
 from .process import run_process
 
+
+# TODO: Improve me
 root_path = "/tesis/clis"
 
 
