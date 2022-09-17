@@ -1,9 +1,9 @@
 import argparse
 from .cache import DatabasesCache, NotCachedError, parse_key
 from .creator import create_database
-import logging
+from utils.logging import get_stdout_logger
 
-log = logging.getLogger("cache-cli")
+log = get_stdout_logger("cache-cli")
 
 def do_cache_key(cache: DatabasesCache, key: str, cli_version: str):
     try:
