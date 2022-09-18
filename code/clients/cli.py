@@ -34,7 +34,7 @@ class CLIClient:
         if isinstance(search_path, str):
             search_path = [search_path]
         extra_args: List[str] = []
-        for k, v in self._query_run_args:
+        for k, v in self._query_run_args.items():
             extra_args.append('%s=%s' % (k, v))
         query_cmd = [
             '%s query run' % (self._cli_path),

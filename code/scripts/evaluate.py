@@ -6,6 +6,7 @@ from clients.cli import CLIClient
 import sys
 from typing import Tuple, List
 from database.cache import DatabasesCache
+from multiprocessing import Pool
 
 log = get_stdout_logger("evaluate-cli")
 
@@ -95,5 +96,6 @@ if __name__ == "__main__":
         cli_client.query_run(db, search_path, bqrs_out, query_file)
         cli_client.bqrs_decode(bqrs_out, "#select", csv_out)
 
-    for db in dbs:
-        do_evaluate_db(db)
+    log.info("Starting processing with 2 processes")
+    with Pool(processes=2) as pool:
+        pool.map(do_evaluate_db, dbs)
