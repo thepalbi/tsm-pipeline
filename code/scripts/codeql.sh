@@ -5,9 +5,11 @@ set -o pipefail
 VERSION=$1
 
 if [[ "$VERSION" == "" ]]; then
-    AVAILABLE=$(ls /tesis/clis/)
-    echo "Available CLI versions"
-    echo "$AVAILABLE"
+    echo "Available CodeQL CLI versions:"
+    for CLI in $(ls /tesis/clis/codeqlcli-*/codeql); do
+        echo "* $($CLI version -q)"
+    done
+    echo "Usage: $0 <version> commands..."
     exit 1
 fi
 

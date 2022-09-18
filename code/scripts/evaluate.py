@@ -30,6 +30,12 @@ if __name__ == "__main__":
         required=True
     )
     args.add_argument(
+        '--boost-results',
+        type=str,
+        dest='boost_results',
+        required=False
+    )
+    args.add_argument(
         '--dbs',
         type=str,
         required=True,
@@ -58,11 +64,13 @@ if __name__ == "__main__":
         sys.exit(1)
 
     search_path = ''
+    external_predicate_file = None
     # TODO: The below just works for tainted path
     if pa.sources == 'worse':
         search_path = path.join(root_dir, 'lib-worse/codeql')
         query_file = 'tsm-atm-pipeline/src/tsm/evaluation/TaintedPathWorseTSM.ql'
         cli_version = '2.5.2'
+        external_predicate_file = pa.boost_results
     else:
         search_path = '/tesis/v0/javascript/ql/lib'
         query_file = 'tsm-evaluation/tsm-evaluation/src/PathEvaluation.ql'
@@ -93,7 +101,12 @@ if __name__ == "__main__":
         log.info("Evaluating %s - %s" % (owner, name))
         bqrs_out = path.join(pa.output, "%s_%s_%s.bqrs" % (owner, name, sha))
         csv_out = path.join(pa.output, "%s_%s_%s.csv" % (owner, name, sha))
-        cli_client.query_run(db, search_path, bqrs_out, query_file)
+        external_preds = {}
+        if external_predicate_file != None:
+            external_preds = {
+                "getReprScore": external_predicate_file
+            }
+        cli_client.query_run(db, search_path, bqrs_out, query_file, external_predicates=external_preds)
         cli_client.bqrs_decode(bqrs_out, "#select", csv_out)
 
     log.info("Starting processing with 2 processes")

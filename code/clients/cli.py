@@ -30,12 +30,15 @@ class CLIClient:
                   db: str,
                   search_path: Union[List[str], str],
                   output: str,
-                  query: str):
+                  query: str,
+                  external_predicates: Dict[str, str] = {}):
         if isinstance(search_path, str):
             search_path = [search_path]
         extra_args: List[str] = []
         for k, v in self._query_run_args.items():
             extra_args.append('%s=%s' % (k, v))
+        for predicate, file in external_predicates.items():
+            extra_args.append('--external=%s=%s' % (predicate, file))
         query_cmd = [
             '%s query run' % (self._cli_path),
             ' '.join(extra_args),

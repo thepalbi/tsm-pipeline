@@ -57,4 +57,4 @@ tsm-run --steps generate_entities,generate_model,optimize \
     run
 
 # Combine scores generated for all the results above
-python -m misc.combinescores --results-dir $RESULTS_DIR --query-name TaintedPathWorse --out $RESULTS_DIR/averaged-results.txt
+python -m misc.combinescores --results-dir $RESULTS_DIR --query-name TaintedPathWorse --out $RESULTS_DIR/averaged-results.txt --raw-out $RESULTS_DIR/averaged-results.csv
