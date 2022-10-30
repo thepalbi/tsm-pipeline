@@ -1,17 +1,24 @@
 #!/bin/bash
 
+ROOT_DIR=$(git rev-parse --show-toplevel)
+
+# Load configs
+. $ROOT_DIR/code/scripts/config.sh
+
 RESULTS_DIR=$2
 
 # Docker based run of the orchestrator pipeline
 # Runs the dockerized version of TSM pipeline, mounting the necessary bind volumes
 function tsm-run() {
     docker run \
-        -v /tesis/clis/codeqlcli-v2.5.2:/cli: \
-        -v /tesis/repos/tsm-pipeline/ql:/ql: \
-        -v /tesis/repos/tsm-pipeline/lib-worse/codeql/javascript/ql/src:/worse_lib: \
-        -v /tesis/tmp:/bigtmp: \
+        # Configure CodeQL CLIs repository
+        -e "CODEQL_CLIS_ROOT=$CODEQL_CLIS_ROOT" \
+        -v $CLI_DIR:/cli: \
+        -v $QL_LIB_DIR:/ql: \
+        -v $QL_LIB_WORSE_DIR:/worse_lib: \
+        -v $TMP_DIR:/bigtmp: \
         -v $RESULTS_DIR:/results: \
-        -v /tesis/dbs:/dbs \
+        -v $CACHE_DBS_DIR:/dbs \
         github.com/thepalbi/tsm-main:latest $@
 }
 
