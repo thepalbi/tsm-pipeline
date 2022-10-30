@@ -6,6 +6,15 @@ cd code
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt-get install python3.10 python3.10-venv build-essential
 python3.10 -m venv env
+
+# Customize activate script
+cat <<EOF >> env/bin/activate
+export CODEQL_CLIS_ROOT=<codeql clis dir>
+export TSM_TMP=<tmp folder to use>
+EOF
+env/bin/activate
+
+>>
 source env/bin/activate
 pip install -r requirements.txt
 ```
@@ -27,12 +36,12 @@ The expected format for database keys is:
 
 The database cache CLI supports downloading a list of databases by using the command:
 ```
-python -m database.cli  --list <new line separated file of db keys> --cache-root <cache root, /tesis/dbs>
+python -m database.cli  --list <new line separated file of db keys> --cache-root <cache root, /tesis/dbs> --cli-version <compiler version>
 ```
 
 If not a single db can be cached with:
 ```
-python -m database.cli  --key <database key> --cache-root /tesis/dbs/
+python -m database.cli  --key <database key> --cache-root /tesis/dbs/ --cli-version <compiler version>
 ```
 
 ## Docker setup
@@ -51,6 +60,11 @@ export CACHE_DBS_DIR=/tesis/dbs:/dbs
 # Root dir for the CodeQL clis directory
 export CODEQL_CLIS_ROOT=/tesis/clis
 ```
+
+## Installing a CLI
+1. Configure the CLIs dir, which should be set in the `$CODEQL_CLIS_ROOT` env var
+2. Download the required version from https://github.com/github/codeql-cli-binaries/releases/
+3. Unzip the downloaded file with the following format: `$CODEQL_CLIS_ROOT/codeqlcli-v<semver version>`
 
 ## Running notes
 ### 24-04-2022
