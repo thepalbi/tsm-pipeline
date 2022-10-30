@@ -6,7 +6,7 @@ import sys
 import shutil
 import requests
 from utils.process import run_process
-from utils.clis import resolve_codeqlcli_path
+from utils.clis import resolve_codeqlcli_path, getenv_or_default
 from utils.logging import get_stdout_logger
 
 
@@ -18,9 +18,7 @@ log = get_stdout_logger("database-creator")
 
 # quick solution to get temp filenames
 temp_filenames = tempfile._get_candidate_names()
-# TODO: add this in config.json
-local_tmp = "/tesis/tmp"
-
+local_tmp =  getenv_or_default("TSM_TMP", "/tesis/tmp")
 
 def get_temp_filename() -> str:
     return next(temp_filenames)

@@ -12,10 +12,10 @@ cat <<EOF >> env/bin/activate
 export CODEQL_CLIS_ROOT=<codeql clis dir>
 export TSM_TMP=<tmp folder to use>
 EOF
-env/bin/activate
 
->>
+# Activate venv
 source env/bin/activate
+# Install pip dependencies
 pip install -r requirements.txt
 ```
 - Install CBC solver: ``
