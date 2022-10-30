@@ -1,3 +1,4 @@
+from optparse import Option
 from typing import Optional, List, Union, Dict
 from utils.clis import resolve_codeqlcli_path
 from utils.process import run_process, RunProcessError
@@ -12,7 +13,8 @@ class CLIClient:
     def __init__(self,
                  exec_path: Optional[str] = None,
                  version: Optional[str] = None,
-                 query_run_args: Dict[str, str] = {}):
+                 query_run_args: Dict[str, str] = {},
+                 cwd: Optional[str] = None):
         if exec_path == None and version == None:
             raise Exception(
                 "You have to either configure `exec_path` or `version`")
@@ -25,6 +27,7 @@ class CLIClient:
             self._cli_path = resolve_codeqlcli_path(version)
             self.version = version
         self._query_run_args = query_run_args
+        self._cwd = cwd
 
     def query_run(self,
                   db: str,
@@ -49,7 +52,7 @@ class CLIClient:
         ]
 
         try:
-            run_process(query_cmd)
+            run_process(query_cmd, cwd=self._cwd)
         except RunProcessError as err:
             raise CLIError("Failed to run query: %s" % (err.stderr))
 
@@ -67,6 +70,19 @@ class CLIClient:
         ]
 
         try:
-            run_process(query_cmd)
+            run_process(query_cmd, cwd=self._cwd)
         except RunProcessError as err:
             raise CLIError("Failed to decode bqrs: %s" % (err.stderr))
+
+    def database_create(self, out: str, language: str):
+        query_cmd = [
+            '%s database create' % (self._cli_path),
+            out,
+            '--language=%s' % (language),
+            '--threads=2'
+        ]
+
+        try:
+            run_process(query_cmd, cwd=self._cwd)
+        except RunProcessError as err:
+            raise CLIError("Failed to create database: %s" % (err.stderr))

@@ -1,13 +1,12 @@
 from .cache import Parsedkey, DatabasesCache
-import logging
 import tempfile
 import os
-import sys
 import shutil
 import requests
 from utils.process import run_process
-from utils.clis import resolve_codeqlcli_path, getenv_or_default
+from utils.clis import getenv_or_default
 from utils.logging import get_stdout_logger
+from clients.cli import CLIClient
 
 
 class GHRepoNotExistentException(Exception):
@@ -18,14 +17,14 @@ log = get_stdout_logger("database-creator")
 
 # quick solution to get temp filenames
 temp_filenames = tempfile._get_candidate_names()
-local_tmp =  getenv_or_default("TSM_TMP", "/tesis/tmp")
+local_tmp = getenv_or_default("TSM_TMP", "/tesis/tmp")
+
 
 def get_temp_filename() -> str:
     return next(temp_filenames)
 
 
 def create_database(parsed_key: Parsedkey, cache: DatabasesCache, cli_version: str):
-    codeql_cli_path = resolve_codeqlcli_path(cli_version)
     # Check if database exists
     res = requests.get("https://github.com/%s/%s" %
                        (parsed_key.gh_user, parsed_key.gh_repo))
@@ -53,17 +52,9 @@ def create_database(parsed_key: Parsedkey, cache: DatabasesCache, cli_version: s
 
     # create database in cached directory
     cached_entry_path = parsed_key.get_path(cache.root_dir)
-    create_commands = [
-        codeql_cli_path,
-        "database",
-        "create",
-        cached_entry_path,
-        # Parameterize this
-        # Are this CodeQL sources used for creating the database correct?
-        "--search-path=/tesis/ts-js-diego/ql:/tesis/ts-js-diego/lib-worse/codeql/javascript/ql",
-        "--language=javascript"
-    ]
-    run_process(create_commands, cwd=temp_dir)
+
+    cli_client = CLIClient(version=cli_version, cwd=temp_dir)
+    cli_client.database_create(cached_entry_path, "javascript")
 
     log.info(
         "database created at [%s]", cached_entry_path)
