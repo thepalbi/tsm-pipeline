@@ -21,7 +21,6 @@ WORKDIR /app
 COPY . ./
 
 # Volumes that need to be mounted in this container to work
-# /search_path: Search path, find out why this is necessary
 # /results: Results directory
 # /worse_lib: Worse CodeQL lib
 # /bigtmp: /tesis/tmp, so that is a higher volume tmp directory

@@ -37,7 +37,7 @@ def getmetrics(actual, predicted, c):
     scores["f1"] = f1_score(actual, predicted)
     return scores
 ```
-tomando la estrategia que tenemos pensada de `Worse`, `WorseBooste` y `V0` o `GroundTruth`. Para v0, podría tomar un commit upstream de CodeQL, y utilizar las customizations que hay, por ejemplo [esta](https://github.com/github/codeql/blob/main/javascript/ql/lib/semmle/javascript/security/dataflow/TaintedPathQuery.qll) para TaintedPath.
+tomando la estrategia que tenemos pensada de `Worse`, `WorseBoosted` y `V0` o `GroundTruth`. Para v0, podría tomar un commit upstream de CodeQL, y utilizar las customizations que hay, por ejemplo [esta](https://github.com/github/codeql/blob/main/javascript/ql/lib/semmle/javascript/security/dataflow/TaintedPathQuery.qll) para TaintedPath.
 
 The command below will run the evaluation evaluation query either worse, or boosted
 <mark>TODO: Corroborate that worse is running worse and not boosted</mark>

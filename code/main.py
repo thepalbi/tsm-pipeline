@@ -9,6 +9,7 @@ from typing import TextIO, Iterator
 from orchestration.orchestrator import Orchestrator
 from orchestration import global_config
 from database.cache import DatabasesCache as ProjectDatabaseCache, NotCachedError
+from utils.process import run_process
 
 def create_logging_file_appender():
     new_log_file = os.path.join(global_config.logs_directory, f"tsm_log_{int(datetime.datetime.now().timestamp())}.log")
@@ -140,7 +141,11 @@ project_cache = None
 project_cache_dir = parsed_arguments.project_cache_dir
 if project_cache_dir is not None:
     # TODO: FIXME and find a way to get the CodeQL CLI version programatically
-    project_cache = ProjectDatabaseCache(project_cache_dir, "2.5.2")
+    cli_version = run_process([
+        global_config.codeql_executable,
+        "version -q"
+    ]).stdout.rstrip("\n")
+    project_cache = ProjectDatabaseCache(project_cache_dir, cli_version)
     logging.info("Project cache enabled with dir: %s", project_cache_dir)
 else:
     project_dir = os.path.normpath(parsed_arguments.project_dir)

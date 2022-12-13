@@ -1,7 +1,19 @@
 from os.path import join
+import os
 from .process import run_process
+from .logging import get_stdout_logger
 
-root_path = "/tesis/clis"
+
+def getenv_or_default(key: str, default: str):
+    try:
+        return os.environ[key]
+    except Exception:
+        get_stdout_logger("loader").warn(
+            "envvar under name %s not found, using default instead.", key)
+        return default
+
+
+root_path = getenv_or_default("CODEQL_CLIS_ROOT", "/tesis/clis")
 
 
 def resolve_codeqlcli_path(version: str) -> str:
