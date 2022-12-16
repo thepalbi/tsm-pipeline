@@ -30,6 +30,8 @@ if __name__ == "__main__":
         "--cli-version", help="CodeQL CLI version to use", required=False, type=str, dest="cli_version", default="2.5.2")
     parser.add_argument(
         "--parallel", help="Download dbs in parallel", required=False, type=bool, dest="parallel", action=argparse.BooleanOptionalAction)
+    parser.add_argument(
+        "--thread-count", help="If parallel enabled, number of threads that the work is pooled on.", required=False, type=int, dest="threads", default=2)
     args = parser.parse_args()
 
     codeql_version = args.cli_version
@@ -46,7 +48,7 @@ if __name__ == "__main__":
                 keys.append(key)
         if args.parallel:
             log.info("Parallel execution enabled! Things going 🏎")
-            with Pool(processes=2) as pool:
+            with Pool(processes=args.threads) as pool:
                 # Map with thread pool
                 pool.map(parallel_cache, keys)
 

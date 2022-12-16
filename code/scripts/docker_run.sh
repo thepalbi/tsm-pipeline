@@ -5,22 +5,6 @@ ROOT_DIR=$(git rev-parse --show-toplevel)
 # Load configs
 . $ROOT_DIR/code/scripts/config.sh
 
-RESULTS_DIR=$2
-
-# Docker based run of the orchestrator pipeline
-# Runs the dockerized version of TSM pipeline, mounting the necessary bind volumes
-function tsm-run() {
-    docker run \
-    -e "CODEQL_CLIS_ROOT=$CODEQL_CLIS_ROOT" \
-    -v $CLI_DIR:/cli: \
-    -v $QL_LIB_DIR:/ql: \
-    -v $QL_LIB_WORSE_DIR:/worse_lib: \
-    -v $TMP_DIR:/bigtmp: \
-    -v $RESULTS_DIR:/results: \
-    -v $CACHE_DBS_DIR:/dbs: \
-    github.com/thepalbi/tsm-main:latest $@
-}
-
 if [[ "$1" == "--help" ]] ; then
     echo "
     HELP:
@@ -43,11 +27,34 @@ if [ ! -d $TMP_DIR/log ]; then
 fi
 
 PROJECT_LIST_FILE=$1
+if [ "${DIR:0:1}" != "/" ]; then
+    echo "Prject list path should be absolute"
+    exit 1
+fi
+
+MOUNTED_LIST_FILE=/data/list.txt
 
 if [[ "$RESULTS_DIR" == "" ]] ; then
     echo "Missing results dir"
     exit 1
 fi
+
+RESULTS_DIR=$2
+
+# Docker based run of the orchestrator pipeline
+# Runs the dockerized version of TSM pipeline, mounting the necessary bind volumes
+function tsm-run() {
+    docker run \
+    -e "CODEQL_CLIS_ROOT=$CODEQL_CLIS_ROOT" \
+    -v $CLI_DIR:/cli: \
+    -v $QL_LIB_DIR:/ql: \
+    -v $QL_LIB_WORSE_DIR:/worse_lib: \
+    -v $TMP_DIR:/bigtmp: \
+    -v $RESULTS_DIR:/results: \
+    -v $CACHE_DBS_DIR:/dbs: \
+    -v $PROJECT_LIST_FILE:$MOUNTED_LIST_FILE:ro
+    github.com/thepalbi/tsm-main:latest $@
+}
 
 cat << EOF
 Running TSM in docker:
