@@ -1,8 +1,0 @@
-{
-"codeQLExecutable": "/tesis/clis/codeqlcli-v2.5.2/codeql",
-"codeQLSourcesRoot": "./scripts/../ql",
-"workingDirectory": "/tesis/repos/tsm-pipeline/scripts/workingDirectory",
-"resultsDirectory": "/tesis/repos/tsm-pipeline/scripts/results",
-"worseLibSearchPath": "./scripts/../ql",
-"logsDirectory": "/tesis/repos/tsm-pipeline/scripts/logs"
-}

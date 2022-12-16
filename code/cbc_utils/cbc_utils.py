@@ -1,5 +1,10 @@
 import sys
 import os
+from utils.process import run_process, RunProcessError
+from utils.logging import get_stdout_logger
+import logging
+
+log = get_stdout_logger('cbc', level=logging.DEBUG)
 
 def writeResultsFile(solution, lpResultsFilePath):
     # First line of solution file should be ignored (contains objective value)
@@ -13,10 +18,16 @@ def writeResultsFile(solution, lpResultsFilePath):
 
 
 def solveLpCommandLine(lpFilePath):
-    os.system(f'cbc {lpFilePath} -solve -printing all -solu sol.txt')
-    with open('sol.txt','r') as file:
-        solution = file.readlines()
-    return solution
+    try:
+        out = run_process(f'cbc {lpFilePath} -solve -printing all -solu sol.txt')
+        log.debug("CBC completed run. STDOUT: %s\nSTDERR: %s", out.stdout, out.stderr)
+        with open('sol.txt','r') as file:
+            solution = file.readlines()
+        return solution
+    except RunProcessError as e:
+        raise Exception('Failed to run CBC solver', e)
+    except Exception as e:
+        raise e
 
 def solveLpProblemCBC(lpFilePath, lpResultsFilePath):
     solution = solveLpCommandLine(lpFilePath)

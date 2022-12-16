@@ -22,7 +22,7 @@ class CodeQLWrapper:
 
             self._logs_directory = wrapper_logs_directory
             self._logger = logging.getLogger(self.__class__.__name__)
-            self._logger.setLevel(logging.DEBUG)
+            self._logger.setLevel(logging.INFO)
         except KeyError:
             raise Exception(
                 "'codeql' binary not found. Try setting the $CODEQL environment variable.")

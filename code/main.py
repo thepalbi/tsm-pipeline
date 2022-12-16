@@ -113,6 +113,10 @@ parser.add_argument("--project.cache_dir", dest="project_cache_dir", required=Fa
                     help="Directory to use for the project cache. Could have already cached DBs. If this flag is configured, the " +
                     "DatabaseCache will be used for fetching project DBs.")
 
+# Print whole global config
+from pprint import pformat
+logging.info("Global config dump:\n%s", pformat(vars(global_config)))
+
 subparsers = parser.add_subparsers(dest="command", required=True)
 run_parser = subparsers.add_parser("run")
 clean_parser = subparsers.add_parser("clean")

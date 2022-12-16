@@ -24,6 +24,11 @@ def get_temp_filename() -> str:
     return next(temp_filenames)
 
 
+def try_upgrade(path: str, cli_version: str):
+    cli_client = CLIClient(version=cli_version)
+    cli_client.database_upgrade(path)
+
+
 def create_database(parsed_key: Parsedkey, cache: DatabasesCache, cli_version: str):
     # Check if database exists
     res = requests.get("https://github.com/%s/%s" %

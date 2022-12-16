@@ -86,3 +86,15 @@ class CLIClient:
             run_process(query_cmd, cwd=self._cwd)
         except RunProcessError as err:
             raise CLIError("Failed to create database: %s" % (err.stderr))
+
+    def database_upgrade(self, path: str):
+        query_cmd = [
+            '%s database upgrade' % (self._cli_path),
+            path,
+            '--threads=2'
+        ]
+
+        try:
+            run_process(query_cmd, cwd=self._cwd)
+        except RunProcessError as err:
+            raise CLIError("Failed to upgrade database: %s" % (err.stderr))

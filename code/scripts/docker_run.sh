@@ -1,4 +1,6 @@
 #!/bin/bash
+# fail on first error
+set -e
 
 ROOT_DIR=$(git rev-parse --show-toplevel)
 
@@ -27,19 +29,19 @@ if [ ! -d $TMP_DIR/log ]; then
 fi
 
 PROJECT_LIST_FILE=$1
-if [ "${DIR:0:1}" != "/" ]; then
+if [ "${PROJECT_LIST_FILE:0:1}" != "/" ]; then
     echo "Prject list path should be absolute"
     exit 1
 fi
 
 MOUNTED_LIST_FILE=/data/list.txt
 
+RESULTS_DIR=$2
+
 if [[ "$RESULTS_DIR" == "" ]] ; then
     echo "Missing results dir"
     exit 1
 fi
-
-RESULTS_DIR=$2
 
 # Docker based run of the orchestrator pipeline
 # Runs the dockerized version of TSM pipeline, mounting the necessary bind volumes
@@ -52,7 +54,7 @@ function tsm-run() {
     -v $TMP_DIR:/bigtmp: \
     -v $RESULTS_DIR:/results: \
     -v $CACHE_DBS_DIR:/dbs: \
-    -v $PROJECT_LIST_FILE:$MOUNTED_LIST_FILE:ro
+    -v $PROJECT_LIST_FILE:$MOUNTED_LIST_FILE:ro \
     github.com/thepalbi/tsm-main:latest $@
 }
 
@@ -69,7 +71,7 @@ EOF
 # - Run the whole orchestrator for each project individually
 tsm-run --steps generate_entities,generate_model,optimize \
 --project.cache_dir /dbs \
---project-list $PROJECT_LIST_FILE \
+--project-list $MOUNTED_LIST_FILE \
 --query-type Path \
 --query-name TaintedPathWorse \
 --solver CBC \
