@@ -1,0 +1,21 @@
+<!doctype html>
+<title>{% block title %}{% endblock %} - Flaskr</title>
+
+<body>
+    <section class="content">
+        {% for message in get_flashed_messages() %}
+        <div class="flash">{{ message }}</div>
+        {% endfor %}
+        <h1>TESIS</h1>
+        <ul>
+            {% for experiment in experiments %}
+            <li>
+                <a href="{{url_for('experiment', id=experiment.experiment_id)}}">{{experiment.name}}</a> started at {{experiment.started_at}}, with total train size {{experiment.total_train_size}}
+            </li>
+            {% endfor %}
+        </ul>
+        {% if experiments|length == 0 %}
+        No experiments
+        {% endif %}
+    </section>
+</body>

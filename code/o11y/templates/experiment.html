@@ -1,0 +1,29 @@
+<!doctype html>
+<title>{% block title %}{% endblock %} - Flaskr</title>
+
+<body>
+    <style>
+        h3 {
+            font-weight: 100;
+        }
+    </style>
+    <section class="content">
+        {% for message in get_flashed_messages() %}
+        <div class="flash">{{ message }}</div>
+        {% endfor %}
+        <h1>Experimento: {{experiment.name}}</h1>
+        <a href="{{url_for('index')}}">back home</a>
+        <h3>Estado: {{'RUNNING' if experiment.finished_at is none else 'FINISHED at ' ~ experiment.finished_at}}</h3>
+        <h3>Quedan por entrenar: {{experiment.total_train_size - (experiment.train_dbs|length)}}</h3>
+        <ul>
+            {% for db in experiment.train_dbs %}
+            <li>
+                <b>{{db.name}}</b> started at {{db.started_at}}, status {{'RUNNING' if db.finished_at is none else 'FINISHED at ' ~ db.finished_at}}
+            </li>
+            {% endfor %}
+        </ul>
+        {% if experiment.train_dbs|length == 0 %}
+        No train dbs
+        {% endif %}
+    </section>
+</body>
