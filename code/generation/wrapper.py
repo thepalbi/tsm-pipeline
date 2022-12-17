@@ -4,6 +4,10 @@ import logging
 import sys
 
 from orchestration import global_config
+from utils.clis import getenv_or_default
+
+
+CODEQL_WRAPPER_TIMEOUT = getenv_or_default("CODEQL_WRAPPER_TIMEOUT", "1800") # default to 30 minuteos
 
 
 class CodeQLWrapper:
@@ -42,7 +46,7 @@ class CodeQLWrapper:
             f"--database={project}",
             f"--output={output_file}",
             "--threads=-1",
-            "--timeout=3600",
+            "--timeout=%s" % CODEQL_WRAPPER_TIMEOUT, 
             f"--search-path={search_path}"
         ]
         self._logger.info(
@@ -67,6 +71,7 @@ class CodeQLWrapper:
             f'--logdir={self._logs_directory}',
             f'--output={output_file}',
             f'--search-path={search_path}',
+            "--timeout=%s" % CODEQL_WRAPPER_TIMEOUT, 
             f'--threads=0' # 1 thread per core
         ]
 
@@ -101,11 +106,13 @@ class CodeQLWrapper:
         self._logger.debug("command issued: %s",
                            " ".join(command_and_arguments))
         try:
-            output = subprocess.run(command_and_arguments, capture_output=True, shell=True, check=True, text=True)
+            subprocess.run(command_and_arguments, capture_output=True, shell=True, check=True, text=True)
         except subprocess.CalledProcessError as call_error:
-            print("FAIL: Command was ", call_error.cmd, ", return code=", call_error.returncode, ", stdout: ", call_error.stdout, ", stderr: ", call_error.stderr)
             self._logger.error(
-                "Error when executing codeql:\n%s", call_error.stderr)
-            sys.exit(f'FAIL: Error when executing codeql, stderr: {call_error.stderr}')
-
-        self._logger.debug("Output from codeql:\n%s", output)
+                "Error when executing codeql: %s", call_error.stderr)
+            if "Some queries times out. Results will be incomplete." in call_error.stderr:
+                # codeql execution might have timed out
+                raise Exception("CodeQL execution timed out")
+            else:
+                # catch every other thing
+                raise Exception("CodeQL execution failed")

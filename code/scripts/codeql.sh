@@ -19,8 +19,7 @@ if [[ "$VERSION" == "" ]]; then
 fi
 
 shift 1
-ARGS=$@
 
 CLI_PATH=$(python -m scripts.codeql_cli_path $VERSION)
-$CLI_PATH $ARGS
+$CLI_PATH $@
 

@@ -1,3 +1,4 @@
 # machine-dependant config
 tsm.db
 scripts/config.sh
+nohup.out

@@ -57,8 +57,10 @@ O11Y_CONTAINER_DB_DIR="/data/tracking.db"
 # Docker based run of the orchestrator pipeline
 # Runs the dockerized version of TSM pipeline, mounting the necessary bind volumes
 function tsm-run() {
+    # timeout each codeql wrapper call after 10 minutes
     docker run \
     -e "CODEQL_CLIS_ROOT=$CODEQL_CLIS_ROOT" \
+    -e "CODEQL_WRAPPER_TIMEOUT=600" \
     -v $CLI_DIR:/cli: \
     -v $QL_LIB_DIR:/ql: \
     -v $QL_LIB_WORSE_DIR:/worse_lib: \
