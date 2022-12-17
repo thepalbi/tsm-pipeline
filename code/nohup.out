@@ -1,0 +1,2610 @@
+Running TSM in docker:
+- Reading projects from: /tesis/repos/tsm-pipeline/experiments/tesis/tainted_path/tainted_path_100_split_train.txt
+- Results will be in: /tesis/tmp/results/tainted_path_top_100/
+
+Beggining container execution...
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/e57f9fc1dff83e054c01202a87ca6a408c016472/TaintedPathWorse-1671296992
+Reading events from:  /bigtmp/wd/data/e57f9fc1dff83e054c01202a87ca6a408c016472/e57f9fc1dff83e054c01202a87ca6a408c016472-eventToConcatRep-small.prop.csv
+New events: 94
+Size rep_count: 94
+New Unique reps: 94
+['(parameter 1 (member listen *))', '(member exists (member default (root https://www.npmjs.com/package/mz/fs)))', '(parameter 0 (member listen *))', '(member errror (global))', '(parameter 0 (member map *))']
+Total events: 94
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/e57f9fc1dff83e054c01202a87ca6a408c016472/e57f9fc1dff83e054c01202a87ca6a408c016472-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 1, reps: 1 
+Unique Query sources locations: 1 
+Reading known from:  /bigtmp/wd/data/e57f9fc1dff83e054c01202a87ca6a408c016472/e57f9fc1dff83e054c01202a87ca6a408c016472-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 4, reps: 3 
+Unique Query sinks locations: 3 
+Reading known from:  /bigtmp/wd/data/e57f9fc1dff83e054c01202a87ca6a408c016472/e57f9fc1dff83e054c01202a87ca6a408c016472-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 0, reps: 0 
+Unique Query sanitizers locations: 0 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 0
+src_san: 0
+src_san_pairs: 0
+san_snk: 0
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 0, Src-San 0, Src-Snk 0
+constraints flow path = /bigtmp/wd/constraints/e57f9fc1dff83e054c01202a87ca6a408c016472/TaintedPathWorse-1671296999/constraints_flow.txt
+Computing blacklist
+Known sources: 1,Known sanitizers: 0,Known sinks: 3
+Objective File: /bigtmp/wd/constraints/e57f9fc1dff83e054c01202a87ca6a408c016472/TaintedPathWorse-1671296999/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/e57f9fc1dff83e054c01202a87ca6a408c016472/TaintedPathWorse-1671296999
+Writing minimization objective
+Model file: /bigtmp/wd/models/e57f9fc1dff83e054c01202a87ca6a408c016472/TaintedPathWorse-1671296999/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/e57f9fc1dff83e054c01202a87ca6a408c016472/TaintedPathWorse-1671296999
+Writing flow and known constraints
+Done flows
+No known sanitizers
+Writing Bounds
+Done
+2022-12-17 17:09:59,873 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/e57f9fc1dff83e054c01202a87ca6a408c016472/TaintedPathWorse-1671296999/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+### CoinLpIO::scan_next(): End inserted
+ERROR: CoinLpIO::read_monom_obj, ### ERROR: Unable to read objective function
+
+There were -1 errors on input
+** Current model not valid
+Option for printingOptions changed from normal to all
+** Current model not valid
+No match for sol.txt - ? for list of commands
+Total time (CPU seconds):       0.00   (Wallclock seconds):       0.00
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/eb28c58692e3dae31244bedb65270df58956cada/TaintedPathWorse-1671296999
+Reading events from:  /bigtmp/wd/data/eb28c58692e3dae31244bedb65270df58956cada/eb28c58692e3dae31244bedb65270df58956cada-eventToConcatRep-small.prop.csv
+New events: 92227
+Size rep_count: 92227
+New Unique reps: 92227
+['(member mRotationKeys *)', '(member _emscripten_bind_btPairCachingGhostObject_activate_1 (member AmmoLib (global)))', '(member vertexColors (parameter 0 (member push (member faces *))))', '(member reset (member composer (global)))', '(parameter smooth (member restoreNormals (member exports *)))']
+Total events: 92227
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/eb28c58692e3dae31244bedb65270df58956cada/eb28c58692e3dae31244bedb65270df58956cada-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 3, reps: 3 
+Unique Query sources locations: 3 
+Reading known from:  /bigtmp/wd/data/eb28c58692e3dae31244bedb65270df58956cada/eb28c58692e3dae31244bedb65270df58956cada-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 45, reps: 7 
+Unique Query sinks locations: 7 
+Reading known from:  /bigtmp/wd/data/eb28c58692e3dae31244bedb65270df58956cada/eb28c58692e3dae31244bedb65270df58956cada-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 100, reps: 44 
+Unique Query sanitizers locations: 44 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 3
+src_san: 3
+src_san_pairs: 14
+san_snk: 3
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 14, Src-San 3, Src-Snk 5
+constraints flow path = /bigtmp/wd/constraints/eb28c58692e3dae31244bedb65270df58956cada/TaintedPathWorse-1671297012/constraints_flow.txt
+Computing blacklist
+Known sources: 3,Known sanitizers: 44,Known sinks: 7
+Objective File: /bigtmp/wd/constraints/eb28c58692e3dae31244bedb65270df58956cada/TaintedPathWorse-1671297012/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/eb28c58692e3dae31244bedb65270df58956cada/TaintedPathWorse-1671297016
+Writing minimization objective
+Model file: /bigtmp/wd/models/eb28c58692e3dae31244bedb65270df58956cada/TaintedPathWorse-1671297012/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/eb28c58692e3dae31244bedb65270df58956cada/TaintedPathWorse-1671297012
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:10:17,803 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/eb28c58692e3dae31244bedb65270df58956cada/TaintedPathWorse-1671297012/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 16 (-330) rows, 19 (-276684) columns and 41 (-391) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 8.6470769e-05 ( 0.086470769%) - largest zero change 0
+0  Obj 5.4 Primal inf 5.249995 (5)
+3  Obj 5.5251057
+Optimal - objective value 5.525
+After Postsolve, objective 5.525, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 5.525 - 3 iterations time 0.042, Presolve 0.03
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.70   (Wallclock seconds):       0.82
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe/TaintedPathWorse-1671297018
+Reading events from:  /bigtmp/wd/data/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe-eventToConcatRep-small.prop.csv
+New events: 33981
+Size rep_count: 33981
+New Unique reps: 33981
+['(member pageY (parameter event (member _mouseDistanceMet *)))', '(member isLastItem (parameter 1 (member widget *)))', '(parameter 0 (member _isOverAxis *))', '(return (member _fmod *))', '(member stroke-opacity *)']
+Total events: 33981
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 16, reps: 7 
+Unique Query sources locations: 7 
+Reading known from:  /bigtmp/wd/data/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 31, reps: 24 
+Unique Query sinks locations: 24 
+Reading known from:  /bigtmp/wd/data/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 83, reps: 25 
+Unique Query sanitizers locations: 25 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 2
+src_san: 2
+src_san_pairs: 2
+san_snk: 2
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 2, Src-San 2, Src-Snk 1
+constraints flow path = /bigtmp/wd/constraints/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe/TaintedPathWorse-1671297027/constraints_flow.txt
+Computing blacklist
+Known sources: 7,Known sanitizers: 25,Known sinks: 24
+Objective File: /bigtmp/wd/constraints/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe/TaintedPathWorse-1671297027/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe/TaintedPathWorse-1671297029
+Writing minimization objective
+Model file: /bigtmp/wd/models/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe/TaintedPathWorse-1671297027/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe/TaintedPathWorse-1671297027
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:10:29,962 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe/TaintedPathWorse-1671297027/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 5 (-336) rows, 8 (-101940) columns and 16 (-341) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00043235385 ( 0.43235385%) - largest zero change 0
+0  Obj 5.6 Primal inf 0.749997 (3)
+3  Obj 5.7753929
+Optimal - objective value 5.775
+After Postsolve, objective 5.775, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 5.775 - 3 iterations time 0.012, Presolve 0.01
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.24   (Wallclock seconds):       0.27
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/e3a5306310846b135951724c72ba307b3f60dcdb/TaintedPathWorse-1671297030
+Reading events from:  /bigtmp/wd/data/e3a5306310846b135951724c72ba307b3f60dcdb/e3a5306310846b135951724c72ba307b3f60dcdb-eventToConcatRep-small.prop.csv
+New events: 17087
+Size rep_count: 17087
+New Unique reps: 17087
+['(member mouseHooks (member event *))', '(parameter methodName *)', '(member valueAttr (parameter line (parameter 1 (member each *))))', '(member toHaveBeenCalled (member not *))', '(member extend (root https://www.npmjs.com/package/lodash))']
+Total events: 17087
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/e3a5306310846b135951724c72ba307b3f60dcdb/e3a5306310846b135951724c72ba307b3f60dcdb-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 6, reps: 5 
+Unique Query sources locations: 5 
+Reading known from:  /bigtmp/wd/data/e3a5306310846b135951724c72ba307b3f60dcdb/e3a5306310846b135951724c72ba307b3f60dcdb-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 223, reps: 6 
+Unique Query sinks locations: 6 
+Reading known from:  /bigtmp/wd/data/e3a5306310846b135951724c72ba307b3f60dcdb/e3a5306310846b135951724c72ba307b3f60dcdb-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 31, reps: 11 
+Unique Query sanitizers locations: 11 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 1
+src_san: 1
+src_san_pairs: 1
+san_snk: 1
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 1, Src-San 1, Src-Snk 1
+constraints flow path = /bigtmp/wd/constraints/e3a5306310846b135951724c72ba307b3f60dcdb/TaintedPathWorse-1671297038/constraints_flow.txt
+Computing blacklist
+Known sources: 5,Known sanitizers: 11,Known sinks: 6
+Objective File: /bigtmp/wd/constraints/e3a5306310846b135951724c72ba307b3f60dcdb/TaintedPathWorse-1671297038/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/e3a5306310846b135951724c72ba307b3f60dcdb/TaintedPathWorse-1671297039
+Writing minimization objective
+Model file: /bigtmp/wd/models/e3a5306310846b135951724c72ba307b3f60dcdb/TaintedPathWorse-1671297038/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/e3a5306310846b135951724c72ba307b3f60dcdb/TaintedPathWorse-1671297038
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:10:39,626 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/e3a5306310846b135951724c72ba307b3f60dcdb/TaintedPathWorse-1671297038/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 3 (-132) rows, 4 (-51260) columns and 6 (-138) elements
+0  Obj 2.35 Primal inf 1.099999 (1)
+2  Obj 2.775
+Optimal - objective value 2.775
+After Postsolve, objective 2.775, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 2.775 - 2 iterations time 0.012, Presolve 0.01
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.11   (Wallclock seconds):       0.13
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/90e13d23b0593aa45f35fdac736b8e19c6616a9d/TaintedPathWorse-1671297039
+Reading events from:  /bigtmp/wd/data/90e13d23b0593aa45f35fdac736b8e19c6616a9d/90e13d23b0593aa45f35fdac736b8e19c6616a9d-eventToConcatRep-small.prop.csv
+New events: 1850
+Size rep_count: 1850
+New Unique reps: 1850
+['(return (member writeFile (root https://www.npmjs.com/package/fs)))', '(member increment *)', '(member resolve (member Promise (global)))', '(return (parameter 0 (member setImmediate (global))))', '(member query (parameter req (member _handleRequest *)))']
+Total events: 1850
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/90e13d23b0593aa45f35fdac736b8e19c6616a9d/90e13d23b0593aa45f35fdac736b8e19c6616a9d-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 1, reps: 1 
+Unique Query sources locations: 1 
+Reading known from:  /bigtmp/wd/data/90e13d23b0593aa45f35fdac736b8e19c6616a9d/90e13d23b0593aa45f35fdac736b8e19c6616a9d-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 30, reps: 8 
+Unique Query sinks locations: 8 
+Reading known from:  /bigtmp/wd/data/90e13d23b0593aa45f35fdac736b8e19c6616a9d/90e13d23b0593aa45f35fdac736b8e19c6616a9d-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 2, reps: 1 
+Unique Query sanitizers locations: 1 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 12
+src_san: 12
+src_san_pairs: 29
+san_snk: 12
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 29, Src-San 12, Src-Snk 5
+constraints flow path = /bigtmp/wd/constraints/90e13d23b0593aa45f35fdac736b8e19c6616a9d/TaintedPathWorse-1671297047/constraints_flow.txt
+Computing blacklist
+Known sources: 1,Known sanitizers: 1,Known sinks: 8
+Objective File: /bigtmp/wd/constraints/90e13d23b0593aa45f35fdac736b8e19c6616a9d/TaintedPathWorse-1671297047/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/90e13d23b0593aa45f35fdac736b8e19c6616a9d/TaintedPathWorse-1671297048
+Writing minimization objective
+Model file: /bigtmp/wd/models/90e13d23b0593aa45f35fdac736b8e19c6616a9d/TaintedPathWorse-1671297047/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/90e13d23b0593aa45f35fdac736b8e19c6616a9d/TaintedPathWorse-1671297047
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:10:48,059 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/90e13d23b0593aa45f35fdac736b8e19c6616a9d/TaintedPathWorse-1671297047/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 39 (-67) rows, 53 (-5543) columns and 129 (-156) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00083259078 ( 0.83259078%) - largest zero change 0
+0  Obj 1 Primal inf 4.749989 (11)
+3  Obj 1.1505771
+Optimal - objective value 1.15
+After Postsolve, objective 1.15, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1.15 - 3 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.01   (Wallclock seconds):       0.01
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/f2c757a20bdc385edcf57b811ec8cc1a72899432/TaintedPathWorse-1671297048
+Reading events from:  /bigtmp/wd/data/f2c757a20bdc385edcf57b811ec8cc1a72899432/f2c757a20bdc385edcf57b811ec8cc1a72899432-eventToConcatRep-small.prop.csv
+New events: 3198
+Size rep_count: 3198
+New Unique reps: 3198
+['(member placeholder (return (member gebid (global))))', '(parameter 0 (member getJokeArray *))', '(member _applyFilters (instance (member exports *)))', '(return (member join (return (member parse *))))', '(return (member forEach (return (member from *))))']
+Total events: 3198
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/f2c757a20bdc385edcf57b811ec8cc1a72899432/f2c757a20bdc385edcf57b811ec8cc1a72899432-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 16, reps: 6 
+Unique Query sources locations: 6 
+Reading known from:  /bigtmp/wd/data/f2c757a20bdc385edcf57b811ec8cc1a72899432/f2c757a20bdc385edcf57b811ec8cc1a72899432-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 89, reps: 15 
+Unique Query sinks locations: 15 
+Reading known from:  /bigtmp/wd/data/f2c757a20bdc385edcf57b811ec8cc1a72899432/f2c757a20bdc385edcf57b811ec8cc1a72899432-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 49, reps: 24 
+Unique Query sanitizers locations: 24 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 114
+src_san: 60
+src_san_pairs: 385
+san_snk: 60
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 385, Src-San 114, Src-Snk 93
+constraints flow path = /bigtmp/wd/constraints/f2c757a20bdc385edcf57b811ec8cc1a72899432/TaintedPathWorse-1671297056/constraints_flow.txt
+Computing blacklist
+Known sources: 6,Known sanitizers: 24,Known sinks: 15
+Objective File: /bigtmp/wd/constraints/f2c757a20bdc385edcf57b811ec8cc1a72899432/TaintedPathWorse-1671297056/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/f2c757a20bdc385edcf57b811ec8cc1a72899432/TaintedPathWorse-1671297056
+Writing minimization objective
+Model file: /bigtmp/wd/models/f2c757a20bdc385edcf57b811ec8cc1a72899432/TaintedPathWorse-1671297056/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/f2c757a20bdc385edcf57b811ec8cc1a72899432/TaintedPathWorse-1671297056
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:10:56,333 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/f2c757a20bdc385edcf57b811ec8cc1a72899432/TaintedPathWorse-1671297056/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 260 (-602) rows, 330 (-9856) columns and 1795 (-2648) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.0009843885 ( 0.9843885%) - largest zero change 0
+0  Obj 4.5 Primal inf 55.249871 (129)
+11  Obj 5.0032112
+Optimal - objective value 5
+After Postsolve, objective 5, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 5 - 11 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.03   (Wallclock seconds):       0.03
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d/TaintedPathWorse-1671297056
+Reading events from:  /bigtmp/wd/data/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d-eventToConcatRep-small.prop.csv
+New events: 27762
+Size rep_count: 27762
+New Unique reps: 27762
+['(return (member generatedPositionFor (instance (member SourceMapConsumer *))))', '(parameter leftStartPos (member parseExprOp (member prototype *)))', '(member * (member lencode (member state (parameter strm *))))', '(return (member jsxParseAttribute *))', '(member msgs (global))']
+Total events: 27762
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 3, reps: 2 
+Unique Query sources locations: 2 
+Reading known from:  /bigtmp/wd/data/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 11, reps: 7 
+Unique Query sinks locations: 7 
+Reading known from:  /bigtmp/wd/data/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 99, reps: 44 
+Unique Query sanitizers locations: 44 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 4
+src_san: 4
+src_san_pairs: 14
+san_snk: 4
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 14, Src-San 4, Src-Snk 5
+constraints flow path = /bigtmp/wd/constraints/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d/TaintedPathWorse-1671297065/constraints_flow.txt
+Computing blacklist
+Known sources: 2,Known sanitizers: 44,Known sinks: 7
+Objective File: /bigtmp/wd/constraints/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d/TaintedPathWorse-1671297065/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d/TaintedPathWorse-1671297066
+Writing minimization objective
+Model file: /bigtmp/wd/models/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d/TaintedPathWorse-1671297065/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d/TaintedPathWorse-1671297065
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:11:06,841 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/8f859ecafbfa8e0a9984d9c66b8c691146ecee3d/TaintedPathWorse-1671297065/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 21 (-320) rows, 27 (-83282) columns and 65 (-364) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00076970544 ( 0.76970544%) - largest zero change 0
+0  Obj 5.3 Primal inf 4.749993 (7)
+3  Obj 5.4509565
+Optimal - objective value 5.45
+After Postsolve, objective 5.45, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 5.45 - 3 iterations time 0.012, Presolve 0.01
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.24   (Wallclock seconds):       0.29
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/8a89dad5bd52689f23e5c613f9f97b51c52f7866/TaintedPathWorse-1671297067
+Reading events from:  /bigtmp/wd/data/8a89dad5bd52689f23e5c613f9f97b51c52f7866/8a89dad5bd52689f23e5c613f9f97b51c52f7866-eventToConcatRep-small.prop.csv
+New events: 1942
+Size rep_count: 1942
+New Unique reps: 1942
+['(member port (member redis *))', '(member resolve (member Promise (global)))', '(parameter app *)', '(member url (parameter 0 (member createRequest *)))', '(member baseUrl (member default *))']
+Total events: 1942
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/8a89dad5bd52689f23e5c613f9f97b51c52f7866/8a89dad5bd52689f23e5c613f9f97b51c52f7866-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 24, reps: 17 
+Unique Query sources locations: 17 
+Reading known from:  /bigtmp/wd/data/8a89dad5bd52689f23e5c613f9f97b51c52f7866/8a89dad5bd52689f23e5c613f9f97b51c52f7866-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 17, reps: 3 
+Unique Query sinks locations: 3 
+Reading known from:  /bigtmp/wd/data/8a89dad5bd52689f23e5c613f9f97b51c52f7866/8a89dad5bd52689f23e5c613f9f97b51c52f7866-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 2, reps: 2 
+Unique Query sanitizers locations: 2 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 7
+src_san: 6
+src_san_pairs: 11
+san_snk: 6
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 11, Src-San 7, Src-Snk 12
+constraints flow path = /bigtmp/wd/constraints/8a89dad5bd52689f23e5c613f9f97b51c52f7866/TaintedPathWorse-1671297075/constraints_flow.txt
+Computing blacklist
+Known sources: 17,Known sanitizers: 2,Known sinks: 3
+Objective File: /bigtmp/wd/constraints/8a89dad5bd52689f23e5c613f9f97b51c52f7866/TaintedPathWorse-1671297075/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/8a89dad5bd52689f23e5c613f9f97b51c52f7866/TaintedPathWorse-1671297075
+Writing minimization objective
+Model file: /bigtmp/wd/models/8a89dad5bd52689f23e5c613f9f97b51c52f7866/TaintedPathWorse-1671297075/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/8a89dad5bd52689f23e5c613f9f97b51c52f7866/TaintedPathWorse-1671297075
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:11:15,238 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/8a89dad5bd52689f23e5c613f9f97b51c52f7866/TaintedPathWorse-1671297075/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 29 (-133) rows, 44 (-5812) columns and 92 (-166) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00064340207 ( 0.64340207%) - largest zero change 0
+0  Obj 2.2 Primal inf 4.749981 (19)
+20  Obj 4.6591994
+Optimal - objective value 4.6583333
+After Postsolve, objective 4.6583333, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 4.658333333 - 20 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.01   (Wallclock seconds):       0.02
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/e6cf0f81368349392f433c7b5122fb568b9b30b0/TaintedPathWorse-1671297075
+Reading events from:  /bigtmp/wd/data/e6cf0f81368349392f433c7b5122fb568b9b30b0/e6cf0f81368349392f433c7b5122fb568b9b30b0-eventToConcatRep-small.prop.csv
+New events: 21359
+Size rep_count: 21359
+New Unique reps: 21359
+['(member save (member _storages (instance (member exports *))))', '(member mouseHooks (member event *))', '(member * (parameter owner (member discard (member prototype *))))', '(parameter radio (parameter 0 (member map *)))', '(return (member remove (parameter location (member load *))))']
+Total events: 21359
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/e6cf0f81368349392f433c7b5122fb568b9b30b0/e6cf0f81368349392f433c7b5122fb568b9b30b0-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 56, reps: 20 
+Unique Query sources locations: 20 
+Reading known from:  /bigtmp/wd/data/e6cf0f81368349392f433c7b5122fb568b9b30b0/e6cf0f81368349392f433c7b5122fb568b9b30b0-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 27, reps: 6 
+Unique Query sinks locations: 6 
+Reading known from:  /bigtmp/wd/data/e6cf0f81368349392f433c7b5122fb568b9b30b0/e6cf0f81368349392f433c7b5122fb568b9b30b0-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 236, reps: 34 
+Unique Query sanitizers locations: 34 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 11
+src_san: 7
+src_san_pairs: 9
+san_snk: 7
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 9, Src-San 11, Src-Snk 7
+constraints flow path = /bigtmp/wd/constraints/e6cf0f81368349392f433c7b5122fb568b9b30b0/TaintedPathWorse-1671297084/constraints_flow.txt
+Computing blacklist
+Known sources: 20,Known sanitizers: 34,Known sinks: 6
+Objective File: /bigtmp/wd/constraints/e6cf0f81368349392f433c7b5122fb568b9b30b0/TaintedPathWorse-1671297084/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/e6cf0f81368349392f433c7b5122fb568b9b30b0/TaintedPathWorse-1671297085
+Writing minimization objective
+Model file: /bigtmp/wd/models/e6cf0f81368349392f433c7b5122fb568b9b30b0/TaintedPathWorse-1671297084/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/e6cf0f81368349392f433c7b5122fb568b9b30b0/TaintedPathWorse-1671297084
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:11:25,317 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/e6cf0f81368349392f433c7b5122fb568b9b30b0/TaintedPathWorse-1671297084/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 22 (-365) rows, 31 (-64073) columns and 73 (-410) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00081110691 ( 0.81110691%) - largest zero change 0
+0  Obj 6.1500001 Primal inf 5.099983 (17)
+12  Obj 6.8263416
+Optimal - objective value 6.825
+After Postsolve, objective 6.825, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 6.825 - 12 iterations time 0.012, Presolve 0.01
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.15   (Wallclock seconds):       0.16
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/1f503090a20e63b2979d4ef5dae249dcbc690d5e/TaintedPathWorse-1671297085
+Reading events from:  /bigtmp/wd/data/1f503090a20e63b2979d4ef5dae249dcbc690d5e/1f503090a20e63b2979d4ef5dae249dcbc690d5e-eventToConcatRep-small.prop.csv
+New events: 4335
+Size rep_count: 4335
+New Unique reps: 4335
+['(parameter app *)', '(parameter moduleList (member ensure *))', '(member reg (parameter 2 (parameter hitBehavior *)))', '(member timestamp (member * (parameter storedcache *)))', '(member normalize (return (parameter 1 (member load *))))']
+Total events: 4335
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/1f503090a20e63b2979d4ef5dae249dcbc690d5e/1f503090a20e63b2979d4ef5dae249dcbc690d5e-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 16, reps: 5 
+Unique Query sources locations: 5 
+Reading known from:  /bigtmp/wd/data/1f503090a20e63b2979d4ef5dae249dcbc690d5e/1f503090a20e63b2979d4ef5dae249dcbc690d5e-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 126, reps: 6 
+Unique Query sinks locations: 6 
+Reading known from:  /bigtmp/wd/data/1f503090a20e63b2979d4ef5dae249dcbc690d5e/1f503090a20e63b2979d4ef5dae249dcbc690d5e-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 21, reps: 14 
+Unique Query sanitizers locations: 14 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 8
+src_san: 4
+src_san_pairs: 4
+san_snk: 4
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 4, Src-San 8, Src-Snk 5
+constraints flow path = /bigtmp/wd/constraints/1f503090a20e63b2979d4ef5dae249dcbc690d5e/TaintedPathWorse-1671297093/constraints_flow.txt
+Computing blacklist
+Known sources: 5,Known sanitizers: 14,Known sinks: 6
+Objective File: /bigtmp/wd/constraints/1f503090a20e63b2979d4ef5dae249dcbc690d5e/TaintedPathWorse-1671297093/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/1f503090a20e63b2979d4ef5dae249dcbc690d5e/TaintedPathWorse-1671297093
+Writing minimization objective
+Model file: /bigtmp/wd/models/1f503090a20e63b2979d4ef5dae249dcbc690d5e/TaintedPathWorse-1671297093/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/1f503090a20e63b2979d4ef5dae249dcbc690d5e/TaintedPathWorse-1671297093
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:11:33,884 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/1f503090a20e63b2979d4ef5dae249dcbc690d5e/TaintedPathWorse-1671297093/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 14 (-153) rows, 19 (-13003) columns and 39 (-186) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00073417285 ( 0.73417285%) - largest zero change 0
+0  Obj 2.5 Primal inf 4.249991 (9)
+9  Obj 3.8007628
+Optimal - objective value 3.8
+After Postsolve, objective 3.8, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 3.8 - 9 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.03   (Wallclock seconds):       0.03
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/202d6515c32638aad12eaed78c4905d14b63a649/TaintedPathWorse-1671297093
+Reading events from:  /bigtmp/wd/data/202d6515c32638aad12eaed78c4905d14b63a649/202d6515c32638aad12eaed78c4905d14b63a649-eventToConcatRep-small.prop.csv
+New events: 8792
+Size rep_count: 8792
+New Unique reps: 8792
+['(parameter bufferOrString *)', '(member toLowerCase (member ABLY_USE_TLS (member __env__ (global))))', '(member failState (member state *))', '(member body (parameter 0 (member httpReq *)))', '(member output (member webworker *))']
+Total events: 8792
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/202d6515c32638aad12eaed78c4905d14b63a649/202d6515c32638aad12eaed78c4905d14b63a649-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 2, reps: 2 
+Unique Query sources locations: 2 
+Reading known from:  /bigtmp/wd/data/202d6515c32638aad12eaed78c4905d14b63a649/202d6515c32638aad12eaed78c4905d14b63a649-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 65, reps: 7 
+Unique Query sinks locations: 7 
+Reading known from:  /bigtmp/wd/data/202d6515c32638aad12eaed78c4905d14b63a649/202d6515c32638aad12eaed78c4905d14b63a649-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 13, reps: 9 
+Unique Query sanitizers locations: 9 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 0
+src_san: 0
+src_san_pairs: 0
+san_snk: 0
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 0, Src-San 0, Src-Snk 0
+constraints flow path = /bigtmp/wd/constraints/202d6515c32638aad12eaed78c4905d14b63a649/TaintedPathWorse-1671297102/constraints_flow.txt
+Computing blacklist
+Known sources: 2,Known sanitizers: 9,Known sinks: 7
+Objective File: /bigtmp/wd/constraints/202d6515c32638aad12eaed78c4905d14b63a649/TaintedPathWorse-1671297102/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/202d6515c32638aad12eaed78c4905d14b63a649/TaintedPathWorse-1671297102
+Writing minimization objective
+Model file: /bigtmp/wd/models/202d6515c32638aad12eaed78c4905d14b63a649/TaintedPathWorse-1671297102/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/202d6515c32638aad12eaed78c4905d14b63a649/TaintedPathWorse-1671297102
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:11:42,640 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/202d6515c32638aad12eaed78c4905d14b63a649/TaintedPathWorse-1671297102/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 0 (-108) rows, 0 (-26376) columns and 0 (-108) elements
+Empty problem - 0 rows, 0 columns and 0 elements
+Optimal - objective value 1.8
+After Postsolve, objective 1.8, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1.8 - 0 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.05   (Wallclock seconds):       0.06
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/0633e186c837457c1d481f4b66a23238336864ca/TaintedPathWorse-1671297102
+Reading events from:  /bigtmp/wd/data/0633e186c837457c1d481f4b66a23238336864ca/0633e186c837457c1d481f4b66a23238336864ca-eventToConcatRep-small.prop.csv
+New events: 761
+Size rep_count: 761
+New Unique reps: 761
+['(member stringify (member JSON (global)))', '(return (member map (member pages (parameter userConfig *))))', '(member * (parameter 1 (member spawnSync *)))', '(return (member assign (member Object (global))))', '(parameter 0 (member map *))']
+Total events: 761
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/0633e186c837457c1d481f4b66a23238336864ca/0633e186c837457c1d481f4b66a23238336864ca-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 1, reps: 1 
+Unique Query sources locations: 1 
+Reading known from:  /bigtmp/wd/data/0633e186c837457c1d481f4b66a23238336864ca/0633e186c837457c1d481f4b66a23238336864ca-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 7, reps: 4 
+Unique Query sinks locations: 4 
+Reading known from:  /bigtmp/wd/data/0633e186c837457c1d481f4b66a23238336864ca/0633e186c837457c1d481f4b66a23238336864ca-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 2, reps: 1 
+Unique Query sanitizers locations: 1 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 0
+src_san: 0
+src_san_pairs: 0
+san_snk: 0
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 0, Src-San 0, Src-Snk 0
+constraints flow path = /bigtmp/wd/constraints/0633e186c837457c1d481f4b66a23238336864ca/TaintedPathWorse-1671297110/constraints_flow.txt
+Computing blacklist
+Known sources: 1,Known sanitizers: 1,Known sinks: 4
+Objective File: /bigtmp/wd/constraints/0633e186c837457c1d481f4b66a23238336864ca/TaintedPathWorse-1671297110/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/0633e186c837457c1d481f4b66a23238336864ca/TaintedPathWorse-1671297110
+Writing minimization objective
+Model file: /bigtmp/wd/models/0633e186c837457c1d481f4b66a23238336864ca/TaintedPathWorse-1671297110/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/0633e186c837457c1d481f4b66a23238336864ca/TaintedPathWorse-1671297110
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:11:50,799 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/0633e186c837457c1d481f4b66a23238336864ca/TaintedPathWorse-1671297110/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 0 (-36) rows, 0 (-2283) columns and 0 (-36) elements
+Empty problem - 0 rows, 0 columns and 0 elements
+Optimal - objective value 0.6
+After Postsolve, objective 0.6, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 0.6 - 0 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.00   (Wallclock seconds):       0.01
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/4a20309b14cee3b6eb74b24c688c5a4a5a98f879/TaintedPathWorse-1671297110
+Reading events from:  /bigtmp/wd/data/4a20309b14cee3b6eb74b24c688c5a4a5a98f879/4a20309b14cee3b6eb74b24c688c5a4a5a98f879-eventToConcatRep-small.prop.csv
+New events: 3871
+Size rep_count: 3871
+New Unique reps: 3871
+['(return (member oncomplete (member transaction *)))', '(member isPlainObject (parameter e *))', '(return (member keyExtraction (parameter 0 (member call *))))', '(member indentChar (member jsDump *))', '(member tbody *)']
+Total events: 3871
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/4a20309b14cee3b6eb74b24c688c5a4a5a98f879/4a20309b14cee3b6eb74b24c688c5a4a5a98f879-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 3, reps: 1 
+Unique Query sources locations: 1 
+Reading known from:  /bigtmp/wd/data/4a20309b14cee3b6eb74b24c688c5a4a5a98f879/4a20309b14cee3b6eb74b24c688c5a4a5a98f879-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 1, reps: 1 
+Unique Query sinks locations: 1 
+Reading known from:  /bigtmp/wd/data/4a20309b14cee3b6eb74b24c688c5a4a5a98f879/4a20309b14cee3b6eb74b24c688c5a4a5a98f879-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 10, reps: 3 
+Unique Query sanitizers locations: 3 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 1
+src_san: 1
+src_san_pairs: 1
+san_snk: 1
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 1, Src-San 1, Src-Snk 1
+constraints flow path = /bigtmp/wd/constraints/4a20309b14cee3b6eb74b24c688c5a4a5a98f879/TaintedPathWorse-1671297118/constraints_flow.txt
+Computing blacklist
+Known sources: 1,Known sanitizers: 3,Known sinks: 1
+Objective File: /bigtmp/wd/constraints/4a20309b14cee3b6eb74b24c688c5a4a5a98f879/TaintedPathWorse-1671297118/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/4a20309b14cee3b6eb74b24c688c5a4a5a98f879/TaintedPathWorse-1671297119
+Writing minimization objective
+Model file: /bigtmp/wd/models/4a20309b14cee3b6eb74b24c688c5a4a5a98f879/TaintedPathWorse-1671297118/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/4a20309b14cee3b6eb74b24c688c5a4a5a98f879/TaintedPathWorse-1671297118
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:11:59,050 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/4a20309b14cee3b6eb74b24c688c5a4a5a98f879/TaintedPathWorse-1671297118/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 3 (-30) rows, 5 (-11611) columns and 9 (-33) elements
+0  Obj 0.5 Primal inf 0.499998 (2)
+3  Obj 1
+Optimal - objective value 1
+After Postsolve, objective 1, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1 - 3 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.03   (Wallclock seconds):       0.03
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/1782326c3cfd6d1816e724a55bb985309d98411b/TaintedPathWorse-1671297119
+Reading events from:  /bigtmp/wd/data/1782326c3cfd6d1816e724a55bb985309d98411b/1782326c3cfd6d1816e724a55bb985309d98411b-eventToConcatRep-small.prop.csv
+New events: 5417
+Size rep_count: 5417
+New Unique reps: 5417
+['(return (member apply (parameter hasher (member memoize *))))', '(member once (parameter 2 (member call *)))', '(member emulateHTTP (parameter 0 (member extend *)))', '(member value (instance (member StringInput (member Doodad *))))', '(member push (member value (parameter 0 (member action *))))']
+Total events: 5417
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/1782326c3cfd6d1816e724a55bb985309d98411b/1782326c3cfd6d1816e724a55bb985309d98411b-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 20, reps: 6 
+Unique Query sources locations: 6 
+Reading known from:  /bigtmp/wd/data/1782326c3cfd6d1816e724a55bb985309d98411b/1782326c3cfd6d1816e724a55bb985309d98411b-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 27, reps: 8 
+Unique Query sinks locations: 8 
+Reading known from:  /bigtmp/wd/data/1782326c3cfd6d1816e724a55bb985309d98411b/1782326c3cfd6d1816e724a55bb985309d98411b-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 29, reps: 8 
+Unique Query sanitizers locations: 8 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 29
+src_san: 13
+src_san_pairs: 105
+san_snk: 13
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 105, Src-San 29, Src-Snk 67
+constraints flow path = /bigtmp/wd/constraints/1782326c3cfd6d1816e724a55bb985309d98411b/TaintedPathWorse-1671297127/constraints_flow.txt
+Computing blacklist
+Known sources: 6,Known sanitizers: 8,Known sinks: 8
+Objective File: /bigtmp/wd/constraints/1782326c3cfd6d1816e724a55bb985309d98411b/TaintedPathWorse-1671297127/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/1782326c3cfd6d1816e724a55bb985309d98411b/TaintedPathWorse-1671297127
+Writing minimization objective
+Model file: /bigtmp/wd/models/1782326c3cfd6d1816e724a55bb985309d98411b/TaintedPathWorse-1671297127/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/1782326c3cfd6d1816e724a55bb985309d98411b/TaintedPathWorse-1671297127
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:12:07,372 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/1782326c3cfd6d1816e724a55bb985309d98411b/TaintedPathWorse-1671297127/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 113 (-220) rows, 128 (-16324) columns and 417 (-1002) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00083259078 ( 0.83259078%) - largest zero change 0
+0  Obj 3.8500014 Primal inf 49.099929 (71)
+17  Obj 5.2517621
+Optimal - objective value 5.25
+After Postsolve, objective 5.25, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 5.25 - 17 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.03   (Wallclock seconds):       0.04
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/2d5e8ee0c03a869f3e32a7c1e812379088de4adb/TaintedPathWorse-1671297127
+Reading events from:  /bigtmp/wd/data/2d5e8ee0c03a869f3e32a7c1e812379088de4adb/2d5e8ee0c03a869f3e32a7c1e812379088de4adb-eventToConcatRep-small.prop.csv
+New events: 10131
+Size rep_count: 10131
+New Unique reps: 10131
+['(parameter meta (member Document (member ui *)))', '(member parse (member json (member treesaver (global))))', '(member push (member failed (instance (member BreakRecord *))))', '(member pagecount (parameter 2 (member expand *)))', '(member async *)']
+Total events: 10131
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/2d5e8ee0c03a869f3e32a7c1e812379088de4adb/2d5e8ee0c03a869f3e32a7c1e812379088de4adb-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 3, reps: 2 
+Unique Query sources locations: 2 
+Reading known from:  /bigtmp/wd/data/2d5e8ee0c03a869f3e32a7c1e812379088de4adb/2d5e8ee0c03a869f3e32a7c1e812379088de4adb-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 2, reps: 1 
+Unique Query sinks locations: 1 
+Reading known from:  /bigtmp/wd/data/2d5e8ee0c03a869f3e32a7c1e812379088de4adb/2d5e8ee0c03a869f3e32a7c1e812379088de4adb-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 14, reps: 6 
+Unique Query sanitizers locations: 6 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 1
+src_san: 1
+src_san_pairs: 2
+san_snk: 1
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 2, Src-San 1, Src-Snk 2
+constraints flow path = /bigtmp/wd/constraints/2d5e8ee0c03a869f3e32a7c1e812379088de4adb/TaintedPathWorse-1671297135/constraints_flow.txt
+Computing blacklist
+Known sources: 2,Known sanitizers: 6,Known sinks: 1
+Objective File: /bigtmp/wd/constraints/2d5e8ee0c03a869f3e32a7c1e812379088de4adb/TaintedPathWorse-1671297135/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/2d5e8ee0c03a869f3e32a7c1e812379088de4adb/TaintedPathWorse-1671297135
+Writing minimization objective
+Model file: /bigtmp/wd/models/2d5e8ee0c03a869f3e32a7c1e812379088de4adb/TaintedPathWorse-1671297135/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/2d5e8ee0c03a869f3e32a7c1e812379088de4adb/TaintedPathWorse-1671297135
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:12:16,008 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/2d5e8ee0c03a869f3e32a7c1e812379088de4adb/TaintedPathWorse-1671297135/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 5 (-54) rows, 7 (-30391) columns and 13 (-62) elements
+0  Obj 1.05 Primal inf 1.349998 (2)
+3  Obj 1.475
+Optimal - objective value 1.475
+After Postsolve, objective 1.475, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1.475 - 3 iterations time 0.012, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.06   (Wallclock seconds):       0.07
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a/TaintedPathWorse-1671297136
+Reading events from:  /bigtmp/wd/data/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a-eventToConcatRep-small.prop.csv
+New events: 21841
+Size rep_count: 21841
+New Unique reps: 21841
+['(parameter methodName *)', '(member slots (parameter i (member $slots *)))', '(member truncate (parameter 1 (member mixin *)))', '(return (member appendFile (root https://www.npmjs.com/package/fs)))', '(member * (member obj2 (global)))']
+Total events: 21841
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 35, reps: 19 
+Unique Query sources locations: 19 
+Reading known from:  /bigtmp/wd/data/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 12, reps: 6 
+Unique Query sinks locations: 6 
+Reading known from:  /bigtmp/wd/data/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 122, reps: 62 
+Unique Query sanitizers locations: 62 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 40
+src_san: 17
+src_san_pairs: 46
+san_snk: 17
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 46, Src-San 40, Src-Snk 53
+constraints flow path = /bigtmp/wd/constraints/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a/TaintedPathWorse-1671297144/constraints_flow.txt
+Computing blacklist
+Known sources: 19,Known sanitizers: 62,Known sinks: 6
+Objective File: /bigtmp/wd/constraints/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a/TaintedPathWorse-1671297144/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a/TaintedPathWorse-1671297145
+Writing minimization objective
+Model file: /bigtmp/wd/models/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a/TaintedPathWorse-1671297144/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a/TaintedPathWorse-1671297144
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:12:25,917 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/d7ba926ade1274bc5b93a8bcb9268137d2ae1b1a/TaintedPathWorse-1671297144/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 118 (-543) rows, 155 (-65507) columns and 463 (-779) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00084867154 ( 0.84867154%) - largest zero change 0
+0  Obj 8.7 Primal inf 23.249907 (93)
+35  Obj 9.540977 Primal inf 2.999991 (9)
+42  Obj 9.607365
+Optimal - objective value 9.6035714
+After Postsolve, objective 9.6035714, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 9.603571429 - 42 iterations time 0.012, Presolve 0.01
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.13   (Wallclock seconds):       0.17
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/b202ca04fe87555d7fe9ca338f87fbcf76812c39/TaintedPathWorse-1671297146
+Reading events from:  /bigtmp/wd/data/b202ca04fe87555d7fe9ca338f87fbcf76812c39/b202ca04fe87555d7fe9ca338f87fbcf76812c39-eventToConcatRep-small.prop.csv
+New events: 1203
+Size rep_count: 1203
+New Unique reps: 1203
+['(return (member writeFile (root https://www.npmjs.com/package/fs)))', '(member resolve (member Promise (global)))', '(member maximumFileSizeToCacheInBytes (parameter 0 (member generate *)))', '(member then (return (member sendMessage (global))))', '(parameter error (parameter 2 (member readFile (root https://www.npmjs.com/package/fs))))']
+Total events: 1203
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/b202ca04fe87555d7fe9ca338f87fbcf76812c39/b202ca04fe87555d7fe9ca338f87fbcf76812c39-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 2, reps: 2 
+Unique Query sources locations: 2 
+Reading known from:  /bigtmp/wd/data/b202ca04fe87555d7fe9ca338f87fbcf76812c39/b202ca04fe87555d7fe9ca338f87fbcf76812c39-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 18, reps: 10 
+Unique Query sinks locations: 10 
+Reading known from:  /bigtmp/wd/data/b202ca04fe87555d7fe9ca338f87fbcf76812c39/b202ca04fe87555d7fe9ca338f87fbcf76812c39-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 1, reps: 1 
+Unique Query sanitizers locations: 1 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 0
+src_san: 0
+src_san_pairs: 0
+san_snk: 0
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 0, Src-San 0, Src-Snk 0
+constraints flow path = /bigtmp/wd/constraints/b202ca04fe87555d7fe9ca338f87fbcf76812c39/TaintedPathWorse-1671297154/constraints_flow.txt
+Computing blacklist
+Known sources: 2,Known sanitizers: 1,Known sinks: 10
+Objective File: /bigtmp/wd/constraints/b202ca04fe87555d7fe9ca338f87fbcf76812c39/TaintedPathWorse-1671297154/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/b202ca04fe87555d7fe9ca338f87fbcf76812c39/TaintedPathWorse-1671297154
+Writing minimization objective
+Model file: /bigtmp/wd/models/b202ca04fe87555d7fe9ca338f87fbcf76812c39/TaintedPathWorse-1671297154/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/b202ca04fe87555d7fe9ca338f87fbcf76812c39/TaintedPathWorse-1671297154
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:12:34,137 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/b202ca04fe87555d7fe9ca338f87fbcf76812c39/TaintedPathWorse-1671297154/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 0 (-78) rows, 0 (-3609) columns and 0 (-78) elements
+Empty problem - 0 rows, 0 columns and 0 elements
+Optimal - objective value 1.3
+After Postsolve, objective 1.3, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1.3 - 0 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.01   (Wallclock seconds):       0.01
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/903d6c86149916111f6de241fed5315bfcfbe48e/TaintedPathWorse-1671297154
+Reading events from:  /bigtmp/wd/data/903d6c86149916111f6de241fed5315bfcfbe48e/903d6c86149916111f6de241fed5315bfcfbe48e-eventToConcatRep-small.prop.csv
+New events: 3093
+Size rep_count: 3093
+New Unique reps: 3093
+['(parameter 3 (member CronJob *))', '(return (member output (parameter previousContext *)))', '(member run (return (member nin *)))', '(member protocol (parameter 0 (root https://www.npmjs.com/package/github)))', '(return (parameter callback (member process (member prototype *))))']
+Total events: 3093
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/903d6c86149916111f6de241fed5315bfcfbe48e/903d6c86149916111f6de241fed5315bfcfbe48e-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 40, reps: 10 
+Unique Query sources locations: 10 
+Reading known from:  /bigtmp/wd/data/903d6c86149916111f6de241fed5315bfcfbe48e/903d6c86149916111f6de241fed5315bfcfbe48e-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 29, reps: 9 
+Unique Query sinks locations: 9 
+Reading known from:  /bigtmp/wd/data/903d6c86149916111f6de241fed5315bfcfbe48e/903d6c86149916111f6de241fed5315bfcfbe48e-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 0, reps: 0 
+Unique Query sanitizers locations: 0 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 5
+src_san: 5
+src_san_pairs: 5
+san_snk: 5
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 5, Src-San 5, Src-Snk 3
+constraints flow path = /bigtmp/wd/constraints/903d6c86149916111f6de241fed5315bfcfbe48e/TaintedPathWorse-1671297162/constraints_flow.txt
+Computing blacklist
+Known sources: 10,Known sanitizers: 0,Known sinks: 9
+Objective File: /bigtmp/wd/constraints/903d6c86149916111f6de241fed5315bfcfbe48e/TaintedPathWorse-1671297162/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/903d6c86149916111f6de241fed5315bfcfbe48e/TaintedPathWorse-1671297162
+Writing minimization objective
+Model file: /bigtmp/wd/models/903d6c86149916111f6de241fed5315bfcfbe48e/TaintedPathWorse-1671297162/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/903d6c86149916111f6de241fed5315bfcfbe48e/TaintedPathWorse-1671297162
+Writing flow and known constraints
+Done flows
+No known sanitizers
+Writing Bounds
+Done
+2022-12-17 17:12:42,438 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/903d6c86149916111f6de241fed5315bfcfbe48e/TaintedPathWorse-1671297162/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 13 (-114) rows, 20 (-9272) columns and 38 (-130) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00010783353 ( 0.10783353%) - largest zero change 0
+0  Obj 2.0500001 Primal inf 2.599993 (7)
+9  Obj 3.100166
+Optimal - objective value 3.1
+After Postsolve, objective 3.1, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 3.1 - 9 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.02   (Wallclock seconds):       0.02
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/3509b1c6e4db64075b62324912054944e1603986/TaintedPathWorse-1671297162
+Reading events from:  /bigtmp/wd/data/3509b1c6e4db64075b62324912054944e1603986/3509b1c6e4db64075b62324912054944e1603986-eventToConcatRep-small.prop.csv
+New events: 1193
+Size rep_count: 1193
+New Unique reps: 1193
+['(member dir (return (member parse (root https://www.npmjs.com/package/path))))', '(member resolveCommit *)', '(return (member read *))', '(member type (return (parameter 0 (member map *))))', '(parameter pathToTest (member pathExists (member exports *)))']
+Total events: 1193
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/3509b1c6e4db64075b62324912054944e1603986/3509b1c6e4db64075b62324912054944e1603986-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 48, reps: 14 
+Unique Query sources locations: 14 
+Reading known from:  /bigtmp/wd/data/3509b1c6e4db64075b62324912054944e1603986/3509b1c6e4db64075b62324912054944e1603986-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 28, reps: 8 
+Unique Query sinks locations: 8 
+Reading known from:  /bigtmp/wd/data/3509b1c6e4db64075b62324912054944e1603986/3509b1c6e4db64075b62324912054944e1603986-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 6, reps: 3 
+Unique Query sanitizers locations: 3 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 152
+src_san: 57
+src_san_pairs: 438
+san_snk: 57
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 438, Src-San 152, Src-Snk 206
+constraints flow path = /bigtmp/wd/constraints/3509b1c6e4db64075b62324912054944e1603986/TaintedPathWorse-1671297170/constraints_flow.txt
+Computing blacklist
+Known sources: 14,Known sanitizers: 3,Known sinks: 8
+Objective File: /bigtmp/wd/constraints/3509b1c6e4db64075b62324912054944e1603986/TaintedPathWorse-1671297170/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/3509b1c6e4db64075b62324912054944e1603986/TaintedPathWorse-1671297170
+Writing minimization objective
+Model file: /bigtmp/wd/models/3509b1c6e4db64075b62324912054944e1603986/TaintedPathWorse-1671297170/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/3509b1c6e4db64075b62324912054944e1603986/TaintedPathWorse-1671297170
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:12:50,645 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/3509b1c6e4db64075b62324912054944e1603986/TaintedPathWorse-1671297170/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 481 (-465) rows, 573 (-3802) columns and 3322 (-2981) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00098581989 ( 0.98581989%) - largest zero change 0
+0  Obj 4.6000017 Primal inf 101.14967 (333)
+60  Obj 7.1012151
+Optimal - objective value 7.097619
+After Postsolve, objective 7.097619, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 7.097619048 - 60 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.01   (Wallclock seconds):       0.02
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b/TaintedPathWorse-1671297170
+Reading events from:  /bigtmp/wd/data/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b-eventToConcatRep-small.prop.csv
+New events: 4927
+Size rep_count: 4927
+New Unique reps: 4927
+['(member mouseHooks (member event *))', '(member watchFile (root https://www.npmjs.com/package/fs))', '(member toLowerCase (return (member replace (parameter a *))))', '(member remove (return (member Callbacks *)))', '(member fx (parameter 0 (parameter a (member init *))))']
+Total events: 4927
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 18, reps: 4 
+Unique Query sources locations: 4 
+Reading known from:  /bigtmp/wd/data/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 22, reps: 13 
+Unique Query sinks locations: 13 
+Reading known from:  /bigtmp/wd/data/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 16, reps: 6 
+Unique Query sanitizers locations: 6 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 2
+src_san: 2
+src_san_pairs: 3
+san_snk: 2
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 3, Src-San 2, Src-Snk 3
+constraints flow path = /bigtmp/wd/constraints/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b/TaintedPathWorse-1671297178/constraints_flow.txt
+Computing blacklist
+Known sources: 4,Known sanitizers: 6,Known sinks: 13
+Objective File: /bigtmp/wd/constraints/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b/TaintedPathWorse-1671297178/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b/TaintedPathWorse-1671297178
+Writing minimization objective
+Model file: /bigtmp/wd/models/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b/TaintedPathWorse-1671297178/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b/TaintedPathWorse-1671297178
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:12:58,894 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/8d9e9a73a381ca73a5dd73d9b09d3aa821ce022b/TaintedPathWorse-1671297178/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 7 (-139) rows, 9 (-14780) columns and 14 (-157) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00010783353 ( 0.10783353%) - largest zero change 0
+0  Obj 2.7500004 Primal inf 3.299997 (3)
+6  Obj 3.950147
+Optimal - objective value 3.95
+After Postsolve, objective 3.95, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 3.95 - 6 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.03   (Wallclock seconds):       0.03
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/61bc3d0a9fce46155e042bd841825f325e648b43/TaintedPathWorse-1671297178
+Reading events from:  /bigtmp/wd/data/61bc3d0a9fce46155e042bd841825f325e648b43/61bc3d0a9fce46155e042bd841825f325e648b43-eventToConcatRep-small.prop.csv
+New events: 381
+Size rep_count: 381
+New Unique reps: 381
+['(member success *)', '(member get (root https://www.npmjs.com/package/config))', '(member sockets (member io *))', '(parameter 1 (member setInterval (global)))', '(parameter 1 (member scrollTo (global)))']
+Total events: 381
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/61bc3d0a9fce46155e042bd841825f325e648b43/61bc3d0a9fce46155e042bd841825f325e648b43-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 19, reps: 1 
+Unique Query sources locations: 1 
+Reading known from:  /bigtmp/wd/data/61bc3d0a9fce46155e042bd841825f325e648b43/61bc3d0a9fce46155e042bd841825f325e648b43-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 23, reps: 4 
+Unique Query sinks locations: 4 
+Reading known from:  /bigtmp/wd/data/61bc3d0a9fce46155e042bd841825f325e648b43/61bc3d0a9fce46155e042bd841825f325e648b43-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 0, reps: 0 
+Unique Query sanitizers locations: 0 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 4
+src_san: 4
+src_san_pairs: 8
+san_snk: 4
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 8, Src-San 4, Src-Snk 4
+constraints flow path = /bigtmp/wd/constraints/61bc3d0a9fce46155e042bd841825f325e648b43/TaintedPathWorse-1671297187/constraints_flow.txt
+Computing blacklist
+Known sources: 1,Known sanitizers: 0,Known sinks: 4
+Objective File: /bigtmp/wd/constraints/61bc3d0a9fce46155e042bd841825f325e648b43/TaintedPathWorse-1671297187/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/61bc3d0a9fce46155e042bd841825f325e648b43/TaintedPathWorse-1671297187
+Writing minimization objective
+Model file: /bigtmp/wd/models/61bc3d0a9fce46155e042bd841825f325e648b43/TaintedPathWorse-1671297187/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/61bc3d0a9fce46155e042bd841825f325e648b43/TaintedPathWorse-1671297187
+Writing flow and known constraints
+Done flows
+No known sanitizers
+Writing Bounds
+Done
+2022-12-17 17:13:07,104 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/61bc3d0a9fce46155e042bd841825f325e648b43/TaintedPathWorse-1671297187/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 12 (-34) rows, 16 (-1143) columns and 28 (-74) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00026958382 ( 0.26958382%) - largest zero change 0
+0  Obj 0.65000012 Primal inf 3.849996 (4)
+5  Obj 1.2002836
+Optimal - objective value 1.2
+After Postsolve, objective 1.2, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1.2 - 5 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.00   (Wallclock seconds):       0.00
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/8d7573168bfa06d724aeec92cc45ae3ee20fb838/TaintedPathWorse-1671297187
+Reading events from:  /bigtmp/wd/data/8d7573168bfa06d724aeec92cc45ae3ee20fb838/8d7573168bfa06d724aeec92cc45ae3ee20fb838-eventToConcatRep-small.prop.csv
+New events: 82388
+Size rep_count: 82389
+New Unique reps: 82389
+['(parameter callback (member copyAsset (member prototype (member FileStorage *))))', '(parameter 0 (member visitChildren *))', '(member splitLine (parameter 0 (member implement *)))', '(parameter 4 (member renderSync *))', '(member C-x C-p (member emacsKeys *))']
+Total events: 82388
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/8d7573168bfa06d724aeec92cc45ae3ee20fb838/8d7573168bfa06d724aeec92cc45ae3ee20fb838-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 32, reps: 15 
+Unique Query sources locations: 15 
+Reading known from:  /bigtmp/wd/data/8d7573168bfa06d724aeec92cc45ae3ee20fb838/8d7573168bfa06d724aeec92cc45ae3ee20fb838-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 156, reps: 24 
+Unique Query sinks locations: 24 
+Reading known from:  /bigtmp/wd/data/8d7573168bfa06d724aeec92cc45ae3ee20fb838/8d7573168bfa06d724aeec92cc45ae3ee20fb838-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 581, reps: 119 
+Unique Query sanitizers locations: 119 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 21
+src_san: 14
+src_san_pairs: 47
+san_snk: 14
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 47, Src-San 21, Src-Snk 87
+constraints flow path = /bigtmp/wd/constraints/8d7573168bfa06d724aeec92cc45ae3ee20fb838/TaintedPathWorse-1671297856/constraints_flow.txt
+Computing blacklist
+Known sources: 15,Known sanitizers: 119,Known sinks: 24
+Objective File: /bigtmp/wd/constraints/8d7573168bfa06d724aeec92cc45ae3ee20fb838/TaintedPathWorse-1671297856/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/8d7573168bfa06d724aeec92cc45ae3ee20fb838/TaintedPathWorse-1671297861
+Writing minimization objective
+Model file: /bigtmp/wd/models/8d7573168bfa06d724aeec92cc45ae3ee20fb838/TaintedPathWorse-1671297856/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/8d7573168bfa06d724aeec92cc45ae3ee20fb838/TaintedPathWorse-1671297856
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:24:22,285 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/8d7573168bfa06d724aeec92cc45ae3ee20fb838/TaintedPathWorse-1671297856/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 132 (-971) rows, 157 (-247165) columns and 367 (-1376) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00084867154 ( 0.84867154%) - largest zero change 0
+0  Obj 20.150004 Primal inf 50.6499 (100)
+55  Obj 25.526796
+Optimal - objective value 25.525
+After Postsolve, objective 25.525, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 25.525 - 55 iterations time 0.032, Presolve 0.03
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.70   (Wallclock seconds):       0.82
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d/TaintedPathWorse-1671297863
+Reading events from:  /bigtmp/wd/data/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d-eventToConcatRep-small.prop.csv
+New events: 3124
+Size rep_count: 3124
+New Unique reps: 3124
+['(return (member writeFile (root https://www.npmjs.com/package/fs)))', '(member tmp (member torrent *))', '(member kl *)', '(member nativeName (member af *))', '(member onAppEntry (member atv (global)))']
+Total events: 3124
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 25, reps: 9 
+Unique Query sources locations: 9 
+Reading known from:  /bigtmp/wd/data/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 57, reps: 14 
+Unique Query sinks locations: 14 
+Reading known from:  /bigtmp/wd/data/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 0, reps: 0 
+Unique Query sanitizers locations: 0 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 36
+src_san: 32
+src_san_pairs: 220
+san_snk: 32
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 220, Src-San 36, Src-Snk 87
+constraints flow path = /bigtmp/wd/constraints/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d/TaintedPathWorse-1671297898/constraints_flow.txt
+Computing blacklist
+Known sources: 9,Known sanitizers: 0,Known sinks: 14
+Objective File: /bigtmp/wd/constraints/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d/TaintedPathWorse-1671297898/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d/TaintedPathWorse-1671297898
+Writing minimization objective
+Model file: /bigtmp/wd/models/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d/TaintedPathWorse-1671297898/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d/TaintedPathWorse-1671297898
+Writing flow and known constraints
+Done flows
+No known sanitizers
+Writing Bounds
+Done
+2022-12-17 17:24:58,599 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/ca1a1e8cd88135ca793cc1c65430b3f2e6c8e78d/TaintedPathWorse-1671297898/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 262 (-219) rows, 323 (-9392) columns and 993 (-996) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00094937063 ( 0.94937063%) - largest zero change 0
+0  Obj 2.4500001 Primal inf 38.849892 (108)
+22  Obj 2.9120683
+Optimal - objective value 2.91
+After Postsolve, objective 2.91, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 2.91 - 22 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.02   (Wallclock seconds):       0.03
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/965190c0ac32ede8712b24e781f3e359134a8765/TaintedPathWorse-1671297898
+Reading events from:  /bigtmp/wd/data/965190c0ac32ede8712b24e781f3e359134a8765/965190c0ac32ede8712b24e781f3e359134a8765-eventToConcatRep-small.prop.csv
+New events: 64092
+Size rep_count: 64093
+New Unique reps: 64093
+['(member pop (member $cells (instance (member Gutter *))))', '(parameter 0 (member visitChildren *))', '(member splitLine (parameter 0 (member implement *)))', '(parameter 4 (member renderSync *))', '(member C-x C-p (member emacsKeys *))']
+Total events: 64092
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/965190c0ac32ede8712b24e781f3e359134a8765/965190c0ac32ede8712b24e781f3e359134a8765-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 15, reps: 6 
+Unique Query sources locations: 6 
+Reading known from:  /bigtmp/wd/data/965190c0ac32ede8712b24e781f3e359134a8765/965190c0ac32ede8712b24e781f3e359134a8765-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 29, reps: 8 
+Unique Query sinks locations: 8 
+Reading known from:  /bigtmp/wd/data/965190c0ac32ede8712b24e781f3e359134a8765/965190c0ac32ede8712b24e781f3e359134a8765-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 399, reps: 72 
+Unique Query sanitizers locations: 72 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 0
+src_san: 0
+src_san_pairs: 0
+san_snk: 0
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 0, Src-San 0, Src-Snk 0
+constraints flow path = /bigtmp/wd/constraints/965190c0ac32ede8712b24e781f3e359134a8765/TaintedPathWorse-1671298179/constraints_flow.txt
+Computing blacklist
+Known sources: 6,Known sanitizers: 72,Known sinks: 8
+Objective File: /bigtmp/wd/constraints/965190c0ac32ede8712b24e781f3e359134a8765/TaintedPathWorse-1671298179/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/965190c0ac32ede8712b24e781f3e359134a8765/TaintedPathWorse-1671298182
+Writing minimization objective
+Model file: /bigtmp/wd/models/965190c0ac32ede8712b24e781f3e359134a8765/TaintedPathWorse-1671298179/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/965190c0ac32ede8712b24e781f3e359134a8765/TaintedPathWorse-1671298179
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:29:43,534 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/965190c0ac32ede8712b24e781f3e359134a8765/TaintedPathWorse-1671298179/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 0 (-516) rows, 0 (-192279) columns and 0 (-516) elements
+Empty problem - 0 rows, 0 columns and 0 elements
+Optimal - objective value 8.6
+After Postsolve, objective 8.6, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 8.6 - 0 iterations time 0.042, Presolve 0.03
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.63   (Wallclock seconds):       0.71
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/b59a0002989a06cab3ae1c5b85967937a940dc44/TaintedPathWorse-1671298184
+Reading events from:  /bigtmp/wd/data/b59a0002989a06cab3ae1c5b85967937a940dc44/b59a0002989a06cab3ae1c5b85967937a940dc44-eventToConcatRep-small.prop.csv
+New events: 6927
+Size rep_count: 6927
+New Unique reps: 6927
+['(parameter args (member set-attr *))', '(member ctx *)', '(member map (return (member parseModifiers (member default *))))', '(return (member load (parameter 0 (member ok *))))', '(member products (member removeProduct (member ecommerce *)))']
+Total events: 6927
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/b59a0002989a06cab3ae1c5b85967937a940dc44/b59a0002989a06cab3ae1c5b85967937a940dc44-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 2, reps: 1 
+Unique Query sources locations: 1 
+Reading known from:  /bigtmp/wd/data/b59a0002989a06cab3ae1c5b85967937a940dc44/b59a0002989a06cab3ae1c5b85967937a940dc44-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 26, reps: 8 
+Unique Query sinks locations: 8 
+Reading known from:  /bigtmp/wd/data/b59a0002989a06cab3ae1c5b85967937a940dc44/b59a0002989a06cab3ae1c5b85967937a940dc44-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 145, reps: 24 
+Unique Query sanitizers locations: 24 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 2
+src_san: 2
+src_san_pairs: 2
+san_snk: 2
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 2, Src-San 2, Src-Snk 1
+constraints flow path = /bigtmp/wd/constraints/b59a0002989a06cab3ae1c5b85967937a940dc44/TaintedPathWorse-1671298249/constraints_flow.txt
+Computing blacklist
+Known sources: 1,Known sanitizers: 24,Known sinks: 8
+Objective File: /bigtmp/wd/constraints/b59a0002989a06cab3ae1c5b85967937a940dc44/TaintedPathWorse-1671298249/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/b59a0002989a06cab3ae1c5b85967937a940dc44/TaintedPathWorse-1671298249
+Writing minimization objective
+Model file: /bigtmp/wd/models/b59a0002989a06cab3ae1c5b85967937a940dc44/TaintedPathWorse-1671298249/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/b59a0002989a06cab3ae1c5b85967937a940dc44/TaintedPathWorse-1671298249
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:30:49,733 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/b59a0002989a06cab3ae1c5b85967937a940dc44/TaintedPathWorse-1671298249/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 5 (-198) rows, 7 (-20779) columns and 11 (-208) elements
+0  Obj 3.3 Primal inf 1.249999 (1)
+2  Obj 3.425
+Optimal - objective value 3.425
+After Postsolve, objective 3.425, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 3.425 - 2 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.04   (Wallclock seconds):       0.05
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/db9a0451ae3c06475d31e10adf2547bd3d34b6f4/TaintedPathWorse-1671298249
+Reading events from:  /bigtmp/wd/data/db9a0451ae3c06475d31e10adf2547bd3d34b6f4/db9a0451ae3c06475d31e10adf2547bd3d34b6f4-eventToConcatRep-small.prop.csv
+New events: 4379
+Size rep_count: 4379
+New Unique reps: 4379
+['(member * (parameter nodes (member exports *)))', '(parameter str (parameter 1 (member replace *)))', '(member documentElement (parameter doc *))', '(member .wrapper .box.b:nth-child(2) (member 1480 (member example8.html *)))', '(parameter 10 (member initMouseEvent *))']
+Total events: 4379
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/db9a0451ae3c06475d31e10adf2547bd3d34b6f4/db9a0451ae3c06475d31e10adf2547bd3d34b6f4-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 4, reps: 1 
+Unique Query sources locations: 1 
+Reading known from:  /bigtmp/wd/data/db9a0451ae3c06475d31e10adf2547bd3d34b6f4/db9a0451ae3c06475d31e10adf2547bd3d34b6f4-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 24, reps: 4 
+Unique Query sinks locations: 4 
+Reading known from:  /bigtmp/wd/data/db9a0451ae3c06475d31e10adf2547bd3d34b6f4/db9a0451ae3c06475d31e10adf2547bd3d34b6f4-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 19, reps: 5 
+Unique Query sanitizers locations: 5 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 0
+src_san: 0
+src_san_pairs: 0
+san_snk: 0
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 0, Src-San 0, Src-Snk 0
+constraints flow path = /bigtmp/wd/constraints/db9a0451ae3c06475d31e10adf2547bd3d34b6f4/TaintedPathWorse-1671298258/constraints_flow.txt
+Computing blacklist
+Known sources: 1,Known sanitizers: 5,Known sinks: 4
+Objective File: /bigtmp/wd/constraints/db9a0451ae3c06475d31e10adf2547bd3d34b6f4/TaintedPathWorse-1671298258/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/db9a0451ae3c06475d31e10adf2547bd3d34b6f4/TaintedPathWorse-1671298258
+Writing minimization objective
+Model file: /bigtmp/wd/models/db9a0451ae3c06475d31e10adf2547bd3d34b6f4/TaintedPathWorse-1671298258/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/db9a0451ae3c06475d31e10adf2547bd3d34b6f4/TaintedPathWorse-1671298258
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:30:58,205 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/db9a0451ae3c06475d31e10adf2547bd3d34b6f4/TaintedPathWorse-1671298258/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 0 (-60) rows, 0 (-13137) columns and 0 (-60) elements
+Empty problem - 0 rows, 0 columns and 0 elements
+Optimal - objective value 1
+After Postsolve, objective 1, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1 - 0 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.03   (Wallclock seconds):       0.03
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4/TaintedPathWorse-1671298258
+Reading events from:  /bigtmp/wd/data/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4-eventToConcatRep-small.prop.csv
+New events: 5196
+Size rep_count: 5196
+New Unique reps: 5196
+['(member articles (return (member exports *)))', '(member parts (parameter result (parameter 0 (member spread *))))', '(member ctx *)', '(return (member getPage *))', '(return (member setExtension *))']
+Total events: 5196
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 3, reps: 1 
+Unique Query sources locations: 1 
+Reading known from:  /bigtmp/wd/data/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 21, reps: 8 
+Unique Query sinks locations: 8 
+Reading known from:  /bigtmp/wd/data/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 14, reps: 9 
+Unique Query sanitizers locations: 9 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 3
+src_san: 3
+src_san_pairs: 6
+san_snk: 3
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 6, Src-San 3, Src-Snk 2
+constraints flow path = /bigtmp/wd/constraints/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4/TaintedPathWorse-1671298284/constraints_flow.txt
+Computing blacklist
+Known sources: 1,Known sanitizers: 9,Known sinks: 8
+Objective File: /bigtmp/wd/constraints/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4/TaintedPathWorse-1671298284/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4/TaintedPathWorse-1671298284
+Writing minimization objective
+Model file: /bigtmp/wd/models/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4/TaintedPathWorse-1671298284/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4/TaintedPathWorse-1671298284
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:31:24,829 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/6c6ef7f4af32a2977e44dd23d3feb6ebf28970f4/TaintedPathWorse-1671298284/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 11 (-108) rows, 16 (-15583) columns and 40 (-119) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00017294154 ( 0.17294154%) - largest zero change 0
+0  Obj 1.8 Primal inf 1.249995 (5)
+5  Obj 1.8850907
+Optimal - objective value 1.885
+After Postsolve, objective 1.885, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1.885 - 5 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.03   (Wallclock seconds):       0.04
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/2d9a91916471f1fbe465dbcdc05db0cf22d720ec/TaintedPathWorse-1671298284
+Reading events from:  /bigtmp/wd/data/2d9a91916471f1fbe465dbcdc05db0cf22d720ec/2d9a91916471f1fbe465dbcdc05db0cf22d720ec-eventToConcatRep-small.prop.csv
+New events: 56515
+Size rep_count: 56515
+New Unique reps: 56515
+['(member pop (member $cells (instance (member Gutter *))))', '(member wattosquare (parameter t *))', '(parameter methodName *)', '(member splitLine (parameter 0 (member implement *)))', '(member apply (member setTransform (parameter 0 (member getPattern *))))']
+Total events: 56515
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/2d9a91916471f1fbe465dbcdc05db0cf22d720ec/2d9a91916471f1fbe465dbcdc05db0cf22d720ec-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 5, reps: 2 
+Unique Query sources locations: 2 
+Reading known from:  /bigtmp/wd/data/2d9a91916471f1fbe465dbcdc05db0cf22d720ec/2d9a91916471f1fbe465dbcdc05db0cf22d720ec-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 50, reps: 11 
+Unique Query sinks locations: 11 
+Reading known from:  /bigtmp/wd/data/2d9a91916471f1fbe465dbcdc05db0cf22d720ec/2d9a91916471f1fbe465dbcdc05db0cf22d720ec-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 342, reps: 86 
+Unique Query sanitizers locations: 86 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 0
+src_san: 0
+src_san_pairs: 0
+san_snk: 0
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 0, Src-San 0, Src-Snk 0
+constraints flow path = /bigtmp/wd/constraints/2d9a91916471f1fbe465dbcdc05db0cf22d720ec/TaintedPathWorse-1671298466/constraints_flow.txt
+Computing blacklist
+Known sources: 2,Known sanitizers: 86,Known sinks: 11
+Objective File: /bigtmp/wd/constraints/2d9a91916471f1fbe465dbcdc05db0cf22d720ec/TaintedPathWorse-1671298466/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/2d9a91916471f1fbe465dbcdc05db0cf22d720ec/TaintedPathWorse-1671298468
+Writing minimization objective
+Model file: /bigtmp/wd/models/2d9a91916471f1fbe465dbcdc05db0cf22d720ec/TaintedPathWorse-1671298466/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/2d9a91916471f1fbe465dbcdc05db0cf22d720ec/TaintedPathWorse-1671298466
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:34:29,337 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/2d9a91916471f1fbe465dbcdc05db0cf22d720ec/TaintedPathWorse-1671298466/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 0 (-594) rows, 0 (-169545) columns and 0 (-594) elements
+Empty problem - 0 rows, 0 columns and 0 elements
+Optimal - objective value 9.9
+After Postsolve, objective 9.9, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 9.9 - 0 iterations time 0.022, Presolve 0.02
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.46   (Wallclock seconds):       0.55
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/729e7e91dd03d009bc658c196937ad4c83365f45/TaintedPathWorse-1671298470
+Reading events from:  /bigtmp/wd/data/729e7e91dd03d009bc658c196937ad4c83365f45/729e7e91dd03d009bc658c196937ad4c83365f45-eventToConcatRep-small.prop.csv
+New events: 281
+Size rep_count: 281
+New Unique reps: 281
+['(member stringify (member JSON (global)))', '(member resolve (member Promise (global)))', '(return (member then (return (member then *))))', '(return (member assign (member Object (global))))', '(member get (member app (member api (member exports *))))']
+Total events: 281
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/729e7e91dd03d009bc658c196937ad4c83365f45/729e7e91dd03d009bc658c196937ad4c83365f45-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 31, reps: 9 
+Unique Query sources locations: 9 
+Reading known from:  /bigtmp/wd/data/729e7e91dd03d009bc658c196937ad4c83365f45/729e7e91dd03d009bc658c196937ad4c83365f45-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 6, reps: 3 
+Unique Query sinks locations: 3 
+Reading known from:  /bigtmp/wd/data/729e7e91dd03d009bc658c196937ad4c83365f45/729e7e91dd03d009bc658c196937ad4c83365f45-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 5, reps: 4 
+Unique Query sanitizers locations: 4 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 20
+src_san: 9
+src_san_pairs: 10
+san_snk: 9
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 10, Src-San 20, Src-Snk 8
+constraints flow path = /bigtmp/wd/constraints/729e7e91dd03d009bc658c196937ad4c83365f45/TaintedPathWorse-1671298496/constraints_flow.txt
+Computing blacklist
+Known sources: 9,Known sanitizers: 4,Known sinks: 3
+Objective File: /bigtmp/wd/constraints/729e7e91dd03d009bc658c196937ad4c83365f45/TaintedPathWorse-1671298496/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/729e7e91dd03d009bc658c196937ad4c83365f45/TaintedPathWorse-1671298496
+Writing minimization objective
+Model file: /bigtmp/wd/models/729e7e91dd03d009bc658c196937ad4c83365f45/TaintedPathWorse-1671298496/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/729e7e91dd03d009bc658c196937ad4c83365f45/TaintedPathWorse-1671298496
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:34:56,938 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/729e7e91dd03d009bc658c196937ad4c83365f45/TaintedPathWorse-1671298496/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 29 (-105) rows, 39 (-842) columns and 97 (-179) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00081591839 ( 0.81591839%) - largest zero change 0
+0  Obj 2.2000005 Primal inf 9.899974 (26)
+12  Obj 2.8507853
+Optimal - objective value 2.85
+After Postsolve, objective 2.85, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 2.85 - 12 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.00   (Wallclock seconds):       0.00
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/3383ae864430f686b5156681564a88bd94f70100/TaintedPathWorse-1671298496
+Reading events from:  /bigtmp/wd/data/3383ae864430f686b5156681564a88bd94f70100/3383ae864430f686b5156681564a88bd94f70100-eventToConcatRep-small.prop.csv
+New events: 40194
+Size rep_count: 40194
+New Unique reps: 40194
+['(return (member add (member classlist *)))', '(member has (return (parameter __webpack_require__ *)))', '(member parseQueryParam (member prototype *))', '(return (member encodeKey (member queryEncoder *)))', '(parameter a (member L (member f *)))']
+Total events: 40194
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/3383ae864430f686b5156681564a88bd94f70100/3383ae864430f686b5156681564a88bd94f70100-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 12, reps: 3 
+Unique Query sources locations: 3 
+Reading known from:  /bigtmp/wd/data/3383ae864430f686b5156681564a88bd94f70100/3383ae864430f686b5156681564a88bd94f70100-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 13, reps: 6 
+Unique Query sinks locations: 6 
+Reading known from:  /bigtmp/wd/data/3383ae864430f686b5156681564a88bd94f70100/3383ae864430f686b5156681564a88bd94f70100-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 388, reps: 104 
+Unique Query sanitizers locations: 104 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 4
+src_san: 4
+src_san_pairs: 4
+san_snk: 4
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 4, Src-San 4, Src-Snk 1
+constraints flow path = /bigtmp/wd/constraints/3383ae864430f686b5156681564a88bd94f70100/TaintedPathWorse-1671298506/constraints_flow.txt
+Computing blacklist
+Known sources: 3,Known sanitizers: 104,Known sinks: 6
+Objective File: /bigtmp/wd/constraints/3383ae864430f686b5156681564a88bd94f70100/TaintedPathWorse-1671298506/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/3383ae864430f686b5156681564a88bd94f70100/TaintedPathWorse-1671298507
+Writing minimization objective
+Model file: /bigtmp/wd/models/3383ae864430f686b5156681564a88bd94f70100/TaintedPathWorse-1671298506/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/3383ae864430f686b5156681564a88bd94f70100/TaintedPathWorse-1671298506
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:35:08,365 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/3383ae864430f686b5156681564a88bd94f70100/TaintedPathWorse-1671298506/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 9 (-678) rows, 14 (-120577) columns and 30 (-687) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00034588308 ( 0.34588308%) - largest zero change 0
+0  Obj 11.3 Primal inf 1.249995 (5)
+5  Obj 11.408525
+Optimal - objective value 11.408333
+After Postsolve, objective 11.408333, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 11.40833333 - 5 iterations time 0.012, Presolve 0.01
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.30   (Wallclock seconds):       0.36
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/1e85e559951bdf97ffe2a7c744ee67ca83589fde/TaintedPathWorse-1671298508
+Reading events from:  /bigtmp/wd/data/1e85e559951bdf97ffe2a7c744ee67ca83589fde/1e85e559951bdf97ffe2a7c744ee67ca83589fde-eventToConcatRep-small.prop.csv
+New events: 2310
+Size rep_count: 2310
+New Unique reps: 2310
+['(return (member writeFile (root https://www.npmjs.com/package/fs)))', '(parameter browserObject (member setBrowserVersion (member ConfigParser *)))', '(return (member assign (member Object (global))))', '(member prototype (member constructor (parameter 0 (member push *))))', '(member length (parameter list (member toArray (member util *))))']
+Total events: 2310
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/1e85e559951bdf97ffe2a7c744ee67ca83589fde/1e85e559951bdf97ffe2a7c744ee67ca83589fde-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 6, reps: 5 
+Unique Query sources locations: 5 
+Reading known from:  /bigtmp/wd/data/1e85e559951bdf97ffe2a7c744ee67ca83589fde/1e85e559951bdf97ffe2a7c744ee67ca83589fde-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 24, reps: 15 
+Unique Query sinks locations: 15 
+Reading known from:  /bigtmp/wd/data/1e85e559951bdf97ffe2a7c744ee67ca83589fde/1e85e559951bdf97ffe2a7c744ee67ca83589fde-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 7, reps: 7 
+Unique Query sanitizers locations: 7 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 6
+src_san: 6
+src_san_pairs: 12
+san_snk: 6
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 12, Src-San 6, Src-Snk 6
+constraints flow path = /bigtmp/wd/constraints/1e85e559951bdf97ffe2a7c744ee67ca83589fde/TaintedPathWorse-1671298540/constraints_flow.txt
+Computing blacklist
+Known sources: 5,Known sanitizers: 7,Known sinks: 15
+Objective File: /bigtmp/wd/constraints/1e85e559951bdf97ffe2a7c744ee67ca83589fde/TaintedPathWorse-1671298540/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/1e85e559951bdf97ffe2a7c744ee67ca83589fde/TaintedPathWorse-1671298540
+Writing minimization objective
+Model file: /bigtmp/wd/models/1e85e559951bdf97ffe2a7c744ee67ca83589fde/TaintedPathWorse-1671298540/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/1e85e559951bdf97ffe2a7c744ee67ca83589fde/TaintedPathWorse-1671298540
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:35:40,927 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/1e85e559951bdf97ffe2a7c744ee67ca83589fde/TaintedPathWorse-1671298540/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 22 (-164) rows, 31 (-6923) columns and 63 (-207) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00043235385 ( 0.43235385%) - largest zero change 0
+0  Obj 2.7 Primal inf 5.49999 (10)
+9  Obj 3.52576
+Optimal - objective value 3.525
+After Postsolve, objective 3.525, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 3.525 - 9 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.01   (Wallclock seconds):       0.02
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff/TaintedPathWorse-1671298540
+Reading events from:  /bigtmp/wd/data/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff-eventToConcatRep-small.prop.csv
+New events: 496
+Size rep_count: 496
+New Unique reps: 496
+['(member stringify (member JSON (global)))', '(parameter 0 (member afterEach (global)))', '(member DisplayFetchedLogs (return (member ShowMessage (member Functions *))))', '(parameter val (member prop (member NavigationButton *)))', '(member lineCount (instance (member ReadFile (parameter exports *))))']
+Total events: 496
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 2, reps: 1 
+Unique Query sources locations: 1 
+Reading known from:  /bigtmp/wd/data/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 4, reps: 2 
+Unique Query sinks locations: 2 
+Reading known from:  /bigtmp/wd/data/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 0, reps: 0 
+Unique Query sanitizers locations: 0 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 0
+src_san: 0
+src_san_pairs: 0
+san_snk: 0
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 0, Src-San 0, Src-Snk 0
+constraints flow path = /bigtmp/wd/constraints/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff/TaintedPathWorse-1671298568/constraints_flow.txt
+Computing blacklist
+Known sources: 1,Known sanitizers: 0,Known sinks: 2
+Objective File: /bigtmp/wd/constraints/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff/TaintedPathWorse-1671298568/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff/TaintedPathWorse-1671298568
+Writing minimization objective
+Model file: /bigtmp/wd/models/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff/TaintedPathWorse-1671298568/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff/TaintedPathWorse-1671298568
+Writing flow and known constraints
+Done flows
+No known sanitizers
+Writing Bounds
+Done
+2022-12-17 17:36:08,245 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/4035d6d3ab6e9214ddcd70ff0c01b4f6c46b33ff/TaintedPathWorse-1671298568/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 0 (-18) rows, 0 (-1488) columns and 0 (-18) elements
+Empty problem - 0 rows, 0 columns and 0 elements
+Optimal - objective value 0.3
+After Postsolve, objective 0.3, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 0.3 - 0 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.00   (Wallclock seconds):       0.00
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/6578b16d9525ee23256ea0fcde5c5f52f81cc545/TaintedPathWorse-1671298568
+Reading events from:  /bigtmp/wd/data/6578b16d9525ee23256ea0fcde5c5f52f81cc545/6578b16d9525ee23256ea0fcde5c5f52f81cc545-eventToConcatRep-small.prop.csv
+New events: 4473
+Size rep_count: 4473
+New Unique reps: 4473
+['(member generateCertificate (member mozRTCPeerConnection (global)))', '(parameter lCodec (parameter 0 (member forEach (member codecs *))))', '(member toString (member byteLength (parameter p *)))', '(return (parameter err_cb (member exports (parameter module *))))', '(member * (member transceivers *))']
+Total events: 4473
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/6578b16d9525ee23256ea0fcde5c5f52f81cc545/6578b16d9525ee23256ea0fcde5c5f52f81cc545-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 2, reps: 1 
+Unique Query sources locations: 1 
+Reading known from:  /bigtmp/wd/data/6578b16d9525ee23256ea0fcde5c5f52f81cc545/6578b16d9525ee23256ea0fcde5c5f52f81cc545-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 12, reps: 5 
+Unique Query sinks locations: 5 
+Reading known from:  /bigtmp/wd/data/6578b16d9525ee23256ea0fcde5c5f52f81cc545/6578b16d9525ee23256ea0fcde5c5f52f81cc545-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 10, reps: 8 
+Unique Query sanitizers locations: 8 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 1
+src_san: 1
+src_san_pairs: 1
+san_snk: 1
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 1, Src-San 1, Src-Snk 1
+constraints flow path = /bigtmp/wd/constraints/6578b16d9525ee23256ea0fcde5c5f52f81cc545/TaintedPathWorse-1671298576/constraints_flow.txt
+Computing blacklist
+Known sources: 1,Known sanitizers: 8,Known sinks: 5
+Objective File: /bigtmp/wd/constraints/6578b16d9525ee23256ea0fcde5c5f52f81cc545/TaintedPathWorse-1671298576/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/6578b16d9525ee23256ea0fcde5c5f52f81cc545/TaintedPathWorse-1671298576
+Writing minimization objective
+Model file: /bigtmp/wd/models/6578b16d9525ee23256ea0fcde5c5f52f81cc545/TaintedPathWorse-1671298576/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/6578b16d9525ee23256ea0fcde5c5f52f81cc545/TaintedPathWorse-1671298576
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:36:16,826 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/6578b16d9525ee23256ea0fcde5c5f52f81cc545/TaintedPathWorse-1671298576/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 3 (-84) rows, 5 (-13417) columns and 9 (-87) elements
+0  Obj 1.4 Primal inf 0.499998 (2)
+3  Obj 1.9
+Optimal - objective value 1.9
+After Postsolve, objective 1.9, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1.9 - 3 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.03   (Wallclock seconds):       0.03
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/c8a6fb852b72f2aca07fb1358c985c7a461baf57/TaintedPathWorse-1671298576
+Reading events from:  /bigtmp/wd/data/c8a6fb852b72f2aca07fb1358c985c7a461baf57/c8a6fb852b72f2aca07fb1358c985c7a461baf57-eventToConcatRep-small.prop.csv
+New events: 3058
+Size rep_count: 3058
+New Unique reps: 3058
+['(parameter 0 (member revert *))', '(parameter 6 (member TileMap (global)))', '(member __rememberedObjectIndecesToControllers (parameter 0 (member push *)))', '(return (member addVector *))', '(parameter 0 (member renameCycles *))']
+Total events: 3058
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/c8a6fb852b72f2aca07fb1358c985c7a461baf57/c8a6fb852b72f2aca07fb1358c985c7a461baf57-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 2, reps: 2 
+Unique Query sources locations: 2 
+Reading known from:  /bigtmp/wd/data/c8a6fb852b72f2aca07fb1358c985c7a461baf57/c8a6fb852b72f2aca07fb1358c985c7a461baf57-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 1, reps: 1 
+Unique Query sinks locations: 1 
+Reading known from:  /bigtmp/wd/data/c8a6fb852b72f2aca07fb1358c985c7a461baf57/c8a6fb852b72f2aca07fb1358c985c7a461baf57-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 2, reps: 2 
+Unique Query sanitizers locations: 2 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 1
+src_san: 1
+src_san_pairs: 1
+san_snk: 1
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 1, Src-San 1, Src-Snk 1
+constraints flow path = /bigtmp/wd/constraints/c8a6fb852b72f2aca07fb1358c985c7a461baf57/TaintedPathWorse-1671298611/constraints_flow.txt
+Computing blacklist
+Known sources: 2,Known sanitizers: 2,Known sinks: 1
+Objective File: /bigtmp/wd/constraints/c8a6fb852b72f2aca07fb1358c985c7a461baf57/TaintedPathWorse-1671298611/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/c8a6fb852b72f2aca07fb1358c985c7a461baf57/TaintedPathWorse-1671298611
+Writing minimization objective
+Model file: /bigtmp/wd/models/c8a6fb852b72f2aca07fb1358c985c7a461baf57/TaintedPathWorse-1671298611/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/c8a6fb852b72f2aca07fb1358c985c7a461baf57/TaintedPathWorse-1671298611
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:36:51,371 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/c8a6fb852b72f2aca07fb1358c985c7a461baf57/TaintedPathWorse-1671298611/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 3 (-30) rows, 4 (-9173) columns and 6 (-36) elements
+0  Obj 0.64999999 Primal inf 1.099999 (1)
+2  Obj 1.075
+Optimal - objective value 1.075
+After Postsolve, objective 1.075, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1.075 - 2 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.02   (Wallclock seconds):       0.02
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/516798071f31c04ee1cfe8881fe509de931b5dc9/TaintedPathWorse-1671298611
+Reading events from:  /bigtmp/wd/data/516798071f31c04ee1cfe8881fe509de931b5dc9/516798071f31c04ee1cfe8881fe509de931b5dc9-eventToConcatRep-small.prop.csv
+New events: 44986
+Size rep_count: 44986
+New Unique reps: 44986
+['(member * (member lang (parameter 2 (member fire *))))', '(member hasFocus (member focusManager (parameter a (member createPanel *))))', '(member * (member * (member removeDialogTabs (member _ *))))', '(member stroke-opacity *)', '(member renderTo (member chart *))']
+Total events: 44986
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/516798071f31c04ee1cfe8881fe509de931b5dc9/516798071f31c04ee1cfe8881fe509de931b5dc9-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 193, reps: 27 
+Unique Query sources locations: 27 
+Reading known from:  /bigtmp/wd/data/516798071f31c04ee1cfe8881fe509de931b5dc9/516798071f31c04ee1cfe8881fe509de931b5dc9-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 53, reps: 12 
+Unique Query sinks locations: 12 
+Reading known from:  /bigtmp/wd/data/516798071f31c04ee1cfe8881fe509de931b5dc9/516798071f31c04ee1cfe8881fe509de931b5dc9-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 80, reps: 32 
+Unique Query sanitizers locations: 32 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 91
+src_san: 38
+src_san_pairs: 698
+san_snk: 38
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 698, Src-San 91, Src-Snk 3092
+constraints flow path = /bigtmp/wd/constraints/516798071f31c04ee1cfe8881fe509de931b5dc9/TaintedPathWorse-1671298731/constraints_flow.txt
+Computing blacklist
+Known sources: 27,Known sanitizers: 32,Known sinks: 12
+Objective File: /bigtmp/wd/constraints/516798071f31c04ee1cfe8881fe509de931b5dc9/TaintedPathWorse-1671298731/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/516798071f31c04ee1cfe8881fe509de931b5dc9/TaintedPathWorse-1671298732
+Writing minimization objective
+Model file: /bigtmp/wd/models/516798071f31c04ee1cfe8881fe509de931b5dc9/TaintedPathWorse-1671298731/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/516798071f31c04ee1cfe8881fe509de931b5dc9/TaintedPathWorse-1671298731
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:38:53,465 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/516798071f31c04ee1cfe8881fe509de931b5dc9/TaintedPathWorse-1671298731/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 3287 (-1020) rows, 3466 (-135373) columns and 11757 (-13752) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.0009843885 ( 0.9843885%) - largest zero change 0
+0  Obj 19.85001 Primal inf 864.24684 (3164)
+110  Obj 29.616767
+Optimal - objective value 29.6125
+After Postsolve, objective 29.6125, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 29.6125 - 110 iterations time 0.012, Presolve 0.01
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.38   (Wallclock seconds):       0.46
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/704adc0814b8f751891b6e46ce9293351958cdb7/TaintedPathWorse-1671298734
+Reading events from:  /bigtmp/wd/data/704adc0814b8f751891b6e46ce9293351958cdb7/704adc0814b8f751891b6e46ce9293351958cdb7-eventToConcatRep-small.prop.csv
+New events: 1020
+Size rep_count: 1020
+New Unique reps: 1020
+['(member stringify (member JSON (global)))', '(parameter 0 (member task *))', '(return (root https://www.npmjs.com/package/gulp-minify-css))', '(member value (member target (parameter e (member updateProjectName *))))', '(member alignItems (member flexContainer *))']
+Total events: 1020
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/704adc0814b8f751891b6e46ce9293351958cdb7/704adc0814b8f751891b6e46ce9293351958cdb7-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 53, reps: 3 
+Unique Query sources locations: 3 
+Reading known from:  /bigtmp/wd/data/704adc0814b8f751891b6e46ce9293351958cdb7/704adc0814b8f751891b6e46ce9293351958cdb7-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 42, reps: 7 
+Unique Query sinks locations: 7 
+Reading known from:  /bigtmp/wd/data/704adc0814b8f751891b6e46ce9293351958cdb7/704adc0814b8f751891b6e46ce9293351958cdb7-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 0, reps: 0 
+Unique Query sanitizers locations: 0 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 3
+src_san: 3
+src_san_pairs: 5
+san_snk: 3
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 5, Src-San 3, Src-Snk 5
+constraints flow path = /bigtmp/wd/constraints/704adc0814b8f751891b6e46ce9293351958cdb7/TaintedPathWorse-1671298762/constraints_flow.txt
+Computing blacklist
+Known sources: 3,Known sanitizers: 0,Known sinks: 7
+Objective File: /bigtmp/wd/constraints/704adc0814b8f751891b6e46ce9293351958cdb7/TaintedPathWorse-1671298762/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/704adc0814b8f751891b6e46ce9293351958cdb7/TaintedPathWorse-1671298762
+Writing minimization objective
+Model file: /bigtmp/wd/models/704adc0814b8f751891b6e46ce9293351958cdb7/TaintedPathWorse-1671298762/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/704adc0814b8f751891b6e46ce9293351958cdb7/TaintedPathWorse-1671298762
+Writing flow and known constraints
+Done flows
+No known sanitizers
+Writing Bounds
+Done
+2022-12-17 17:39:22,192 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/704adc0814b8f751891b6e46ce9293351958cdb7/TaintedPathWorse-1671298762/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 13 (-60) rows, 21 (-3052) columns and 41 (-73) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00040555346 ( 0.40555346%) - largest zero change 0
+0  Obj 1 Primal inf 1.999992 (8)
+9  Obj 1.8507515
+Optimal - objective value 1.85
+After Postsolve, objective 1.85, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1.85 - 9 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.00   (Wallclock seconds):       0.01
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/78bde22b483004e28e3ed50b5db36e66b8e0afd7/TaintedPathWorse-1671298762
+Reading events from:  /bigtmp/wd/data/78bde22b483004e28e3ed50b5db36e66b8e0afd7/78bde22b483004e28e3ed50b5db36e66b8e0afd7-eventToConcatRep-small.prop.csv
+New events: 688
+Size rep_count: 688
+New Unique reps: 688
+['(return (member writeFile (root https://www.npmjs.com/package/fs)))', '(member id (member 0 (return (member first *))))', '(return (member end (return (member request *))))', '(return (member ceil (member Math (global))))', '(return (member pipe (return (member createReadStream *))))']
+Total events: 688
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/78bde22b483004e28e3ed50b5db36e66b8e0afd7/78bde22b483004e28e3ed50b5db36e66b8e0afd7-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 14, reps: 5 
+Unique Query sources locations: 5 
+Reading known from:  /bigtmp/wd/data/78bde22b483004e28e3ed50b5db36e66b8e0afd7/78bde22b483004e28e3ed50b5db36e66b8e0afd7-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 10, reps: 7 
+Unique Query sinks locations: 7 
+Reading known from:  /bigtmp/wd/data/78bde22b483004e28e3ed50b5db36e66b8e0afd7/78bde22b483004e28e3ed50b5db36e66b8e0afd7-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 1, reps: 1 
+Unique Query sanitizers locations: 1 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 1
+src_san: 1
+src_san_pairs: 1
+san_snk: 1
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 1, Src-San 1, Src-Snk 1
+constraints flow path = /bigtmp/wd/constraints/78bde22b483004e28e3ed50b5db36e66b8e0afd7/TaintedPathWorse-1671298770/constraints_flow.txt
+Computing blacklist
+Known sources: 5,Known sanitizers: 1,Known sinks: 7
+Objective File: /bigtmp/wd/constraints/78bde22b483004e28e3ed50b5db36e66b8e0afd7/TaintedPathWorse-1671298770/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/78bde22b483004e28e3ed50b5db36e66b8e0afd7/TaintedPathWorse-1671298770
+Writing minimization objective
+Model file: /bigtmp/wd/models/78bde22b483004e28e3ed50b5db36e66b8e0afd7/TaintedPathWorse-1671298770/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/78bde22b483004e28e3ed50b5db36e66b8e0afd7/TaintedPathWorse-1671298770
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:39:30,299 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/78bde22b483004e28e3ed50b5db36e66b8e0afd7/TaintedPathWorse-1671298770/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 3 (-78) rows, 5 (-2062) columns and 9 (-81) elements
+0  Obj 1.3 Primal inf 0.499998 (2)
+3  Obj 1.8
+Optimal - objective value 1.8
+After Postsolve, objective 1.8, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1.8 - 3 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.00   (Wallclock seconds):       0.01
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/acb7cf57897abc90d7588d7cfab24204c6c580ba/TaintedPathWorse-1671298770
+Reading events from:  /bigtmp/wd/data/acb7cf57897abc90d7588d7cfab24204c6c580ba/acb7cf57897abc90d7588d7cfab24204c6c580ba-eventToConcatRep-small.prop.csv
+New events: 145
+Size rep_count: 145
+New Unique reps: 145
+['(parameter 1 (member listen *))', '(return (return (member parse *)))', '(parameter 1 (member exists *))', '(return (member error (member Console (root https://www.npmjs.com/package/console))))', '(parameter 0 (member match *))']
+Total events: 145
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/acb7cf57897abc90d7588d7cfab24204c6c580ba/acb7cf57897abc90d7588d7cfab24204c6c580ba-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 7, reps: 2 
+Unique Query sources locations: 2 
+Reading known from:  /bigtmp/wd/data/acb7cf57897abc90d7588d7cfab24204c6c580ba/acb7cf57897abc90d7588d7cfab24204c6c580ba-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 6, reps: 5 
+Unique Query sinks locations: 5 
+Reading known from:  /bigtmp/wd/data/acb7cf57897abc90d7588d7cfab24204c6c580ba/acb7cf57897abc90d7588d7cfab24204c6c580ba-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 0, reps: 0 
+Unique Query sanitizers locations: 0 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 5
+src_san: 5
+src_san_pairs: 23
+san_snk: 5
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 23, Src-San 5, Src-Snk 9
+constraints flow path = /bigtmp/wd/constraints/acb7cf57897abc90d7588d7cfab24204c6c580ba/TaintedPathWorse-1671298794/constraints_flow.txt
+Computing blacklist
+Known sources: 2,Known sanitizers: 0,Known sinks: 5
+Objective File: /bigtmp/wd/constraints/acb7cf57897abc90d7588d7cfab24204c6c580ba/TaintedPathWorse-1671298794/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/acb7cf57897abc90d7588d7cfab24204c6c580ba/TaintedPathWorse-1671298794
+Writing minimization objective
+Model file: /bigtmp/wd/models/acb7cf57897abc90d7588d7cfab24204c6c580ba/TaintedPathWorse-1671298794/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/acb7cf57897abc90d7588d7cfab24204c6c580ba/TaintedPathWorse-1671298794
+Writing flow and known constraints
+Done flows
+No known sanitizers
+Writing Bounds
+Done
+2022-12-17 17:39:54,843 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/acb7cf57897abc90d7588d7cfab24204c6c580ba/TaintedPathWorse-1671298794/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 29 (-50) rows, 37 (-435) columns and 91 (-131) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00083259078 ( 0.83259078%) - largest zero change 0
+0  Obj 0.7 Primal inf 5.999988 (12)
+4  Obj 0.8758934
+Optimal - objective value 0.875
+After Postsolve, objective 0.875, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 0.875 - 4 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.00   (Wallclock seconds):       0.00
+
+
+STDERR: 
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/2edef3d8ea89531737272e4fae88985dff9b6dd5/TaintedPathWorse-1671298794
+Reading events from:  /bigtmp/wd/data/2edef3d8ea89531737272e4fae88985dff9b6dd5/2edef3d8ea89531737272e4fae88985dff9b6dd5-eventToConcatRep-small.prop.csv
+New events: 1314
+Size rep_count: 1314
+New Unique reps: 1314
+['(member root (member scenario *))', '(member name (member * (member * (member _factors *))))', '(parameter 0 (member to *))', '(member json (parameter res (parameter 1 (member get *))))', '(member _getAvgOfField (instance (member exports *)))']
+Total events: 1314
+Constraints for known events
+Reading known from:  /bigtmp/wd/data/2edef3d8ea89531737272e4fae88985dff9b6dd5/2edef3d8ea89531737272e4fae88985dff9b6dd5-sources-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sources locations: 24, reps: 2 
+Unique Query sources locations: 2 
+Reading known from:  /bigtmp/wd/data/2edef3d8ea89531737272e4fae88985dff9b6dd5/2edef3d8ea89531737272e4fae88985dff9b6dd5-sinks-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sinks locations: 16, reps: 6 
+Unique Query sinks locations: 6 
+Reading known from:  /bigtmp/wd/data/2edef3d8ea89531737272e4fae88985dff9b6dd5/2edef3d8ea89531737272e4fae88985dff9b6dd5-sanitizers-Path.prop.csv
+Query:  TaintedPathWorse
+Unique sanitizers locations: 3, reps: 2 
+Unique Query sanitizers locations: 2 
+Creating variables
+Built vars
+Done variables
+Wrote to file
+src_san_pairs: 12
+src_san: 10
+src_san_pairs: 17
+san_snk: 10
+Sinks not found 0
+Sources not found 0
+Sanitizers not found 0
+Flows: San-Snk 17, Src-San 12, Src-Snk 6
+constraints flow path = /bigtmp/wd/constraints/2edef3d8ea89531737272e4fae88985dff9b6dd5/TaintedPathWorse-1671298816/constraints_flow.txt
+Computing blacklist
+Known sources: 2,Known sanitizers: 2,Known sinks: 6
+Objective File: /bigtmp/wd/constraints/2edef3d8ea89531737272e4fae88985dff9b6dd5/TaintedPathWorse-1671298816/objective.txt
+result candidates = []
+Results candidates do not exist
+(given results folder = /results
+results folder = /results/2edef3d8ea89531737272e4fae88985dff9b6dd5/TaintedPathWorse-1671298816
+Writing minimization objective
+Model file: /bigtmp/wd/models/2edef3d8ea89531737272e4fae88985dff9b6dd5/TaintedPathWorse-1671298816/optimization_model_1.0_1.lp
+Constraint folder: /bigtmp/wd/constraints/2edef3d8ea89531737272e4fae88985dff9b6dd5/TaintedPathWorse-1671298816
+Writing flow and known constraints
+Done flows
+Writing Bounds
+Done
+2022-12-17 17:40:16,894 - DEBUG - CBC completed run. STDOUT: Welcome to the CBC MILP Solver 
+Version: 2.10.5 
+Build Date: Oct 15 2020 
+
+command line - cbc /bigtmp/wd/models/2edef3d8ea89531737272e4fae88985dff9b6dd5/TaintedPathWorse-1671298816/optimization_model_1.0_1.lp -solve -printing all -solu sol.txt (default strategy 1)
+Presolve 30 (-65) rows, 43 (-3934) columns and 116 (-115) elements
+Perturbing problem by 0.001% of 1 - largest nonzero change 0.00083259078 ( 0.83259078%) - largest zero change 0
+0  Obj 1 Primal inf 4.499982 (18)
+6  Obj 1.1005768
+Optimal - objective value 1.1
+After Postsolve, objective 1.1, infeasibilities - dual 0 (0), primal 0 (0)
+Optimal objective 1.1 - 6 iterations time 0.002, Presolve 0.00
+Option for printingOptions changed from normal to all
+Total time (CPU seconds):       0.01   (Wallclock seconds):       0.01
+
+
+STDERR: 
+Running TSM in docker:
+- Reading projects from: /tesis/repos/tsm-pipeline/experiments/tesis/tainted_path/tainted_path_10.txt
+- Results will be in: /tesis/tmp/results/tainted_path_top_10/
+
+Beggining container execution...

@@ -10,6 +10,7 @@ from orchestration.orchestrator import Orchestrator
 from orchestration import global_config
 from database.cache import DatabasesCache as ProjectDatabaseCache, NotCachedError
 from utils.process import run_process
+from o11y import none_tracker_factory, new_tracker_factory
 
 def create_logging_file_appender():
     new_log_file = os.path.join(global_config.logs_directory, f"tsm_log_{int(datetime.datetime.now().timestamp())}.log")
@@ -113,6 +114,11 @@ parser.add_argument("--project.cache_dir", dest="project_cache_dir", required=Fa
                     help="Directory to use for the project cache. Could have already cached DBs. If this flag is configured, the " +
                     "DatabaseCache will be used for fetching project DBs.")
 
+parser.add_argument("--o11y.name", dest="o11y_experiment_name", required=False, type=str,
+                    help="When observaibility is enabled, this will be the tracked experiment name.")
+parser.add_argument("--o11y.db_path", dest="o11y_db_path", required=False, type=str,
+                    help="If present, o11y is enabled. Path to the SQLLite db used for pipeline o11y.")
+
 # Print whole global config
 from pprint import pformat
 logging.info("Global config dump:\n%s", pformat(vars(global_config)))
@@ -170,6 +176,11 @@ if parsed_arguments.multiple:
 rep_counter = dict()
 
 
+tracker_factory = none_tracker_factory()
+if parsed_arguments.o11y_db_path != "":
+    # o11y is enabled
+    tracker_factory = new_tracker_factory(parsed_arguments.o11y_db_path)
+
 if __name__ == '__main__':
     all_projects = projectList
     if parsed_arguments.multiple:
@@ -180,8 +191,20 @@ if __name__ == '__main__':
     if parsed_arguments.solver == "gurobi":
         raise Exception("gurobi is deprecated. Use CBC instead!")
 
+    # start experiment, and in each check first check if it's none
+    experiment_tracker = tracker_factory(
+        name=parsed_arguments.o11y_experiment_name,
+        train_size=len(all_projects),
+    )
+
     for project in all_projects:       
         logging.info(f"Running orchestrator-{parsed_arguments.command} on project: {project}")
+
+        # orchestrator running for new project, track
+        project_end = experiment_tracker.new_step(
+            train_db_name=project,
+        )
+
         project_name = os.path.basename(project)
         # TODO: Fix poject name, which is just becoming here the project db hash
         orchestrator = Orchestrator(project, project_name, 
@@ -207,10 +230,16 @@ if __name__ == '__main__':
                 else:
                     orchestrator.run_step(parsed_arguments.single_step)
                 hasExecuted = True
+                # project ended successfully
+                project_end()
             except Exception as inst:
                 logging.error(f"Error running  project: {project}, {inst}")
                 logging.exception("Fatal error occured in orchestrator execution")
-
+                # project ended with error
+                project_end(error=True)
 
         elif parsed_arguments.command == "clean":
             orchestrator.clean()
+
+    # experiment has finished, report event
+    experiment_tracker.end()

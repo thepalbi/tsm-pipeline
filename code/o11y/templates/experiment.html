@@ -13,12 +13,13 @@
         {% endfor %}
         <h1>Experimento: {{experiment.name}}</h1>
         <a href="{{url_for('index')}}">back home</a>
+        <h3>Creado {{experiment.started_at}}</h3>
         <h3>Estado: {{'RUNNING' if experiment.finished_at is none else 'FINISHED at ' ~ experiment.finished_at}}</h3>
         <h3>Quedan por entrenar: {{experiment.total_train_size - (experiment.train_dbs|length)}}</h3>
         <ul>
             {% for db in experiment.train_dbs %}
             <li>
-                <b>{{db.name}}</b> started at {{db.started_at}}, status {{'RUNNING' if db.finished_at is none else 'FINISHED at ' ~ db.finished_at}}
+                <b>{{db.name}}</b> started at {{db.started_at}}, status {{db.status}}{%if db.status != 'running'%}, finished at {{db.finished_at}}{%endif%}
             </li>
             {% endfor %}
         </ul>

@@ -43,6 +43,17 @@ if [[ "$RESULTS_DIR" == "" ]] ; then
     exit 1
 fi
 
+O11Y_EXPERIMENT_NAME=$3
+if [[ "$O11Y_EXPERIMENT_NAME" == "" ]] ; then
+    echo "experiment name shoulnd't be empty"
+    exit 1
+fi
+
+
+# This is hardcoded
+O11Y_DB_DIR="/tesis/repos/tsm-pipeline/code/tsm.db"
+O11Y_CONTAINER_DB_DIR="/data/tracking.db"
+
 # Docker based run of the orchestrator pipeline
 # Runs the dockerized version of TSM pipeline, mounting the necessary bind volumes
 function tsm-run() {
@@ -55,6 +66,7 @@ function tsm-run() {
     -v $RESULTS_DIR:/results: \
     -v $CACHE_DBS_DIR:/dbs: \
     -v $PROJECT_LIST_FILE:$MOUNTED_LIST_FILE:ro \
+    -v $O11Y_DB_DIR:$O11Y_CONTAINER_DB_DIR:rw \
     github.com/thepalbi/tsm-main:latest $@
 }
 
@@ -69,12 +81,15 @@ EOF
 # Run the TSM learning pipeline for the provided project list. This will have the following characteristics:
 # - Use CBC as solver
 # - Run the whole orchestrator for each project individually
-tsm-run --steps generate_entities,generate_model,optimize \
+tsm-run \
+--steps generate_entities,generate_model,optimize \
 --project.cache_dir /dbs \
 --project-list $MOUNTED_LIST_FILE \
 --query-type Path \
 --query-name TaintedPathWorse \
 --solver CBC \
+--o11y.db_path $O11Y_CONTAINER_DB_DIR \
+--o11y.name $O11Y_EXPERIMENT_NAME \
 run
 
 # Combine scores generated for all the results above
