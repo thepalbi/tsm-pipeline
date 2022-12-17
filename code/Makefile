@@ -22,9 +22,11 @@ IMAGE_TAG    ?= $(SANITIZED_GIT_BRANCH)-$(GIT_VERSION)
 PRINT_BOLD := $(shell tput bold)
 PRINT_NORMAL := $(shell tput sgr0)
 
+DOCKER_BUILD_ARGS := --build-arg GROUP_ID=$(shell id -g) --build-arg USER_ID=$(shell id -u)
+
 docker: docker-tsm-main
 
 docker-tsm-main:
-	DOCKER_BUILDKIT=1 docker build -t $(IMAGE_PREFIX)/tsm-main -f ./Dockerfile .
+	DOCKER_BUILDKIT=1 docker build -t $(IMAGE_PREFIX)/tsm-main $(DOCKER_BUILD_ARGS) -f ./Dockerfile .
 	docker tag $(IMAGE_PREFIX)/tsm-main $(IMAGE_PREFIX)/tsm-main:latest
 	docker tag $(IMAGE_PREFIX)/tsm-main $(IMAGE_PREFIX)/tsm-main:$(IMAGE_TAG)

@@ -37,5 +37,12 @@ RUN cat <<EOF > config.json
 }
 EOF
 
+ARG USER_ID
+ARG GROUP_ID
+
+RUN addgroup --gid $GROUP_ID tsm
+RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID tsm
+USER tsm
+
 ENTRYPOINT ["python", "main.py"]
 CMD ["--help"]
