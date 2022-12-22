@@ -42,6 +42,10 @@ if [[ "$RESULTS_DIR" == "" ]] ; then
     echo "Missing results dir"
     exit 1
 fi
+if [ ! -d $RESULTS_DIR ]; then
+    echo "Creating results dir at $RESULTS_DIR"
+    mkdir $RESULTS_DIR
+fi
 
 O11Y_EXPERIMENT_NAME=$3
 if [[ "$O11Y_EXPERIMENT_NAME" == "" ]] ; then
@@ -68,7 +72,7 @@ function tsm-run() {
     -v $RESULTS_DIR:/results: \
     -v $CACHE_DBS_DIR:/dbs: \
     -v $PROJECT_LIST_FILE:$MOUNTED_LIST_FILE:ro \
-    -v $O11Y_DB_DIR:$O11Y_CONTAINER_DB_DIR:rw \
+    -v $O11Y_DB_DIR:$O11Y_CONTAINER_DB_DIR: \
     github.com/thepalbi/tsm-main:latest $@
 }
 

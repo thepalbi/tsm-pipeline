@@ -1,28 +1,36 @@
 # syntax=docker/dockerfile:1.3-labs
+
+# ------------------
+# installation image
+# ------------------
+# This image will first install all python dependencies in a virtuanenv, and copy
+# the installation folder changing the owner to the TSM user.
 FROM python:3.10.5-bullseye as compile-image
 
 # Dependencies installation
 WORKDIR /tmp
-
 COPY requirements.txt .
 RUN python -m venv /opt/venv
-# Make sure we use the virtualenv
 ENV PATH="/opt/venv/bin:$PATH"
-# Install required dependencies
 RUN pip install -r requirements.txt
 
+# ----------
+# main image
+# ----------
+# Slim image to be used in TSM
 FROM python:3.10.5-bullseye as build-image
 
-# Configuring container user
+# Arguments to keep the same uid and gid as the host user
 ARG USER_ID
 ARG GROUP_ID
 
+# tsm is the main container user, using the same uid and gid as the local user to let other scripts fiddle
+# with the work in progress files.
 RUN addgroup --gid $GROUP_ID tsm
 RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID tsm
 USER tsm
 
 COPY --from=compile-image --chown=tsm /opt/venv /opt/venv
-# Make sure we use the virtualenv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Install cbc as root

@@ -1,8 +1,12 @@
 from .app import models_for_base
 from peewee import SqliteDatabase, Model
 import datetime
+from utils.logging import get_stdout_logger
+
+log = get_stdout_logger("o11y")
 
 def new_tracker_factory(db_path: str):
+    log.info("starting new tracker factory at path %s", db_path)
     db = SqliteDatabase(db_path)
     class BaseModel(Model):
         class Meta:
