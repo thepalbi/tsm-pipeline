@@ -20,6 +20,12 @@ RUN pip install -r requirements.txt
 # Slim image to be used in TSM
 FROM python:3.10.5-bullseye as build-image
 
+# Install cbc as root
+RUN \
+    apt-get update \
+    && apt-get install -y coinor-cbc \
+    && apt-get install -y sqlite3
+
 # Arguments to keep the same uid and gid as the host user
 ARG USER_ID
 ARG GROUP_ID
@@ -28,25 +34,29 @@ ARG GROUP_ID
 # with the work in progress files.
 RUN addgroup --gid $GROUP_ID tsm
 RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID tsm
+
+# Make data directory and make it writeable
+RUN mkdir /data && chown tsm:tsm /data
+RUN mkdir /cli && chown tsm:tsm /cli
+RUN mkdir /ql && chown tsm:tsm /ql
+RUN mkdir /worse_lib && chown tsm:tsm /worse_lib
+RUN mkdir /bigtmp && chown tsm:tsm /bigtmp
+RUN mkdir /results && chown tsm:tsm /results
+RUN mkdir /dbs && chown tsm:tsm /dbs
+
+# Change to the runtime user
 USER tsm
 
+# Copy already installed virtualenv
 COPY --from=compile-image --chown=tsm /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-
-# Install cbc as root
-USER 0
-RUN \
-    apt-get update \
-    && apt-get install -y coinor-cbc
-
-USER tsm
 
 # Moving application artifacts
 WORKDIR /app
 
 # Copy eveything needed to run the orchestrator
 # TODO: Trim this down somehow
-COPY . ./
+COPY --chown=tsm . ./
 
 # Volumes that need to be mounted in this container to work
 # /results: Results directory
