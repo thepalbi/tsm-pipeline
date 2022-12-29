@@ -53,6 +53,19 @@ if [[ "$O11Y_EXPERIMENT_NAME" == "" ]] ; then
     exit 1
 fi
 
+QUERY_TYPE=$4
+if [[ "$QUERY_TYPE" == "" ]] ; then
+    # ["Xss", "NoSql", "Sql", "Sel", "Path"]
+    echo "missing query type"
+    exit 1
+fi
+QUERY_NAME=$5
+if [[ "$QUERY_NAME" == "" ]] ; then
+    # ["NosqlInjectionWorse", "SqlInjectionWorse", "DomBasedXssWorse", "SeldonWorse", "TaintedPathWorse"]
+    echo "missing query name"
+    exit 1
+fi
+
 
 # This is hardcoded
 O11Y_DB_DIR="/tesis/repos/tsm-pipeline/code/tsm.db"
@@ -91,8 +104,8 @@ tsm-run \
 --steps generate_entities,generate_model,optimize \
 --project.cache_dir /dbs \
 --project-list $MOUNTED_LIST_FILE \
---query-type Path \
---query-name TaintedPathWorse \
+--query-type $QUERY_TYPE \
+--query-name $QUERY_NAME \
 --solver CBC \
 --o11y.db_path $O11Y_CONTAINER_DB_DIR \
 --o11y.name $O11Y_EXPERIMENT_NAME \
