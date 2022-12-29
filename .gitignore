@@ -135,3 +135,4 @@ tsm-atm-pipeline/test/xss/xss.testproj/trap/*
 # CBC files
 code/sol.txt
 
+nohup.out
