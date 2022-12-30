@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 import os
 from utils.logging import get_stdout_logger
 
+from misc.combinescores import combine_scores
+
 logger = get_stdout_logger("docker")
 
 
@@ -153,6 +155,7 @@ def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs
         detach=True,
         **settings.docker_kwargs
     )
+    logger.info("running at container %s. Use `docker logs %s --tail 10 --follow` to follow progress", container.id, container.id)
     if block:
         container.wait()
     elif tail_logs:
@@ -162,6 +165,15 @@ def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs
             stream=True,
         ):
             print("%s" % log.decode("utf-8"))
+
+    logger.info("running combine scores")
+    combine_scores(
+        query=query.name,
+        results_dir=settings.results_dir,
+        multiple=False,
+        out_file=os.path.join(settings.results_dir, "averaged-results.txt"),
+        raw_out_file=os.path.join(settings.results_dir, "averaged-results.csv"),
+    )
 
 
 if __name__ == "__main__":
