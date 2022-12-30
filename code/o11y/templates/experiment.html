@@ -1,6 +1,20 @@
 <!doctype html>
 <title>{% block title %}{% endblock %} - Flaskr</title>
 
+<style>
+.error {
+    color: red;
+}
+.success, .finished {
+    color: chartreuse;
+}
+.running {
+    color: darkkhaki;
+}
+
+</style>
+
+
 <body>
     <style>
         h3 {
@@ -19,7 +33,7 @@
         <ul>
             {% for db in experiment.train_dbs %}
             <li>
-                <b>{{db.name}}</b> started at {{db.started_at}}, status {{db.status}}{%if db.status != 'running'%}, finished at {{db.finished_at}}{%endif%}
+                <b class="{{db.status}}">{{db.name}}</b> started at {{db.started_at}}, status {{db.status}}{%if db.status != 'running'%}, finished at {{db.finished_at}}{%endif%}
             </li>
             {% endfor %}
         </ul>
