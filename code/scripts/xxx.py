@@ -1,9 +1,42 @@
 import docker
 from docker.types import Mount
-
-
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Any
 import re
+from dataclasses import dataclass, field
+import os
+from utils.logging import get_stdout_logger
+
+logger = get_stdout_logger("docker")
+
+
+@dataclass(frozen=True)
+class QueryNameAndType:
+    name: str
+    type: str
+
+
+QUERY_TYPES: Dict[str, QueryNameAndType] = {
+    'nosql': QueryNameAndType(
+        type='NoSql',
+        name='NosqlInjectionWorse'
+    ),
+    'xss': QueryNameAndType(
+        type='Xss',
+        name='DomBasedXssWorse',
+    ),
+    'sql': QueryNameAndType(
+        type='Sql',
+        name='SqlInjectionWorse',
+    ),
+    'sel': QueryNameAndType(
+        type='Sel',
+        name='SeldonWorse',
+    ),
+    'path': QueryNameAndType(
+        type='Path',
+        name='TaintedPathWorse'
+    )
+}
 
 
 def parse_bash_config(raw: str) -> Dict[str, str]:
@@ -32,24 +65,103 @@ O11Y_CONTAINDER_DB_DIR = '/data/tracking.db'
 # cq stands for CodeQL
 
 
+@dataclass()
+class ExperimentSettings:
+    name: str
+    bash_config_path: str
+    project_list_file: str
+    results_dir: str
+    o11y_db_dir: str
+    query_type: str
+    tmp_dir: str = field(init=False)
+    cq_wrapper_timeout: int = 600
+
+    # after init
+    docker_mounts: List[Mount] = field(init=False)
+    docker_env: Dict[str, str] = field(init=False)
+
+    def __post_init__(self):
+        with open(self.bash_config_path, 'r') as f:
+            cfg = parse_bash_config(f.read())
+            self.tmp_dir = cfg["TMP_DIR"]
+            self.docker_mounts, self.docker_env = mounts_and_envs(
+                config=cfg,
+                project_list_file=self.project_list_file,
+                results_dir=self.results_dir,
+                o11y_db_dir=self.o11y_db_dir,
+                cq_wrapper_timeout=self.cq_wrapper_timeout,
+            )
+
+    @property
+    def docker_kwargs(self) -> Dict[str, Any]:
+        return {
+            "mounts": self.docker_mounts,
+            "environment": self.docker_env,
+        }
+
+
 def mounts_and_envs(config: Dict[str, str], project_list_file: str, results_dir: str, o11y_db_dir: str, cq_wrapper_timeout=600) -> Tuple[List[Mount], Dict[str, str]]:
     mounts = [
         # basic mounts retrieved from the bash config
-        Mount(source=config["CLI_DIR"], target="/cli"),
-        Mount(source=config["QL_LIB_DIR"], target="/ql"),
-        Mount(source=config["QL_LIB_WORSE_DIR"], target="/worse_lib"),
-        Mount(source=config["TMP_DIR"], target="/bigtmp"),
-        Mount(source=results_dir, target="/results"),
-        Mount(source=config["CACHE_DBS_DIR"], target="/dbs"),
+        Mount(source=config["CLI_DIR"], target="/cli", type='bind'),
+        Mount(source=config["QL_LIB_DIR"], target="/ql", type='bind'),
+        Mount(source=config["QL_LIB_WORSE_DIR"],
+              target="/worse_lib", type='bind'),
+        Mount(source=config["TMP_DIR"], target="/bigtmp", type='bind'),
+        Mount(source=results_dir, target="/results", type='bind'),
+        Mount(source=config["CACHE_DBS_DIR"], target="/dbs", type='bind'),
         # additional mounts
-        Mount(source=project_list_file, target=MOUNTED_LIST_FILE, read_only=True),
-        Mount(source=o11y_db_dir, target=O11Y_CONTAINDER_DB_DIR)
+        Mount(source=project_list_file, target=MOUNTED_LIST_FILE,
+              read_only=True, type='bind'),
+        Mount(source=o11y_db_dir, target=O11Y_CONTAINDER_DB_DIR, type='bind')
     ]
     envs = {
         "CODEQL_CLIS_ROOT": config['CODEQL_CLIS_ROOT'],
         "CODEQL_WRAPPER_TIMEOUT": cq_wrapper_timeout,
     }
     return mounts, envs
+
+
+def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs=False, block=False):
+    # prerequisites
+    # create results and logs folder if necessary
+    def create_dir(dir: str):
+        try:
+            logger.info("creating %s dir. Omitting error if already existing", dir)
+            os.mkdir(dir)
+        except FileExistsError:
+            pass
+
+    create_dir(settings.results_dir)
+    create_dir(os.path.join(settings.tmp_dir, "log"))
+
+    query = QUERY_TYPES[settings.query_type]
+    container_cmds = [
+        "--steps=generate_entities,generate_model,optimize",
+        "--project.cache_dir=/dbs",
+        "--project-list=%s" % (MOUNTED_LIST_FILE),
+        "--query-type=%s" % (query.type),
+        "--query-name=%s" % (query.name),
+        "--solver=CBC",
+        "--o11y.db_path=%s" % (O11Y_CONTAINDER_DB_DIR),
+        "--o11y.name=%s" % (settings.name),
+        "run"
+    ]
+    container = client.containers.run(
+        image="github.com/thepalbi/tsm-main:latest",
+        command=container_cmds,
+        detach=True,
+        **settings.docker_kwargs
+    )
+    if block:
+        container.wait()
+    elif tail_logs:
+        for log in container.logs(
+            stdout=True,
+            stderr=True,
+            stream=True,
+        ):
+            print("%s" % log.decode("utf-8"))
 
 
 if __name__ == "__main__":
@@ -65,13 +177,4 @@ if __name__ == "__main__":
         o11y_db_dir='/tesis/repos/tsm-pipeline/code/tsm.db',
     )
 
-    container = client.containers.run(
-        image="python:3.10.5-bullseye",
-        command="echo hello world",
-        detach=True,
-        mounts=mounts,
-        environment=env,
-    )
-    container.wait()
-    print(container.logs(stdout=True))
-    print("done")
+    run_tsm(client, mounts, env)
