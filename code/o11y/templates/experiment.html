@@ -30,6 +30,8 @@
         <h3>Creado {{experiment.started_at}}</h3>
         <h3>Estado: {{'RUNNING' if experiment.finished_at is none else 'FINISHED at ' ~ experiment.finished_at}}</h3>
         <h3>Quedan por entrenar: {{experiment.total_train_size - (experiment.train_dbs|length)}}</h3>
+        <h3>Total: {{metrics.total_count}}</h3>
+        <h3>Cantidad de errores: {{metrics.error_count}}</h3>
         <ul>
             {% for db in experiment.train_dbs %}
             <li>

@@ -29,6 +29,7 @@ database = flask_db.database
 # MODELS
 ########
 
+
 def models_for_base(base_model: Type[Model]):
     """
     Generates the model for the appropriate base model class. Can be used to instantiate models separately
@@ -41,7 +42,6 @@ def models_for_base(base_model: Type[Model]):
         started_at = DateTimeField(default=datetime.datetime.now)
         finished_at = DateTimeField(default=None, null=True)
         total_train_size = IntegerField()
-
 
     class TrainDatabase(base_model):
         db_id = AutoField()
@@ -66,7 +66,12 @@ def index():
 @app.route('/experiment/<int:id>')
 def experiment(id):
     experiment = Experiment.get(Experiment.experiment_id == id)
-    return render_template('experiment.html', experiment=experiment)
+    num_errors = len(
+        [td for td in experiment.train_dbs if td.status == 'error'])
+    return render_template('experiment.html', experiment=experiment, metrics={
+        "error_count": num_errors,
+        "total_count": len(experiment.train_dbs),
+    })
 
 
 @app.errorhandler(404)
