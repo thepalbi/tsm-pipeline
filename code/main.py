@@ -197,6 +197,13 @@ if __name__ == '__main__':
         train_size=len(all_projects),
     )
 
+    # preety print project list
+    preety_project_list = ''
+    for (i,project) in enumerate(all_projects):
+        preety_project_list += '%d\t%s\n' % (i+1, project)
+    preety_project_list += '\n'
+    logging.info("Dumping project list for tracking purposes:\n%s", preety_project_list)
+
     for project in all_projects:       
         logging.info(f"Running orchestrator-{parsed_arguments.command} on project: {project}")
 
