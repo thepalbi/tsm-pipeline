@@ -1,14 +1,98 @@
 import argparse
 from utils.process import run_process
 from utils.logging import get_stdout_logger
-from os import path
+from os import path, mkdir
 from clients.cli import CLIClient
 import sys
-from typing import Tuple, List
+from typing import Tuple, Optional
 from database.cache import DatabasesCache
 from multiprocessing import Pool
+import dataclasses
 
 log = get_stdout_logger("evaluate-cli")
+
+
+def create_dir(dir: str):
+    try:
+        log.info("creating %s dir. Omitting error if already existing", dir)
+        mkdir(dir)
+    except FileExistsError:
+        pass
+
+
+@dataclasses.dataclass
+class EvaluationSettings:
+    search_path: str
+    query_file: str
+    cli_version: str
+    external_predicate_file: Optional[str] = None
+
+@dataclasses.dataclass
+class Evaluator:
+    settings: EvaluationSettings
+    cache_root: str
+    dbs_path: str
+    output_dir: str
+    client: CLIClient
+    db: str
+
+    def evalute(self):
+        """
+        evalute evaluates and decodes the query result from a database.
+
+        :param str db: The path to the CodeQL db. Assumes it's stored in a cache folder structure to retrieve it's name.
+        """
+        owner, name, sha = extract_db_info(self.db)
+        log.info("Evaluating %s - %s" % (owner, name))
+        bqrs_out = path.join(self.output_dir, "%s_%s_%s.bqrs" % (owner, name, sha))
+        csv_out = path.join(self.output_dir, "%s_%s_%s.csv" % (owner, name, sha))
+        external_preds = {}
+        if self.settings.external_predicate_file != None:
+            external_preds = {
+                "getReprScore": self.settings.external_predicate_file
+            }
+        self.client.query_run(self.db, self.settings.search_path, bqrs_out,
+                             self.settings.query_file, external_predicates=external_preds)
+        self.client.bqrs_decode(bqrs_out, "#select", csv_out)
+
+def do_evalute(e: Evaluator):
+    e.evalute()
+
+def evaluate(
+    settings: EvaluationSettings,
+    cache_root: str,
+    dbs_path: str,
+    output_dir: str,
+):
+    create_dir(output_dir)
+
+    # Configure codeql query run execution with 2 threads, and 6GB ram
+    cli_client = CLIClient(version=settings.cli_version, query_run_args={
+        "--threads": "2",
+        "--ram": "6000",
+    })
+    cache = DatabasesCache(cache_root, settings.cli_version)
+    dbs = []
+    with open(dbs_path, 'r') as dbs_file:
+        for db in dbs_file.readlines():
+            db = db.rstrip('\n')
+            _, db_dir = cache.get(db)
+            dbs.append(db_dir)
+
+    log.info("Starting processing with 4 processes")
+
+    evaluators = [
+        Evaluator(
+            settings,
+            cache_root,
+            dbs_path,
+            output_dir,
+            cli_client,
+            db
+        ) for db in dbs
+    ]
+    with Pool(processes=4) as pool:
+        pool.map(do_evalute, evaluators)
 
 
 def extract_db_info(db: str) -> Tuple[str, str, str]:
@@ -63,52 +147,24 @@ if __name__ == "__main__":
         log.error("--output should be a directory")
         sys.exit(1)
 
-    search_path = ''
-    external_predicate_file = None
-    # TODO: The below just works for tainted path
     if pa.sources == 'worse':
-        search_path = path.join(root_dir, 'lib-worse/codeql')
-        query_file = 'tsm-atm-pipeline/src/tsm/evaluation/TaintedPathWorseTSM.ql'
-        cli_version = '2.5.2'
-        external_predicate_file = pa.boost_results
+        settings = EvaluationSettings(
+            search_path=path.join(root_dir, 'lib-worse/codeql'),
+            query_file=path.join(
+                root_dir, 'tsm-atm-pipeline/src/tsm/evaluation/TaintedPathWorseTSM.ql'),
+            cli_version='2.5.2',
+            external_predicate_file=pa.boost_results,
+        )
     else:
-        search_path = '/tesis/v0/javascript/ql/lib'
-        query_file = 'tsm-evaluation/tsm-evaluation/src/PathEvaluation.ql'
-        cli_version = '2.10.5'
+        settings = EvaluationSettings(
+            search_path='/tesis/v0/javascript/ql/lib',
+            query_file='tsm-evaluation/tsm-evaluation/src/PathEvaluation.ql',
+            cli_version='2.10.5',
+        )
 
-    # Configure codeql query run execution with 2 threads, and 6GB ram
-    cli_client = CLIClient(version=cli_version, query_run_args={
-        "--threads": "2",
-        "--ram": "6000",
-    })
-    query_file = path.join(root_dir, query_file)
-
-    cache = DatabasesCache(pa.cache_root, cli_client.version)
-    dbs = []
-    with open(pa.dbs, 'r') as dbs_file:
-        for db in dbs_file.readlines():
-            db = db.rstrip('\n')
-            _, db_dir = cache.get(db)
-            dbs.append(db_dir)
-
-    def do_evaluate_db(db: str):
-        """
-        do_evaluate_db evaluates and decodes the query result from a database.
-
-        :param str db: The path to the CodeQL db. Assumes it's stored in a cache folder structure to retrieve it's name.
-        """
-        owner, name, sha = extract_db_info(db)
-        log.info("Evaluating %s - %s" % (owner, name))
-        bqrs_out = path.join(pa.output, "%s_%s_%s.bqrs" % (owner, name, sha))
-        csv_out = path.join(pa.output, "%s_%s_%s.csv" % (owner, name, sha))
-        external_preds = {}
-        if external_predicate_file != None:
-            external_preds = {
-                "getReprScore": external_predicate_file
-            }
-        cli_client.query_run(db, search_path, bqrs_out, query_file, external_predicates=external_preds)
-        cli_client.bqrs_decode(bqrs_out, "#select", csv_out)
-
-    log.info("Starting processing with 2 processes")
-    with Pool(processes=2) as pool:
-        pool.map(do_evaluate_db, dbs)
+    evaluate(
+        settings=settings,
+        cache_root=pa.cache_root,
+        dbs_path=pa.dbs,
+        output_dir=pa.output,
+    )
