@@ -28,6 +28,23 @@ brew tap coin-or-tools/coinor
 brew install coin-or-tools/coinor/cbc
 ```
 
+## Installing the CodeQL CLIs
+The CLIs should be downloaded from [GH releases](https://github.com/github/codeql-cli-binaries/releases/tag/v2.10.5), and extracted under the directory selected for `CODEQL_CLIS_ROOT`. Each CLI version should be extracted following this pattern:
+
+```
+$CODEQL_CLIS_ROOT/codeqlcli-{version starting with v}/
+```
+
+Right now, we are using the following versions:
+- Worse: [v2.5.2](https://github.com/github/codeql-cli-binaries/releases/tag/v2.5.2)
+- V0: [v2.10.5](https://github.com/github/codeql-cli-binaries/releases/tag/v2.10.5)
+
+## Instaling the CodeQL libraris
+
+First, to install **lib-worse** we are using the [`a1c38b78a9`](https://github.com/github/codeql/commit/a1c38b78a9) commit, and needs to be cloned into `lib-worse/codeql`.
+
+After, for running the v0 evaluarion: ...
+
 ## Downdloading a db
 The expected format for database keys is:
 ```
@@ -94,6 +111,6 @@ Alternatively, running 'codeql database upgrade /tesis/dbs/zuzak_gov.zk_859ae98'
 
 Got it working after:
 - Using commit `a1c38b78a9` for CodeQL libraries
-- Using CLI v2.5.2
+- Using CLI [v2.5.2](https://github.com/github/codeql-cli-binaries/releases/tag/v2.5.2) and [v2.10.5](https://github.com/github/codeql-cli-binaries/releases/tag/v2.10.5)
 - Generating the database from the sourcecode
     - Idea: Implement a step that generates the database, and use a cache to previously generated dbs with the following directory structure: `gh_user`/`gh_repo`/`commit_hash`/
