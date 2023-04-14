@@ -25,8 +25,8 @@ python code/misc/combinescores.py --results-dir <directory with step 1 results> 
 
 ### 3. Evaluation
 
-Por ejemplo tomemeos Tainted Path. Se me ocurre que podría calcular los scores
-```
+Por ejemplo tomemos Tainted Path. Se me ocurre que podría calcular los scores
+```python
 def getmetrics(actual, predicted, c):
     # Precision
     scores = dict()
