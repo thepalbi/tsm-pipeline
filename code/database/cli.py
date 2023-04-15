@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from .cache import DatabasesCache, NotCachedError, parse_key
 from .creator import create_database, try_upgrade
@@ -58,29 +59,33 @@ if __name__ == "__main__":
         "--check", help="If enabled, just check if each database is present or healthy. NOTE THAT THIS WILL JUST DISLAY FAILURES.", required=False, type=bool, dest="just_check", default=False, action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
 
-    codeql_version = args.cli_version
-    log.info("Using CodeQL version %s", codeql_version)
-    cache = DatabasesCache(args.cache_root, codeql_version)
-    # Helper function for parallel execution
-    def parallel_cache(k): return do_cache_key(cache, k, codeql_version, args.just_check)
-    if args.list is not None:
-        keys = []
-        with open(args.list, 'r') as f:
-            for key in f.readlines():
-                # Clear key from trailing newline
-                key = key.rstrip('\n')
-                keys.append(key)
-        if args.parallel:
-            log.info("Parallel execution enabled! Things going 🏎")
-            with Pool(processes=args.threads) as pool:
-                # Map with thread pool
-                pool.map(parallel_cache, keys)
-
-        else:
-            log.info("Sequential execution enabled... This might take a while")
-            for key in keys:
-                do_cache_key(cache, key, codeql_version, args.just_check)
-    elif args.key != "":
-        do_cache_key(cache, args.key, codeql_version, args.just_check)
-    else:
+    if args.key == "" and args.list is None:
         log.error("list and key cannot be both empty!")
+        sys.exit(1)
+
+    cli_versions = [v.strip() for v in args.cli_version.split(",")]
+    log.info("Downloading dbs for CLI versions: %s", cli_versions)
+    for codeql_version in cli_versions:
+        log.info("Using CodeQL version %s", codeql_version)
+        cache = DatabasesCache(args.cache_root, codeql_version)
+        # Helper function for parallel execution
+        def parallel_cache(k): return do_cache_key(cache, k, codeql_version, args.just_check)
+        if args.list is not None:
+            keys = []
+            with open(args.list, 'r') as f:
+                for key in f.readlines():
+                    # Clear key from trailing newline
+                    key = key.rstrip('\n')
+                    keys.append(key)
+            if args.parallel:
+                log.info("Parallel execution enabled! Things going 🏎")
+                with Pool(processes=args.threads) as pool:
+                    # Map with thread pool
+                    pool.map(parallel_cache, keys)
+
+            else:
+                log.info("Sequential execution enabled... This might take a while")
+                for key in keys:
+                    do_cache_key(cache, key, codeql_version, args.just_check)
+        else:
+            do_cache_key(cache, args.key, codeql_version, args.just_check)

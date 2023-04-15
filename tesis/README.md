@@ -28,12 +28,11 @@ brew tap coin-or-tools/coinor
 brew install coin-or-tools/coinor/cbc
 ```
 
-## Installing the CodeQL CLIs
-The CLIs should be downloaded from [GH releases](https://github.com/github/codeql-cli-binaries/releases/tag/v2.10.5), and extracted under the directory selected for `CODEQL_CLIS_ROOT`. Each CLI version should be extracted following this pattern:
+## Installing a CLI
 
-```
-$CODEQL_CLIS_ROOT/codeqlcli-{version starting with v}/
-```
+1. Configure the CLIs dir, which should be set in the `$CODEQL_CLIS_ROOT` env var
+2. Download the required version from https://github.com/github/codeql-cli-binaries/releases/
+3. Unzip the downloaded file with the following format: `$CODEQL_CLIS_ROOT/codeqlcli-v<semver version>`
 
 Right now, we are using the following versions:
 - Worse: [v2.5.2](https://github.com/github/codeql-cli-binaries/releases/tag/v2.5.2)
@@ -61,6 +60,12 @@ If not a single db can be cached with:
 python -m database.cli  --key <database key> --cache-root /tesis/dbs/ --cli-version <compiler version>
 ```
 
+If the same dbs are needed for multiple CLI versions, a list of versions can be specified
+
+```
+python -m database.cli  --key <database key> --cache-root /tesis/dbs/ --cli-version <compiler version1>,<compiler version 2>
+```
+
 ## Docker setup
 Add a configuration file under `code/scripts/config.sh`, with the following contents according to your system:
 ```bash
@@ -77,11 +82,6 @@ export CACHE_DBS_DIR=/tesis/dbs:/dbs
 # Root dir for the CodeQL clis directory
 export CODEQL_CLIS_ROOT=/tesis/clis
 ```
-
-## Installing a CLI
-1. Configure the CLIs dir, which should be set in the `$CODEQL_CLIS_ROOT` env var
-2. Download the required version from https://github.com/github/codeql-cli-binaries/releases/
-3. Unzip the downloaded file with the following format: `$CODEQL_CLIS_ROOT/codeqlcli-v<semver version>`
 
 ## Running notes
 ### 24-04-2022
