@@ -33,7 +33,7 @@ def do_cache_key(cache: DatabasesCache, key: str, cli_version: str, just_check: 
             # try_upgrade(cached_db, cli_version)
     except NotCachedError:
         if just_check:
-            log.info("Not cached!")
+            log.info("Not cached! %s", key)
         else:
             log.info("Not cached, creating db %s", key)
             parsed_key = parse_key(key)

@@ -5,6 +5,7 @@
 cd code
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt-get install python3.10 python3.10-venv build-essential
+sudo apt install nodejs
 python3.10 -m venv env
 
 # Customize activate script
