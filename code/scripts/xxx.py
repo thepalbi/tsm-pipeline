@@ -165,6 +165,9 @@ def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs
             stream=True,
         ):
             print("%s" % log.decode("utf-8"))
+    else:
+        logger.info("not blocking, required to run combine scores after")
+        return
 
     logger.info("running combine scores")
     combine_scores(
