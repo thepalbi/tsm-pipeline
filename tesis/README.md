@@ -43,7 +43,7 @@ Right now, we are using the following versions:
 
 First, to install **lib-worse** we are using the [`a1c38b78a9`](https://github.com/github/codeql/commit/a1c38b78a9) commit, and needs to be cloned into `lib-worse/codeql`.
 
-After, for running the v0 evaluarion: ...
+After, for running the v0 evaluation, in the latest trials the [`3165babc887c1c1127f7f028493380ceca004b2e`](https://github.com/github/codeql/commit/3165babc887c1c1127f7f028493380ceca004b2e) commit of CodeQL was being used. Using the same one.
 
 ## Downdloading a db
 The expected format for database keys is:
