@@ -11,7 +11,7 @@ from playhouse.flask_utils import FlaskDB, get_object_or_404
 # APP
 ########
 APP_DIR = os.path.dirname(os.path.realpath(__file__))
-DATABASE = 'sqliteext:////tesis/repos/tsm-pipeline/code/tsm.db'
+DATABASE = 'sqliteext:////home/pablo/tesis/tsm-pipeline/code/tsm.db'
 DEBUG = False
 
 app = Flask(__name__)
