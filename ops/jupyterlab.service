@@ -1,0 +1,15 @@
+[Unit]
+Description=JupyterLab Daemon
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c "/home/pablo/tesis/tsm-pipeline/code/env/bin/jupyter-lab --no-browser --notebook-dir=/home/pablo/tesis/tsm-pipeline/experiments"
+WorkingDirectory=/home/pablo/tesis/tsm-pipeline
+User=pablo
+Group=pablo
+PIDFile=/run/jupyter-notebook.pid
+Restart=on-failure
+RestartSec=60s
+
+[Install]
+WantedBy=multi-user.target
