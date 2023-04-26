@@ -1,10 +1,11 @@
 import docker
 from docker.types import Mount
-from typing import Dict, Tuple, List, Any
+from typing import Dict, Tuple, List, Any, Optional
 import re
 from dataclasses import dataclass, field
 import os
 from utils.logging import get_stdout_logger
+from .files import db_list_to_file
 
 from misc.combinescores import combine_scores
 
@@ -71,10 +72,11 @@ O11Y_CONTAINDER_DB_DIR = '/data/tracking.db'
 class ExperimentSettings:
     name: str
     bash_config_path: str
-    project_list_file: str
     results_dir: str
     o11y_db_dir: str
     query_type: str
+    project_list_file: Optional[str] = None
+    project_list: Optional[List[str]] = None
     tmp_dir: str = field(init=False)
     cq_wrapper_timeout: int = 600
 
@@ -86,13 +88,28 @@ class ExperimentSettings:
         with open(self.bash_config_path, 'r') as f:
             cfg = parse_bash_config(f.read())
             self.tmp_dir = cfg["TMP_DIR"]
-            self.docker_mounts, self.docker_env = mounts_and_envs(
-                config=cfg,
-                project_list_file=self.project_list_file,
-                results_dir=self.results_dir,
-                o11y_db_dir=self.o11y_db_dir,
-                cq_wrapper_timeout=self.cq_wrapper_timeout,
-            )
+
+        # handle if project was supplied as list
+        if self.project_list is not None:
+            if self.project_list_file is not None:
+                # both cannot be set
+                raise Exception("cannot configure projects as list and file")
+            
+            self.project_list_file = db_list_to_file(self.project_list, self.tmp_dir)
+        
+        if self.project_list_file is None:
+            raise Exception("either project_list or project_list_file need to be configures")
+
+        self.docker_mounts, self.docker_env = mounts_and_envs(
+            config=cfg,
+            project_list_file=self.project_list_file,
+            results_dir=self.results_dir,
+            o11y_db_dir=self.o11y_db_dir,
+            cq_wrapper_timeout=self.cq_wrapper_timeout,
+        )
+
+            
+
 
     @property
     def docker_kwargs(self) -> Dict[str, Any]:

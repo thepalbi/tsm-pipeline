@@ -4,10 +4,11 @@ from utils.logging import get_stdout_logger
 from os import path, mkdir
 from clients.cli import CLIClient
 import sys
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 from database.cache import DatabasesCache
 from multiprocessing import Pool
 import dataclasses
+from .files import db_list_to_file
 
 log = get_stdout_logger("evaluate-cli")
 
@@ -25,13 +26,12 @@ class EvaluationSettings:
     search_path: str
     query_file: str
     cli_version: str
+    cache_root: str
     external_predicate_file: Optional[str] = None
 
 @dataclasses.dataclass
 class Evaluator:
     settings: EvaluationSettings
-    cache_root: str
-    dbs_path: str
     output_dir: str
     client: CLIClient
     db: str
@@ -60,10 +60,13 @@ def do_evalute(e: Evaluator):
 
 def evaluate(
     settings: EvaluationSettings,
-    cache_root: str,
-    dbs_path: str,
     output_dir: str,
+    dbs_path: Optional[str] = None,
+    dbs: Optional[List[str]] = None,
 ):
+    if dbs is None and dbs_path is None:
+        raise Exception('dbs_path and dbs cannot be None')
+
     create_dir(output_dir)
 
     # Configure codeql query run execution with 2 threads, and 6GB ram
@@ -71,25 +74,31 @@ def evaluate(
         "--threads": "2",
         "--ram": "6000",
     })
-    cache = DatabasesCache(cache_root, settings.cli_version)
-    dbs = []
-    with open(dbs_path, 'r') as dbs_file:
-        for db in dbs_file.readlines():
-            db = db.rstrip('\n')
-            _, db_dir = cache.get(db)
-            dbs.append(db_dir)
+    cache = DatabasesCache(settings.cache_root, settings.cli_version)
+
+    # if dbs paras is not passed, get those from dbs_path file
+    if dbs is None:
+        dbs = []
+        with open(dbs_path, 'r') as dbs_file:
+            for db in dbs_file.readlines():
+                db = db.rstrip('\n')
+                dbs.append(db)
+
+    # use the cache to get the directories where each compiled db is located
+    db_dirs = []
+    for db in dbs:
+        _, db_dir = cache.get(db)
+        db_dirs.append(db_dir)
 
     log.info("Starting processing with 4 processes")
 
     evaluators = [
         Evaluator(
             settings,
-            cache_root,
-            dbs_path,
             output_dir,
             cli_client,
             db
-        ) for db in dbs
+        ) for db in db_dirs
     ]
     with Pool(processes=4) as pool:
         pool.map(do_evalute, evaluators)

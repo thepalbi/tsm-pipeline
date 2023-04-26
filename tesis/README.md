@@ -70,18 +70,18 @@ python -m database.cli  --key <database key> --cache-root /tesis/dbs/ --cli-vers
 ## Docker setup
 Add a configuration file under `code/scripts/config.sh`, with the following contents according to your system:
 ```bash
-# Directory where the CodeQL CLI binary is located
-export CLI_DIR=/tesis/clis/codeqlcli-v2.5.2:/cli
 # Directory where the tsm-pipelien QL sources are located
-export QL_LIB_DIR=/tesis/repos/tsm-pipeline/ql:/ql
+export QL_LIB_DIR=/home/pablo/tesis/tsm-pipeline/ql
 # Lib worse CodeQL javascript library
-export QL_LIB_WORSE_DIR=/tesis/repos/tsm-pipeline/lib-worse/codeql/javascript/ql/src:/worse_lib
+export QL_LIB_WORSE_DIR=/home/pablo/tesis/tsm-pipeline/lib-worse/codeql/javascript/ql/src
 # tmp
-export TMP_DIR=/tesis/tmp:/bigtmp
+export TMP_DIR=/tmp
 # database cache root directory
-export CACHE_DBS_DIR=/tesis/dbs:/dbs
+export CACHE_DBS_DIR=/home/pablo/dbcache
 # Root dir for the CodeQL clis directory
-export CODEQL_CLIS_ROOT=/tesis/clis
+export CODEQL_CLIS_ROOT=/home/pablo/clis
+# Directory where the CodeQL CLI binary is located
+export CLI_DIR=/home/pablo/clis/codeqlcli-v2.5.2
 ```
 
 ## Running notes
