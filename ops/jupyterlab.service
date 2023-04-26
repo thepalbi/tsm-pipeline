@@ -5,6 +5,8 @@ Description=JupyterLab Daemon
 Type=simple
 ExecStart=/bin/bash -c "/home/pablo/tesis/tsm-pipeline/code/env/bin/jupyter-lab --no-browser --notebook-dir=/home/pablo/tesis/tsm-pipeline/experiments"
 WorkingDirectory=/home/pablo/tesis/tsm-pipeline
+Environment="CODEQL_CLIS_ROOT=/home/pablo/clis"
+Environment="TSM_TMP=/tmp"
 User=pablo
 Group=pablo
 PIDFile=/run/jupyter-notebook.pid
