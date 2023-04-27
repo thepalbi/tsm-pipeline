@@ -11,12 +11,10 @@ from misc.combinescores import combine_scores
 
 logger = get_stdout_logger("docker")
 
-
 @dataclass(frozen=True)
 class QueryNameAndType:
     name: str
     type: str
-
 
 QUERY_TYPES: Dict[str, QueryNameAndType] = {
     'nosql': QueryNameAndType(
@@ -41,7 +39,6 @@ QUERY_TYPES: Dict[str, QueryNameAndType] = {
     )
 }
 
-
 def parse_bash_config(raw: str) -> Dict[str, str]:
     """
     # Directory where the CodeQL CLI binary is located
@@ -61,12 +58,9 @@ def parse_bash_config(raw: str) -> Dict[str, str]:
         config[g[0]] = g[1]
     return config
 
-
 MOUNTED_LIST_FILE = '/data/list.txt'
 
 # cq stands for CodeQL
-
-
 @dataclass()
 class ExperimentSettings:
     name: str
@@ -104,9 +98,6 @@ class ExperimentSettings:
             results_dir=self.results_dir,
             cq_wrapper_timeout=self.cq_wrapper_timeout,
         )
-
-            
-
 
     @property
     def docker_kwargs(self) -> Dict[str, Any]:
@@ -171,14 +162,16 @@ def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs
     if block:
         container.wait()
     elif tail_logs:
+        import sys
         for log in container.logs(
             stdout=True,
             stderr=True,
             stream=True,
         ):
-            print("%s" % log.decode("utf-8"))
+            # pipe output directly to stdout, rather than print
+            sys.stdout.write(log.decode('utf-8'))
     else:
-        logger.info("not blocking, required to run combine scores after")
+        logger.info("not blocking, please to run combine scores after")
         return
 
     logger.info("running combine scores")
