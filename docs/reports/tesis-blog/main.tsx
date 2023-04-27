@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import blog, { ga, redirects, h } from "blog";
+import blog from "blog";
 
 blog({
   title: "Tesis Blog",
@@ -10,7 +10,7 @@ blog({
   // footer: <footer>Your custom footer</footer>,
   avatar: "https://deno-avatar.deno.dev/avatar/blog.svg",
   avatarClass: "rounded-full",
-  author: "Un tesis llamado Pablo",
+  author: "Un tesista llamado Pablo",
 
   // middlewares: [
 
