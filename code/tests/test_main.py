@@ -21,8 +21,11 @@ test_train_data = [
 ]
 
 class TestMain(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.docker_client = docker.from_env()
+
     def test_smoke_training_run(self):
-        docker_client = docker.from_env()
         results_dir = tempfile.mkdtemp()
         print("Using temporary directory as results: %s" % (results_dir))
 
@@ -35,10 +38,12 @@ class TestMain(unittest.TestCase):
             **defaults
         )
 
-        run_tsm(docker_client, train_settings, tail_logs=True)
+        run_tsm(self.docker_client, train_settings, tail_logs=True)
+
+        # assert empty model error was logged
+        self.assert_in_training_log(results_dir, "run ok")
 
     def test_expected_empty_model_error(self):
-        docker_client = docker.from_env()
         results_dir = tempfile.mkdtemp()
         print("Using temporary directory as results: %s" % (results_dir))
         train_data_with_empty_model = ["bugulink/bugu-web/422f3bf2a8dbc85bd85e12e89ce40cb3cd9f6555"]
@@ -52,9 +57,15 @@ class TestMain(unittest.TestCase):
             **defaults
         )
 
-        run_tsm(docker_client, train_settings, tail_logs=True)
+        run_tsm(self.docker_client, train_settings, tail_logs=True)
 
+        # assert empty model error was logged
+        self.assert_in_training_log(results_dir, "run ended because model was empty")
+
+    def assert_in_training_log(self, results_dir: str, what: str):
+        """checks if the training log located in results_dir containes the what given string.
+        """
         # assert empty model error was logged
         with open(path_join(results_dir, "training_log.txt"), "r") as f:
             log = f.read()
-            self.assertTrue("run ended because model was empty" in log)
+            self.assertTrue(what in log)
