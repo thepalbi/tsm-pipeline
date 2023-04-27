@@ -1,5 +1,4 @@
 {
-    "codeQL.cli.executablePath": "/tesis/clis/codeqlcli-v2.5.2/codeql",
     "frontMatter.content.pageFolders": [
         {
             "title": "posts",
