@@ -63,7 +63,6 @@ def parse_bash_config(raw: str) -> Dict[str, str]:
 
 
 MOUNTED_LIST_FILE = '/data/list.txt'
-O11Y_CONTAINDER_DB_DIR = '/data/tracking.db'
 
 # cq stands for CodeQL
 
@@ -73,7 +72,6 @@ class ExperimentSettings:
     name: str
     bash_config_path: str
     results_dir: str
-    o11y_db_dir: str
     query_type: str
     project_list_file: Optional[str] = None
     project_list: Optional[List[str]] = None
@@ -104,7 +102,6 @@ class ExperimentSettings:
             config=cfg,
             project_list_file=self.project_list_file,
             results_dir=self.results_dir,
-            o11y_db_dir=self.o11y_db_dir,
             cq_wrapper_timeout=self.cq_wrapper_timeout,
         )
 
@@ -119,7 +116,7 @@ class ExperimentSettings:
         }
 
 
-def mounts_and_envs(config: Dict[str, str], project_list_file: str, results_dir: str, o11y_db_dir: str, cq_wrapper_timeout=600) -> Tuple[List[Mount], Dict[str, str]]:
+def mounts_and_envs(config: Dict[str, str], project_list_file: str, results_dir: str, cq_wrapper_timeout=600) -> Tuple[List[Mount], Dict[str, str]]:
     mounts = [
         # basic mounts retrieved from the bash config
         Mount(source=config["CLI_DIR"], target="/cli", type='bind'),
@@ -132,7 +129,6 @@ def mounts_and_envs(config: Dict[str, str], project_list_file: str, results_dir:
         # additional mounts
         Mount(source=project_list_file, target=MOUNTED_LIST_FILE,
               read_only=True, type='bind'),
-        Mount(source=o11y_db_dir, target=O11Y_CONTAINDER_DB_DIR, type='bind')
     ]
     envs = {
         "CODEQL_CLIS_ROOT": config['CODEQL_CLIS_ROOT'],
@@ -162,8 +158,6 @@ def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs
         "--query-type=%s" % (query.type),
         "--query-name=%s" % (query.name),
         "--solver=CBC",
-        "--o11y.db_path=%s" % (O11Y_CONTAINDER_DB_DIR),
-        "--o11y.name=%s" % (settings.name),
         "--progress-log=/results/training_log.txt",
         "run"
     ]
@@ -207,7 +201,6 @@ if __name__ == "__main__":
         config=config,
         project_list_file='/tesis/repos/tsm-pipeline/experiments/tesis/tainted_path/test_4.txt',
         results_dir='/tmp',
-        o11y_db_dir='/tesis/repos/tsm-pipeline/code/tsm.db',
     )
 
     run_tsm(client, mounts, env)
