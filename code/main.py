@@ -10,6 +10,7 @@ from orchestration.orchestrator import Orchestrator
 from orchestration import global_config
 from database.cache import DatabasesCache as ProjectDatabaseCache, NotCachedError
 from utils.process import run_process
+from cbc_utils.cbc_utils import EmptyModelError
 
 logging_format = "[%(levelname)s\t%(asctime)s] %(name)s\t%(message)s"
 
@@ -252,11 +253,16 @@ if __name__ == '__main__':
                 hasExecuted = True
                 # project ended successfully
                 dblogger.info("run ok")
+
+            except EmptyModelError as em:
+                logging.error("error solving model. Model was empty: %s", em.model_path)
+                dblogger.error("run ended because model was empty: %s", em.model_path)
+
             except Exception as inst:
                 logging.error(f"Error running  project: {project}, {inst}")
                 logging.exception("Fatal error occured in orchestrator execution")
                 # project ended with error
-                dblogger.exception("run eneded with exception")
+                dblogger.exception("run eneded with unhandled exception")
 
         elif parsed_arguments.command == "clean":
             orchestrator.clean()

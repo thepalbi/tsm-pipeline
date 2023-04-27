@@ -6,6 +6,14 @@ import logging
 
 log = get_stdout_logger('cbc', level=logging.DEBUG)
 
+class EmptyModelError(Exception):
+    """Raised when a model could not be solved because it was empty.
+    """
+    def __init__(self, *args: object, **kwargs) -> None:
+        self.model_path = kwargs.pop("model_path", None)
+        super().__init__(*args, **kwargs)
+
+
 def writeResultsFile(solution, lpResultsFilePath):
     # First line of solution file should be ignored (contains objective value)
     # Get variable values and write (name:value) pairs (as expected by solve_gb.py)
@@ -22,7 +30,7 @@ def solveLpCommandLine(lpFilePath):
         out = run_process(f'cbc {lpFilePath} -solve -printing all -solu sol.txt')
         # these are some ad-hoc conditions in which the optimization might have failed
         if 'Empty problem' in out.stdout:
-            raise Exception("empty model was generated, and cannot be solved: %s" % (lpFilePath))
+            raise EmptyModelError(model_path=lpFilePath)
 
         log.debug("CBC completed run. STDOUT: %s\nSTDERR: %s", out.stdout, out.stderr)
         with open('sol.txt','r') as file:

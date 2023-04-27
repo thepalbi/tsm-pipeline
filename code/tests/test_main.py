@@ -4,6 +4,7 @@ import docker
 from scripts.xxx import run_tsm, ExperimentSettings
 # from scripts.evaluate import evaluate, EvaluationSettings
 import tempfile
+from os.path import join as path_join
 
 defaults = {
     "bash_config_path": "/home/pablo/tesis/tsm-pipeline/code/scripts/config.sh",
@@ -35,3 +36,25 @@ class TestMain(unittest.TestCase):
         )
 
         run_tsm(docker_client, train_settings, tail_logs=True)
+
+    def test_expected_empty_model_error(self):
+        docker_client = docker.from_env()
+        results_dir = tempfile.mkdtemp()
+        print("Using temporary directory as results: %s" % (results_dir))
+        train_data_with_empty_model = ["bugulink/bugu-web/422f3bf2a8dbc85bd85e12e89ce40cb3cd9f6555"]
+
+        # training
+        train_settings = ExperimentSettings(
+            name="smoke_training_run",
+            query_type="path",
+            project_list=train_data_with_empty_model,
+            results_dir=results_dir,
+            **defaults
+        )
+
+        run_tsm(docker_client, train_settings, tail_logs=True)
+
+        # assert empty model error was logged
+        with open(path_join(results_dir, "training_log.txt"), "r") as f:
+            log = f.read()
+            self.assertTrue("run ended because model was empty" in log)
