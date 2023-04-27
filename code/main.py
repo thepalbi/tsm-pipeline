@@ -11,6 +11,8 @@ from orchestration import global_config
 from database.cache import DatabasesCache as ProjectDatabaseCache, NotCachedError
 from utils.process import run_process
 
+logging_format = "[%(levelname)s\t%(asctime)s] %(name)s\t%(message)s"
+
 def create_logging_file_appender():
     new_log_file = os.path.join(global_config.logs_directory, f"tsm_log_{int(datetime.datetime.now().timestamp())}.log")
     file_appender = logging.FileHandler(new_log_file)
@@ -18,7 +20,6 @@ def create_logging_file_appender():
     file_appender.setLevel(logging.DEBUG)
     return file_appender
 
-logging_format = "[%(levelname)s\t%(asctime)s] %(name)s\t%(message)s"
 logging.basicConfig(level=logging.INFO, format=logging_format)
 
 # Add file handler to root logger
@@ -131,6 +132,8 @@ parsed_arguments = parser.parse_args()
 # enriched loglines with a dbname=name pre-prended to the actual message
 tracking_handler = logging.FileHandler(parsed_arguments.progress_log, encoding='utf-8', delay=True)
 tracking_handler.setLevel(logging.INFO)
+# re-use the same formattes as above
+tracking_handler.setFormatter(logging.Formatter(logging_format))
 
 import re
 matcher = re.compile(r"dbname=.+")
