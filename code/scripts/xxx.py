@@ -164,6 +164,7 @@ def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs
         "--solver=CBC",
         "--o11y.db_path=%s" % (O11Y_CONTAINDER_DB_DIR),
         "--o11y.name=%s" % (settings.name),
+        "--progress-log=/results/training_log.txt",
         "run"
     ]
     container = client.containers.run(
