@@ -19,6 +19,12 @@ def create_logging_file_appender():
     file_appender.setLevel(logging.DEBUG)
     return file_appender
 
+logging_format = "[%(levelname)s\t%(asctime)s] %(name)s\t%(message)s"
+logging.basicConfig(level=logging.INFO, format=logging_format)
+
+# Add file handler to root logger
+logging.getLogger().addHandler(create_logging_file_appender())
+
 LIST_FILE_COMMENT_SYMBOL = "#"
 
 # Parse the project list file, yielding trimmed project identifiers.
@@ -66,12 +72,6 @@ run_separate_on_multiple_projects = True
 
 parser = argparse.ArgumentParser()
 
-logging_format = "[%(levelname)s\t%(asctime)s] %(name)s\t%(message)s"
-logging.basicConfig(level=logging.INFO, format=logging_format)
-
-# Add file handler to basic logger
-logging.getLogger().addHandler(create_logging_file_appender())
-
 parser.add_argument("--single-step", dest="single_step", type=str, default=all_steps, metavar="STEP",
                     help="DEPRECATED. USE --steps. Runs a single step of the orchestrator named STEP")
 
@@ -118,6 +118,8 @@ parser.add_argument("--o11y.name", dest="o11y_experiment_name", required=False, 
                     help="When observaibility is enabled, this will be the tracked experiment name.")
 parser.add_argument("--o11y.db_path", dest="o11y_db_path", required=False, type=str,
                     help="If present, o11y is enabled. Path to the SQLLite db used for pipeline o11y.")
+parser.add_argument("--progress-log", dest="progress_log", required=True, type=str,
+                    help="File where to log training progress")
 
 # Print whole global config
 from pprint import pformat
@@ -128,6 +130,33 @@ run_parser = subparsers.add_parser("run")
 clean_parser = subparsers.add_parser("clean")
 
 parsed_arguments = parser.parse_args()
+
+# handler used to track when databases start being processed, etc
+# the idea is that this handler will have a filter just looking for 
+# enriched loglines with a dbname=name pre-prended to the actual message
+tracking_handler = logging.FileHandler(parsed_arguments.progress_log, encoding='utf-8', delay=True)
+tracking_handler.setLevel(logging.INFO)
+
+import re
+matcher = re.compile(r"dbname=.+")
+def tracking_filter(record: logging.LogRecord)->bool:
+    return matcher.match(record.message) is not None
+
+tracking_handler.addFilter(tracking_filter)
+from typing import Any, MutableMapping
+
+# define log adapter used to wrap any logger to add the dbname label
+# when needing a logger with the dbname pre-prended, use:
+# l = TrackingAdapter(logger, {'dbname': db})
+# l.info ...
+class TrackingAdapter(logging.LoggerAdapter):
+    def process(self, msg: Any, kwargs: MutableMapping[str, Any]) -> tuple[Any, MutableMapping[str, Any]]:
+        return 'dbname=%s %s' % (self.extra['dbname'], msg), kwargs
+
+logging.getLogger().addHandler(tracking_handler)
+
+# end of logging tracking configuration
+
 results_dir = global_config.results_directory
 working_dir = global_config.working_directory
 scores_file = None
@@ -206,6 +235,8 @@ if __name__ == '__main__':
 
     for project in all_projects:       
         logging.info(f"Running orchestrator-{parsed_arguments.command} on project: {project}")
+        dblogger = TrackingAdapter(logging.getLogger(), {'dbname': project})
+        dblogger.info("running pipeline")
 
         # orchestrator running for new project, track
         project_end = experiment_tracker.new_step(
@@ -239,11 +270,13 @@ if __name__ == '__main__':
                 hasExecuted = True
                 # project ended successfully
                 project_end()
+                dblogger.info("run ok")
             except Exception as inst:
                 logging.error(f"Error running  project: {project}, {inst}")
                 logging.exception("Fatal error occured in orchestrator execution")
                 # project ended with error
                 project_end(error=True)
+                dblogger.exception("run eneded with exception")
 
         elif parsed_arguments.command == "clean":
             orchestrator.clean()
