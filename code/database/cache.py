@@ -44,6 +44,6 @@ class DatabasesCache:
         resolved_path = parsed_key.get_path(self.root_dir)
         if not os.path.exists(resolved_path):
             # cache miss
-            raise NotCachedError(f"{key} not cached. Try caching it with CLI: python -m database.cli  --key {key} --cache-root {self._advertised_root_dir}")
+            raise NotCachedError(f"{key} not cached at '{resolved_path}'. Try caching it with CLI: python -m database.cli  --key {key} --cache-root {self._advertised_root_dir}")
 
         return parsed_key, resolved_path
