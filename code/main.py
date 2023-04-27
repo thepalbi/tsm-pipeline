@@ -4,7 +4,8 @@ import os
 import glob
 import datetime
 
-from typing import TextIO, Iterator
+from typing import TextIO, Iterator, List
+from dataclasses import dataclass
 
 from orchestration.orchestrator import Orchestrator
 from orchestration import global_config
@@ -35,35 +36,29 @@ def parse_project_list(list_file: TextIO) -> Iterator[str]:
             continue
         yield line.replace('\r', '').replace('\n', '')
 
+@dataclass
+class Project:
+    name: str
+    resolved_dir: str
 
-def create_project_list(projectListFile, cache: ProjectDatabaseCache):
+
+def create_project_list(projectListFile, cache: ProjectDatabaseCache) -> List[Project]:
     resultingProjects = [] 
 
     with open(projectListFile) as list_file:
         for project in parse_project_list(list_file):
             if cache is None:
-                # Find project the old way, without using the project cache
-                logging.info(f"Project name: {project}")
-                projectPrefix =  os.path.join(project_dir, project.replace("/","_"))
-                logging.info(f"Prefix: {projectPrefix}")
-                ## To-do: improve. The project list could be a list of projec names or project folders
-                # I'd better to include a cmd line option
-                if("/" in project):
-                    projectCandidate = glob.glob(projectPrefix+"*", recursive=True)
-                else:
-                    projectCandidate = glob.glob(projectPrefix, recursive=True)
-                    
-                if len(projectCandidate)>0:
-                    candidate = projectCandidate[0]
-                    logging.info("Project candidate: %s", candidate)
-                    resultingProjects.append(candidate)
+                raise Exception("old method deprecated. Please use dbcache")
             else:
                 try:
-                    _, resolved_dir = cache.get(project)
+                    parsed_key, resolved_dir = cache.get(project)
+                    # use as name format the following: 'owner_repo_422f3bf2'
+                    name = "%s_%s_%s" % (parsed_key.gh_user, parsed_key.gh_repo, parsed_key.gh_commit_hash[0:8])
+                    project = Project(name, resolved_dir)
                 except NotCachedError:
                     raise
 
-                resultingProjects.append(resolved_dir)
+                resultingProjects.append(project)
 
     return resultingProjects
 
@@ -195,7 +190,7 @@ projectListFile = parsed_arguments.projectListFile
 if parsed_arguments.projectListFile is not None:
     projectList = create_project_list(projectListFile, project_cache)
 else:
-    projectList = [project_dir]
+    raise Exception("--project-dir is no longer supported, use file instead")
 
 if parsed_arguments.multiple:
     run_separate_on_multiple_projects = False
@@ -206,8 +201,10 @@ rep_counter = dict()
 
 if __name__ == '__main__':
     all_projects = projectList
+
     if parsed_arguments.multiple:
-        all_projects = [projectList[0]]
+        # all_projects = [projectList[0]]
+        raise Exception("multiple not supported for the moment")
 
     hasExecuted = False
 
@@ -217,18 +214,16 @@ if __name__ == '__main__':
     # preety print project list
     preety_project_list = ''
     for (i,project) in enumerate(all_projects):
-        preety_project_list += '%d\t%s\n' % (i+1, project)
+        preety_project_list += '%d\t%s\n' % (i+1, project.name)
     preety_project_list += '\n'
     logging.info("Dumping project list for tracking purposes:\n%s", preety_project_list)
 
     for project in all_projects:       
-        logging.info(f"Running orchestrator-{parsed_arguments.command} on project: {project}")
-        dblogger = TrackingAdapter(logging.getLogger(), {'dbname': project})
+        logging.info(f"Running orchestrator-{parsed_arguments.command} on project: {project.name}")
+        dblogger = TrackingAdapter(logging.getLogger(), {'dbname': project.name})
         dblogger.info("running pipeline")
 
-        project_name = os.path.basename(project)
-        # TODO: Fix poject name, which is just becoming here the project db hash
-        orchestrator = Orchestrator(project, project_name, 
+        orchestrator = Orchestrator(project.resolved_dir, project.name, 
                             parsed_arguments.query_type,
                             parsed_arguments.query_name, 
                             parsed_arguments.kind, 
@@ -258,8 +253,8 @@ if __name__ == '__main__':
                 logging.error("error solving model. Model was empty: %s", em.model_path)
                 dblogger.error("run ended because model was empty: %s", em.model_path)
 
-            except Exception as inst:
-                logging.error(f"Error running  project: {project}, {inst}")
+            except Exception as err:
+                logging.error(f"Error running  project: {project.name}, {err}")
                 logging.exception("Fatal error occured in orchestrator execution")
                 # project ended with error
                 dblogger.exception("run eneded with unhandled exception")
