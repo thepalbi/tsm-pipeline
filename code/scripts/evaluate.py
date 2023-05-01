@@ -5,12 +5,14 @@ from os import path, mkdir
 from clients.cli import CLIClient
 import sys
 from typing import Tuple, Optional, List
-from database.cache import DatabasesCache
+from database.cache import DatabasesCache, Parsedkey
 from multiprocessing import Pool
 import dataclasses
 from .files import db_list_to_file
+import logging
 
-log = get_stdout_logger("evaluate-cli")
+
+log = logging.getLogger(__name__)
 
 
 def create_dir(dir: str):
@@ -35,6 +37,7 @@ class Evaluator:
     output_dir: str
     client: CLIClient
     db: str
+    parsed_key: Parsedkey
 
     def evalute(self):
         """
@@ -42,7 +45,7 @@ class Evaluator:
 
         :param str db: The path to the CodeQL db. Assumes it's stored in a cache folder structure to retrieve it's name.
         """
-        owner, name, sha = extract_db_info(self.db)
+        owner, name, sha = self.parsed_key.gh_user, self.parsed_key.gh_repo, self.parsed_key.gh_commit_hash
         log.info("Evaluating %s - %s" % (owner, name))
         bqrs_out = path.join(self.output_dir, "%s_%s_%s.bqrs" % (owner, name, sha))
         csv_out = path.join(self.output_dir, "%s_%s_%s.csv" % (owner, name, sha))
@@ -72,23 +75,23 @@ def evaluate(
     # Configure codeql query run execution with 2 threads, and 6GB ram
     cli_client = CLIClient(version=settings.cli_version, query_run_args={
         "--threads": "2",
-        "--ram": "6000",
+        "--ram": "4000",
     })
     cache = DatabasesCache(settings.cache_root, settings.cli_version)
 
     # if dbs paras is not passed, get those from dbs_path file
     if dbs is None:
         dbs = []
-        with open(dbs_path, 'r') as dbs_file:
-            for db in dbs_file.readlines():
+        with open(dbs_path, 'r') as f:
+            for db in f.readlines():
                 db = db.rstrip('\n')
                 dbs.append(db)
 
     # use the cache to get the directories where each compiled db is located
-    db_dirs = []
+    dbs_from_cache = []
     for db in dbs:
-        _, db_dir = cache.get(db)
-        db_dirs.append(db_dir)
+        parsed_key, db_dir = cache.get(db)
+        dbs_from_cache.append((parsed_key, db_dir))
 
     log.info("Starting processing with 4 processes")
 
@@ -97,8 +100,9 @@ def evaluate(
             settings,
             output_dir,
             cli_client,
-            db
-        ) for db in db_dirs
+            db,
+            pk,
+        ) for (pk, db) in dbs_from_cache
     ]
     with Pool(processes=4) as pool:
         pool.map(do_evalute, evaluators)
