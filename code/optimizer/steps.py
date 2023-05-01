@@ -161,12 +161,6 @@ class GenerateModelStep(OrchestrationStep):
                                                config.constraint_format,
                                                config.lambda_const,
                                                config.working_dir)
-        data_generator = DataGenerator(
-            project_dir,
-            project, 
-            self.orchestrator.data_generator.working_dir, 
-            self.orchestrator.data_generator.results_dir,
-        )
         for project_path in projects_path:
             project = os.path.basename(project_path)
             project_dir = os.path.dirname(project_path)
@@ -176,6 +170,12 @@ class GenerateModelStep(OrchestrationStep):
                 # hack -> refactor using populate
                 if not self.orchestrator.run_single:
                     self.orchestrator.project_name = project
+                    data_generator = DataGenerator(
+                        project_dir,
+                        project, 
+                        self.orchestrator.data_generator.working_dir, 
+                        self.orchestrator.data_generator.results_dir,
+                    )
        
                     (ctx[SOURCE_ENTITIES],
                     ctx[SINK_ENTITIES],
@@ -208,6 +208,12 @@ class GenerateModelStep(OrchestrationStep):
             # hack -> refactor using populate
             if not self.orchestrator.run_single:
                 self.orchestrator.project_name = project
+                data_generator = DataGenerator(
+                    project_dir,
+                    project, 
+                    self.orchestrator.data_generator.working_dir, 
+                    self.orchestrator.data_generator.results_dir,
+                )
     
                 (ctx[SOURCE_ENTITIES],
                 ctx[SINK_ENTITIES],

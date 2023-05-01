@@ -30,3 +30,6 @@ docker-tsm-main:
 	DOCKER_BUILDKIT=1 docker build -t $(IMAGE_PREFIX)/tsm-main $(DOCKER_BUILD_ARGS) -f ./Dockerfile .
 	docker tag $(IMAGE_PREFIX)/tsm-main $(IMAGE_PREFIX)/tsm-main:latest
 	docker tag $(IMAGE_PREFIX)/tsm-main $(IMAGE_PREFIX)/tsm-main:$(IMAGE_TAG)
+
+test:
+	@python -m unittest tests/test_main.py

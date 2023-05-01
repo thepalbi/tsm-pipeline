@@ -52,19 +52,20 @@ def combine_scores(query: str,
     for reprScoreFile in files:
         if r'results\combined' not in reprScoreFile:
             n += 1
-            for reprScopeLine in open(reprScoreFile).readlines():
-                # From the project line, parse the repr, taint object type and score
-                repr = re.findall("repr = \"([^\"]+)\"", reprScopeLine)[0]
-                t = re.findall("t = \"([^\"]+)\"", reprScopeLine)[0]
-                res = float(re.findall("result = ([0-9.]+)", reprScopeLine)[0])
+            with open(reprScoreFile, "r") as f:
+                for reprScopeLine in f.readlines():
+                    # From the project line, parse the repr, taint object type and score
+                    repr = re.findall("repr = \"([^\"]+)\"", reprScopeLine)[0]
+                    t = re.findall("t = \"([^\"]+)\"", reprScopeLine)[0]
+                    res = float(re.findall("result = ([0-9.]+)", reprScopeLine)[0])
 
-                # Add up for each repr, the scores found
-                if t == "src":
-                    src_dict[repr].append(res)
-                elif t == "snk":
-                    snk_dict[repr].append(res)
-                elif t == "san":
-                    san_dict[repr].append(res)
+                    # Add up for each repr, the scores found
+                    if t == "src":
+                        src_dict[repr].append(res)
+                    elif t == "snk":
+                        snk_dict[repr].append(res)
+                    elif t == "san":
+                        san_dict[repr].append(res)
 
     with open(out_file, "w") as scoresfile:
         scoresfile.writelines([

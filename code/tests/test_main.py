@@ -25,6 +25,12 @@ class TestMain(unittest.TestCase):
     def setUpClass(cls):
         cls.docker_client = docker.from_env()
 
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.docker_client.close()
+
+
     def test_smoke_training_run(self):
         results_dir = tempfile.mkdtemp()
         print("Using temporary directory as results: %s" % (results_dir))
