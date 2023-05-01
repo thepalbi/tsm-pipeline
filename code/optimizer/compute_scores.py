@@ -7,18 +7,7 @@ import os
 import logging
 import shutil
 
-log = logging.getLogger("compute_scores")
-
-
-def getmetrics(actual, predicted, c):
-    # Precision
-    scores = dict()
-    scores["actual"] = sum(actual)
-    scores["predicted"] = sum(predicted)
-    scores["precision"] = precision_score(actual, predicted)
-    scores["recall"] = recall_score(actual, predicted)
-    scores["f1"] = f1_score(actual, predicted)
-    return scores
+log = logging.getLogger(__name__)
 
 
 def compute_optimized_repr_scores(config: SolverConfig, ctx):

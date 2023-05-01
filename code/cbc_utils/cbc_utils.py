@@ -1,10 +1,8 @@
 import sys
-import os
 from utils.process import run_process, RunProcessError
-from utils.logging import get_stdout_logger
 import logging
 
-log = get_stdout_logger('cbc', level=logging.DEBUG)
+log = logging.getLogger(__name__)
 
 class EmptyModelError(Exception):
     """Raised when a model could not be solved because it was empty.
