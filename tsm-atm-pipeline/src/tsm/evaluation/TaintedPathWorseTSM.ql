@@ -1,5 +1,7 @@
 import javascript
+// Import known source, sink and sanitizer definitions, in other words, the worse libraries
 import tsm.evaluation.TaintedPathWorseTSMCustomizations
+// import the DataFlow::Configuration customized for this evaluation
 import tsm.path.TaintedPathTSMConfig
 import tsm.TaintSpecificationMining
 

@@ -3,9 +3,10 @@ private import NodeRepresentation
 
 private float minScore_snk() { result = 0.1 }
 
+// Since the score goes from 0 to 1, this prohibits using learned src
 private float minScore_src() { result = 100 }
 
-// Score>1 to ignore sanitizers
+// Since the score goes from 0 to 1, this prohibits using learned san
 private float minScore_san() { result = 100 }
 
 module TSM {
