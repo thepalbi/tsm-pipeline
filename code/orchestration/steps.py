@@ -54,9 +54,6 @@ class OrchestrationStep:
 
 
     def get_new_working_directories(self, query_name, working_dir):
-        projects_folder = os.path.join(working_dir, "data")
-        projects = glob(os.path.join(projects_folder, self.orchestrator.project_name))
-
         timestamp = str(int(time.mktime(datetime.datetime.now().timetuple())))
         optimizer_run_name = f"{query_name}-{timestamp}"
         

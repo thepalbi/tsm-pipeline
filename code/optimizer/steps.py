@@ -115,10 +115,12 @@ class GenerateModelStep(OrchestrationStep):
         2. When cleaning, delete the existing model dirs
         3. If running multiple steps, but this step is not included, reuse existing model dirs
         """
-        return \
-            (SINGLE_STEP_NAME in ctx) and ctx[SINGLE_STEP_NAME] == "optimize" or \
-            (COMMAND_NAME in ctx) and ctx[COMMAND_NAME] == "clean" or \
-            (SINGLE_STEP_NAME not in ctx and STEP_NAMES in ctx) and not self.name() in ctx[STEP_NAMES]
+        # Commenting out, old feature used when the pipeline was run individually
+        # return \
+        #     (SINGLE_STEP_NAME in ctx) and ctx[SINGLE_STEP_NAME] == "optimize" or \
+        #     (COMMAND_NAME in ctx) and ctx[COMMAND_NAME] == "clean" or \
+        #     (SINGLE_STEP_NAME not in ctx and STEP_NAMES in ctx) and not self.name() in ctx[STEP_NAMES]
+        return False
 
     def run(self, ctx: Context) -> Context:
         # TODO: Implement --mode=combined model generation
@@ -251,7 +253,7 @@ class OptimizeStep(OrchestrationStep):
         results_dir = ctx[RESULTS_DIR_KEY]
         working_dir = ctx[WORKING_DIR_KEY]
 
-        # If we a clean in ran, and each previous step once again (generate_entities and generate_model),
+        # If we are clean in ran, and each previous step once again (generate_entities and generate_model),
         # we might need to re-create the model dir, since it was previously deleted.
 
         os.makedirs(ctx[MODELS_DIR_KEY], exist_ok=True)

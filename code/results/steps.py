@@ -18,7 +18,7 @@ class GenerateScoresStep(OrchestrationStep):
 # This step (not included) just create the tsm_repr_pred.qll file
 class GenerateTSMQueryStep(OrchestrationStep):
     """
-    GenerateTSMQueryStep is an Orchestrator step that having the pipelien ran already, and given the learned results,
+    GenerateTSMQueryStep is an Orchestrator step that having the pipeline ran already, and given the learned results,
     creates a tsm_repr_pred.qll file containing the core getReprScore QL query.
     """
     def populate(self, ctx: Context) -> Context:
