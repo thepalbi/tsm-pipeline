@@ -2,6 +2,7 @@ import os
 import subprocess
 import logging
 import sys
+from typing import Optional
 
 from orchestration import global_config
 from utils.clis import getenv_or_default
@@ -15,7 +16,7 @@ class CodeQLWrapper:
     the $CODEQL environment variable.
     """
 
-    def __init__(self):
+    def __init__(self, process_timeout: Optional[int] = None):
         try:
             # TODO: Check that file exists, and it's codeql?
             self._code_ql_binary_path = global_config.codeql_executable
@@ -27,6 +28,7 @@ class CodeQLWrapper:
             self._logs_directory = wrapper_logs_directory
             self._logger = logging.getLogger(self.__class__.__name__)
             self._logger.setLevel(logging.INFO)
+            self._process_timeout = process_timeout
         except KeyError:
             raise Exception(
                 "'codeql' binary not found. Try setting the $CODEQL environment variable.")
@@ -106,7 +108,7 @@ class CodeQLWrapper:
         self._logger.debug("command issued: %s",
                            " ".join(command_and_arguments))
         try:
-            subprocess.run(command_and_arguments, capture_output=True, shell=True, check=True, text=True)
+            subprocess.run(command_and_arguments, capture_output=True, shell=True, check=True, text=True, timeout=self._process_timeout)
         except subprocess.CalledProcessError as call_error:
             self._logger.error(
                 "Error when executing codeql: %s", call_error.stderr)

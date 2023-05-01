@@ -13,6 +13,8 @@ SOURCES = SINKS = SANITIZERS = "Known"
 
 SUPPORTED_QUERY_TYPES = ["NoSql", "Sql", "Xss", "Sel", "Path"]
 
+# Using for all codeql stuff a hard 5 minute timeout, that if elapsed, will kill the process
+CODEQL_PROCESS_TIMEOUT = 5 * 60
 
 class GenerateEntitiesStep(OrchestrationStep):
     def populate(self, ctx: Context) -> Context:
@@ -51,7 +53,7 @@ class DataGenerator:
         """
         self.project_dir = project_dir
         self.project_name = project_name
-        self.codeql = CodeQLWrapper()
+        self.codeql = CodeQLWrapper(process_timeout=CODEQL_PROCESS_TIMEOUT)
         # noinspection PyInterpreter
         self.logger = logging.getLogger(self.__class__.__name__)
         self.working_dir = working_dir
