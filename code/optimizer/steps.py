@@ -159,6 +159,12 @@ class GenerateModelStep(OrchestrationStep):
                                                config.constraint_format,
                                                config.lambda_const,
                                                config.working_dir)
+        data_generator = DataGenerator(
+            project_dir,
+            project, 
+            self.orchestrator.data_generator.working_dir, 
+            self.orchestrator.data_generator.results_dir,
+        )
         for project_path in projects_path:
             project = os.path.basename(project_path)
             project_dir = os.path.dirname(project_path)
@@ -167,9 +173,6 @@ class GenerateModelStep(OrchestrationStep):
 
                 # hack -> refactor using populate
                 if not self.orchestrator.run_single:
-                    dataGenerator = DataGenerator(project_dir, project, 
-                                                self.orchestrator.data_generator.working_dir, 
-                                                self.orchestrator.data_generator.results_dir)
                     self.orchestrator.project_name = project
        
                     (ctx[SOURCE_ENTITIES],
@@ -177,7 +180,7 @@ class GenerateModelStep(OrchestrationStep):
                     ctx[SANITIZER_ENTITIES],
                     ctx[SRC_SAN_TUPLES_ENTITIES],
                     ctx[SAN_SNK_TUPLES_ENTITIES],
-                    ctx[REPR_MAP_ENTITIES]) = dataGenerator.get_entity_files(self.orchestrator.query_type)
+                    ctx[REPR_MAP_ENTITIES]) = data_generator.get_entity_files(self.orchestrator.query_type)
 
                 constraint_builder.readEventsAndReps(project, ctx)
                 constraint_builder.readAllKnown(project, config.query_name, config.query_type,
@@ -202,9 +205,6 @@ class GenerateModelStep(OrchestrationStep):
             self.logger.info(">>>>>>>>>>>>>Executing project %s" % project)
             # hack -> refactor using populate
             if not self.orchestrator.run_single:
-                dataGenerator = DataGenerator(project_dir, project, 
-                                            self.orchestrator.data_generator.working_dir, 
-                                            self.orchestrator.data_generator.results_dir)
                 self.orchestrator.project_name = project
     
                 (ctx[SOURCE_ENTITIES],
@@ -212,7 +212,7 @@ class GenerateModelStep(OrchestrationStep):
                 ctx[SANITIZER_ENTITIES],
                 ctx[SRC_SAN_TUPLES_ENTITIES],
                 ctx[SAN_SNK_TUPLES_ENTITIES],
-                ctx[REPR_MAP_ENTITIES]) = dataGenerator.get_entity_files(self.orchestrator.query_type)
+                ctx[REPR_MAP_ENTITIES]) = data_generator.get_entity_files(self.orchestrator.query_type)
             try:
                 # Write flow constraints, as in Seldon 4.2
                 constraint_builder.generate_flow_constraints_from_pairs(project, config.constraints_constant_C, query=config.query_name, ctx=ctx)

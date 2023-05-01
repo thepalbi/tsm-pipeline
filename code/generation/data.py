@@ -84,6 +84,12 @@ class DataGenerator:
         return self._get_tsm_query_file(query_type, f"{queried_entity}-{query_type}.ql")
 
     def _get_tsm_query_file(self, query_type: str, filename: str) -> str:
+        """_get_tsm_query_file gets the absolute path to the tsm library codeql query file.
+
+        :param str query_type: query type
+        :param str filename: filename
+        :return str aboluste path to the query
+        """        
         if query_type is None:
             return os.path.join(global_config.sources_root, "tsm", filename)
         else: 
@@ -159,20 +165,11 @@ class DataGenerator:
         # to feed the corresponding predicates in the PG query
         try:
             propgraph_path = self._get_tsm_query_file(query_type, f"PropagationGraph-{query_type}.ql")
-            tmp_propgraph_name = f"PropagationGraph-{self.project_name}-{query_type}.ql"
-            new_propgraph_path = os.path.join(os.path.dirname(propgraph_path), tmp_propgraph_name )
-            
-            # Create a copy of PG query with the name of the project
-            # This is useful for debugging (e.g., if the query times-out or fails)
-            with open(new_propgraph_path , "w", encoding='utf-8') as new_pg_file: 
-                with open(propgraph_path, "r", encoding='utf-8') as pg_file:
-                    pg_lines = pg_file.readlines()
-                new_pg_file.writelines(pg_lines)
 
             # For Progapation graphs we use current version of CodeQl Libraries  
             self.codeql.database_analyze(
                 self.project_dir,
-                new_propgraph_path,
+                propgraph_path,
                 f"{self.logs_folder}/js-results.csv",
                 global_config.worse_lib_search_path,
                 [f"--external=knownSource={ctx[SOURCE_ENTITIES]}",
@@ -183,9 +180,6 @@ class DataGenerator:
         except Exception as e:
             self.logger.info("Error Analyzing PropagationGraph.ql")
             raise(e)
-
-        # removes temporary progatation graph query
-        os.remove(new_propgraph_path)
 
         self.logger.info("Generating propagation graph data")
         bqrs_propgraph = self._get_tsm_bqrs_file_for_entity(f"PropagationGraph-{self.project_name}", query_type)
