@@ -184,6 +184,14 @@ def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs
     )
 
 
+def read_dbs_dataset(path):
+    dbs = []
+    with open(path, "r") as f:
+        for l in f.readlines():
+            dbs.append(l.rstrip())
+    return dbs
+
+
 if __name__ == "__main__":
     client = docker.from_env()
 
