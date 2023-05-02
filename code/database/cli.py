@@ -35,10 +35,15 @@ def do_cache_key(cache: DatabasesCache, key: str, cli_version: str, just_check: 
         if just_check:
             log.info("Not cached! %s", key)
         else:
+            # continue to the try block below
             log.info("Not cached, creating db %s", key)
-            parsed_key = parse_key(key)
-            caching_dir = create_database(parsed_key, cache, cli_version)
-            log.info("Created! %s", caching_dir)
+            try:
+                    parsed_key = parse_key(key)
+                    caching_dir = create_database(parsed_key, cache, cli_version)
+                    log.info("Created! %s", caching_dir)
+            except:
+                # omit exception, we can then check and see if one failed
+                log.exception("Error creating db: %s", key)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Tuple
 import os
+import shutil
 
 
 @dataclass
@@ -39,7 +40,7 @@ class DatabasesCache:
         self.root_dir = os.path.join(root_dir, cli_version)
 
 
-    def get(self, key: str) -> Tuple[Parsedkey, Optional[str]]:
+    def get(self, key: str) -> Tuple[Parsedkey, str]:
         parsed_key = parse_key(key)
         resolved_path = parsed_key.get_path(self.root_dir)
         if not os.path.exists(resolved_path):
@@ -47,3 +48,19 @@ class DatabasesCache:
             raise NotCachedError(f"{key} not cached at '{resolved_path}'. Try caching it with CLI: python -m database.cli  --key {key} --cache-root {self._advertised_root_dir}")
 
         return parsed_key, resolved_path
+    
+    def clean_results(self, key: str) -> bool:
+        """clean_results cleans the underlying db results
+
+        :param str key: the db key
+        :return bool: whether or not the db results folder has been deleted, if it existed
+        """        
+        _, db_path = self.get(key)
+        results_path = os.path.join(db_path, "results")
+        if len(os.listdir(results_path)) == 0:
+            return False
+
+        # the dir is not empty, should delete
+        shutil.rmtree(results_path, ignore_errors=False)
+        return True
+
