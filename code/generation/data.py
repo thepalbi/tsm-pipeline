@@ -182,7 +182,7 @@ class DataGenerator:
             raise(e)
 
         self.logger.info("Generating propagation graph data")
-        bqrs_propgraph = self._get_tsm_bqrs_file_for_entity(f"PropagationGraph-{self.project_name}", query_type)
+        bqrs_propgraph = self._get_tsm_bqrs_file_for_entity("PropagationGraph", query_type)
         # data/1046224544_fontend_19c10c3/1046224544_fontend_19c10c3-src-san.prop.csv
         
         # We remove the entities to make sure we use updated versions
