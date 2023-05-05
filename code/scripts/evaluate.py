@@ -1,6 +1,5 @@
 import argparse
 from utils.process import run_process
-from utils.logging import get_stdout_logger
 from os import path, mkdir
 from clients.cli import CLIClient
 import sys
@@ -8,7 +7,6 @@ from typing import Tuple, Optional, List
 from database.cache import DatabasesCache, Parsedkey
 from multiprocessing import Pool
 import dataclasses
-from .files import db_list_to_file
 import logging
 
 
@@ -28,6 +26,7 @@ class EvaluationSettings:
     search_path: str
     query_file: str
     cli_version: str
+    db_cli_version: str
     cache_root: str
     external_predicate_file: Optional[str] = None
 
@@ -77,7 +76,7 @@ def evaluate(
         "--threads": "2",
         "--ram": "4000",
     })
-    cache = DatabasesCache(settings.cache_root, settings.cli_version)
+    cache = DatabasesCache(settings.cache_root, settings.db_cli_version)
 
     # if dbs paras is not passed, get those from dbs_path file
     if dbs is None:

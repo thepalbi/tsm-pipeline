@@ -1,7 +1,7 @@
 import unittest
 
 import docker
-from scripts.xxx import run_tsm, ExperimentSettings
+from scripts.docker import run_tsm, ExperimentSettings
 # from scripts.evaluate import evaluate, EvaluationSettings
 import tempfile
 from os.path import join as path_join
@@ -16,16 +16,9 @@ defaults_evalute = {
     "cache_root": "/home/pablo/dbcache",
 }
 
-log = logging.getLogger(__name__)
 
-test_train_data = [
-    # "ASCOT/dashboardjs/352a8b6710d6f2ddfd42ddfa0266af65c9c23ebe",
-    # "alphagov/submit-prototype-kit/6ce9e75078ea7965cb9429446cca8c5765817d7c",
-    # "RuffApps/Apps/90e13d23b0593aa45f35fdac736b8e19c6616a9d",
-    # xss
-    # danielstern/express-react-fullstack/865504ee0d0188f10d162a06d1311d9115a68cfe
-    "Sv443/JokeAPI/f2c757a20bdc385edcf57b811ec8cc1a72899432",
-]
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger(__name__)
 
 
 class TestMain(unittest.TestCase):
@@ -45,6 +38,9 @@ class TestMain(unittest.TestCase):
                 log.info("cleaned up results for db: %s", db)
 
     def test_smoke_training_run_path(self):
+        test_train_data = [
+            "Sv443/JokeAPI/f2c757a20bdc385edcf57b811ec8cc1a72899432",
+        ]
         results_dir = tempfile.mkdtemp()
         print("Using temporary directory as results: %s" % (results_dir))
 
@@ -59,7 +55,7 @@ class TestMain(unittest.TestCase):
             **defaults
         )
 
-        run_tsm(self.docker_client, train_settings, tail_logs=True)
+        run_tsm(self.docker_client, train_settings, tail_logs=True, debug=True)
 
         # assert empty model error was logged
         self.assert_in_training_log(results_dir, "run ok")

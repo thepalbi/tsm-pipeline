@@ -70,8 +70,9 @@ RUN cat <<EOF > config.json
   "codeQLSourcesRoot": "/ql",
   "workingDirectory": "/bigtmp/wd",
   "resultsDirectory": "/results",
-  "worseLibSearchPath": "/worse_lib",
-  "logsDirectory" : "/bigtmp/log" 
+  "searchPath": "/worse_lib:/js_upgrades_lib",
+  "logsDirectory" : "/bigtmp/log",
+  "compiledDBsVersion": "2.5.2"
 }
 EOF
 

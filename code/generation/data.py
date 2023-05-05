@@ -150,15 +150,15 @@ class DataGenerator:
         # sources
         self._generate_for_entity(
             query_type, SOURCES, f"source{query_type}Classes", ctx[SOURCE_ENTITIES], True,
-            global_config.worse_lib_search_path)
+            global_config.search_path)
         # sinks
         self._generate_for_entity(
             query_type, SINKS, f"sink{query_type}Classes", ctx[SINK_ENTITIES], False,
-            global_config.worse_lib_search_path)
+            global_config.search_path)
         # sanitizers
         self._generate_for_entity(
             query_type, SANITIZERS, f"sanitizer{query_type}Classes", ctx[SANITIZER_ENTITIES], False,
-            global_config.worse_lib_search_path)
+            global_config.search_path)
         
         # running propagation graph queries
         # we use the csv files of known sources/sinks/sanitizers 
@@ -171,7 +171,7 @@ class DataGenerator:
                 self.project_dir,
                 propgraph_path,
                 f"{self.logs_folder}/js-results.csv",
-                global_config.worse_lib_search_path,
+                global_config.search_path,
                 [f"--external=knownSource={ctx[SOURCE_ENTITIES]}",
                 f"--external=knownSink={ctx[SINK_ENTITIES]}",
                 f"--external=knownSanitizer={ctx[SANITIZER_ENTITIES]}"]
@@ -240,7 +240,7 @@ class DataGenerator:
 
     def _generate_for_entity(self, query_type: str, entity_type: str, result_set: str, output_file: str, 
                             force_query: bool = True,
-                            search_path:str = global_config.worse_lib_search_path):
+                            search_path:str = global_config.search_path):
         """Runs the query for a given entity, and extracts the results into a csv file."""
         self.logger.info(
             "Generating %s data in file=[%s]", entity_type, output_file)

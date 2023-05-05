@@ -33,3 +33,6 @@ docker-tsm-main:
 
 test:
 	@python -m unittest tests/test_main.py
+
+test-quick:
+	@python -m unittest tests/test_main.py -k="*test_smoke_training_run_path"

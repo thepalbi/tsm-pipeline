@@ -16,10 +16,14 @@ Original file is located at
 log = logging.getLogger(__name__)
 
 
-def calculate_scores(
+def _calculate_score_sets(
     results_folder: str,
-    cleanup_base_dir="/tesis/tmp"
-) -> Tuple[float, float, float]:
+    cleanup_base_dir="/tesis/tmp",
+) -> Tuple[Set[str], Set[str], Set[str]]:
+    """_calculate_score_sets calulates the result sets for an experiment
+
+    :return Tuple[Set[str], Set[str], Set[str]]: v0, worse, boosted result sets
+    """    
     # Take as input results folder, and assume that there exists a `v0` and `worse` folder with the evaluation results
     v0_dir = "v0/"
     boost_dir = "worse/"
@@ -96,16 +100,35 @@ def calculate_scores(
         df = cleanup(df)
         worse = worse | set(df.apply(lambda x: hash_tuple(tuple(x)), axis=1))
 
+    return v0, worse, boosted
+    
+
+def calculate_scores(
+    results_folder: str,
+    cleanup_base_dir="/tesis/tmp",
+    use_v0_prime=True,
+) -> Tuple[float, float, float]:
+    """calculate_scores calcultes precision, recall and accuracy for the given experiment.
+
+    :param str results_folder: the folder containing the results of the experiment
+    :param str cleanup_base_dir: base dir to cleanup in source files from query results, defaults to "/tesis/tmp"
+    :param bool use_v0_prime: whether or not to substract worse from v0 to caculate true results, defaults to True
+    :return Tuple[float, float, float]: precision, recall and accuracy
+    """    
+    v0, worse, boosted = _calculate_score_sets(results_folder, cleanup_base_dir)
+
     # Using instead of the whole set just the following sets:
     # - V0 prime, which is V0 - Worse
     # - Boosted, which is in the worseboosted query, just the results corresponding to boosted
     # by doing doing, our universe of alarms is universe - worse, since those are the facts. We want to evaluate
     # from the boosted alerts, which are real compared to v0, but witout having alarms already covered by worse
-    v0_prime = v0 - worse
-    all = v0_prime | boosted
+    v0_used = v0
+    if use_v0_prime:
+        v0_used = v0 - worse
+    all = v0_used | boosted
 
     log.debug("Result sets sizes: Worse %d, Boosted %d, V0 %d, V0_prime %d, All %d" %
-             (len(worse), len(boosted), len(v0), len(v0_prime), len(all)))
+             (len(worse), len(boosted), len(v0), len(v0_used), len(all)))
 
     # Helper function to make a set iterable in a repeatable order. Used for generating
     # the item sets required by the score calculation functions in sklearn
@@ -119,7 +142,7 @@ def calculate_scores(
         for it in all_ordered
     ]
     y_true = [
-        int(it in v0_prime)
+        int(it in v0_used)
         for it in all_ordered
     ]
 

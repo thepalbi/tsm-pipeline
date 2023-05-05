@@ -4,7 +4,7 @@ CODEQL_SOURCES_ROOT_KEY = "codeQLSourcesRoot"
 CODEQL_EXECUTABLE_KEY = "codeQLExecutable"
 WORKING_DIRECTORY_KEY = "workingDirectory"
 RESULTS_DIRECTORY_KEY = "resultsDirectory"
-SEARCH_WORSE_LIB_PATH_KEY = "worseLibSearchPath"
+SEARCH_WORSE_LIB_PATH_KEY = "searchPath"
 LOGS_DIRECTORY_KEY = "logsDirectory"
 
 class Configuration:
@@ -29,12 +29,27 @@ class Configuration:
         return self.config[RESULTS_DIRECTORY_KEY]
 
     @property
-    def worse_lib_search_path(self):
+    def search_path(self):
+        """search_path is the tsm configured search used when running `codeql database analyze` or
+        `codeql query run`. It's used to resolve the javascript libraries, or dependencies of them.
+        If it's more than one item they should be `:` concatenated.
+
+        :return str: the search path to be used.
+        """        
         return self.config[SEARCH_WORSE_LIB_PATH_KEY]
 
     @property
     def logs_directory(self):
         return self.config[LOGS_DIRECTORY_KEY]
+
+    @property
+    def compiled_dbs_version(self):
+        """compiled_dbs_version is the CodeQL CLI version used in the database cache
+        to compile the dbs used during training.
+
+        :return str: the db version to use in the cache
+        """        
+        return self.config["compiledDBsVersion"]
 
     def __getattr__(self, item):
         return self.config[item]

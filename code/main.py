@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-import glob
 import datetime
 
 from typing import TextIO, Iterator, List
@@ -23,6 +22,12 @@ def create_logging_file_appender():
     return file_appender
 
 logging.basicConfig(level=logging.INFO, format=logging_format)
+
+log = logging.getLogger(__name__)
+
+# use DEBUG env var in 'true' to enable program wide debug logging
+if os.getenv("DEBUG", "false") == "true":
+    logging.getLogger().setLevel(logging.DEBUG)
 
 # Add file handler to root logger
 logging.getLogger().addHandler(create_logging_file_appender())
@@ -115,7 +120,7 @@ parser.add_argument("--progress-log", dest="progress_log", required=True, type=s
 
 # Print whole global config
 from pprint import pformat
-logging.info("Global config dump:\n%s", pformat(vars(global_config)))
+log.info("Global config dump:\n%s", pformat(vars(global_config)))
 
 subparsers = parser.add_subparsers(dest="command", required=True)
 run_parser = subparsers.add_parser("run")
@@ -168,7 +173,7 @@ if parsed_arguments.scores_file is not None:
 if parsed_arguments.no_flow:
     no_flow = True
 
-logging.info(f"Results folder: {results_dir}")
+log.info(f"Results folder: {results_dir}")
 
 project_cache = None
 project_cache_dir = parsed_arguments.project_cache_dir
@@ -178,8 +183,8 @@ if project_cache_dir is not None:
         global_config.codeql_executable,
         "version -q"
     ]).stdout.rstrip("\n")
-    project_cache = ProjectDatabaseCache(project_cache_dir, cli_version)
-    logging.info("Project cache enabled with dir: %s", project_cache_dir)
+    project_cache = ProjectDatabaseCache(project_cache_dir, global_config.compiled_dbs_version)
+    log.info("Project cache enabled with dir: %s", project_cache_dir)
 else:
     project_dir = os.path.normpath(parsed_arguments.project_dir)
 
@@ -216,10 +221,10 @@ if __name__ == '__main__':
     for (i,project) in enumerate(all_projects):
         preety_project_list += '%d\t%s\n' % (i+1, project.name)
     preety_project_list += '\n'
-    logging.info("Dumping project list for tracking purposes:\n%s", preety_project_list)
+    log.info("Dumping project list for tracking purposes:\n%s", preety_project_list)
 
     for project in all_projects:       
-        logging.info(f"Running orchestrator-{parsed_arguments.command} on project: {project.name}")
+        log.info(f"Running orchestrator-{parsed_arguments.command} on project: {project.name}")
         dblogger = TrackingAdapter(logging.getLogger(), {'dbname': project.name})
         dblogger.info("running pipeline")
 
@@ -250,12 +255,12 @@ if __name__ == '__main__':
                 dblogger.info("run ok")
 
             except EmptyModelError as em:
-                logging.error("error solving model. Model was empty: %s", em.model_path)
+                log.error("error solving model. Model was empty: %s", em.model_path)
                 dblogger.error("run ended because model was empty: %s", em.model_path)
 
             except Exception as err:
-                logging.error(f"Error running  project: {project.name}, {err}")
-                logging.exception("Fatal error occured in orchestrator execution")
+                log.error(f"Error running  project: {project.name}, {err}")
+                log.exception("Fatal error occured in orchestrator execution")
                 # project ended with error
                 dblogger.exception("run eneded with unhandled exception")
 

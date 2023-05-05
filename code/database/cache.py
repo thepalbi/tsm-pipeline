@@ -57,7 +57,7 @@ class DatabasesCache:
         """        
         _, db_path = self.get(key)
         results_path = os.path.join(db_path, "results")
-        if len(os.listdir(results_path)) == 0:
+        if not os.path.exists(results_path) or len(os.listdir(results_path)) == 0:
             return False
 
         # the dir is not empty, should delete

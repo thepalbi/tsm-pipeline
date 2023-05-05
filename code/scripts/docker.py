@@ -4,12 +4,13 @@ from typing import Dict, Tuple, List, Any, Optional
 import re
 from dataclasses import dataclass, field
 import os
-from utils.logging import get_stdout_logger
+import logging
 from .files import db_list_to_file
 
 from misc.combinescores import combine_scores
 
-logger = get_stdout_logger("docker")
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
 @dataclass(frozen=True)
 class QueryNameAndType:
@@ -117,6 +118,8 @@ def mounts_and_envs(config: Dict[str, str], project_list_file: str, results_dir:
         Mount(source=config["TMP_DIR"], target="/bigtmp", type='bind'),
         Mount(source=results_dir, target="/results", type='bind'),
         Mount(source=config["CACHE_DBS_DIR"], target="/dbs", type='bind'),
+        # codeql package cache
+        Mount(source=config["QL_JAVASCRIPT_UPGRADES"], target="/js_upgrades_lib", type='bind'),
         # additional mounts
         Mount(source=project_list_file, target=MOUNTED_LIST_FILE,
               read_only=True, type='bind'),
@@ -128,12 +131,12 @@ def mounts_and_envs(config: Dict[str, str], project_list_file: str, results_dir:
     return mounts, envs
 
 
-def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs=False, block=False):
+def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs=False, block=False, debug=False):
     # prerequisites
     # create results and logs folder if necessary
     def create_dir(dir: str):
         try:
-            logger.info("creating %s dir. Omitting error if already existing", dir)
+            log.info("creating %s dir. Omitting error if already existing", dir)
             os.mkdir(dir)
         except FileExistsError:
             pass
@@ -152,29 +155,36 @@ def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs
         "--progress-log=/results/training_log.txt",
         "run"
     ]
+
+    # if debug patch environment, this will enable debug logging
+    if debug:
+        log.warning("enabling debug mode in tsm")
+        settings.docker_env["DEBUG"] = "true"
+
     container = client.containers.run(
         image="github.com/thepalbi/tsm-main:latest",
         command=container_cmds,
         detach=True,
         **settings.docker_kwargs
     )
-    logger.info("running at container %s. Use `docker logs %s --tail 10 --follow` to follow progress", container.id, container.id)
+    log.info("running at container %s. Use `docker logs %s --tail 10 --follow` to follow progress", container.id, container.id)
+    print("running at container %s. Use `docker logs %s --tail 10 --follow` to follow progress" % (container.id, container.id))
     if block:
         container.wait()
     elif tail_logs:
         import sys
-        for log in container.logs(
+        for l in container.logs(
             stdout=True,
             stderr=True,
             stream=True,
         ):
             # pipe output directly to stdout, rather than print
-            sys.stdout.write(log.decode('utf-8'))
+            sys.stdout.write(l.decode('utf-8'))
     else:
-        logger.info("not blocking, please to run combine scores after")
+        log.info("not blocking, please to run combine scores after")
         return
 
-    logger.info("running combine scores")
+    log.info("running combine scores")
     combine_scores(
         query=query.name,
         results_dir=settings.results_dir,

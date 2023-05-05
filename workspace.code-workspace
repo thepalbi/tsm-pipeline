@@ -7,5 +7,7 @@
 			"path": "lib-worse/codeql"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"codeQL.cli.executablePath": "/home/pablo/clis/codeqlcli-v2.13.1/codeql"
+	}
 }

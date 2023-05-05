@@ -49,5 +49,11 @@
   "frontMatter.framework.id": "other",
   "frontMatter.content.publicFolder": "",
   "frontMatter.taxonomy.tags": [],
-  "frontMatter.taxonomy.categories": []
+  "frontMatter.taxonomy.categories": [],
+  "frontMatter.content.pageFolders": [
+    {
+      "title": "posts",
+      "path": "[[workspace]]/docs/reports/tesis-blog/posts"
+    }
+  ]
 }

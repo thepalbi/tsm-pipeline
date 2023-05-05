@@ -1,5 +1,5 @@
 name: tsm-js
 version: 0.0.0
 libraryPathDependencies:
-  - codeql-javascript
+  - codeql/javascript-all
 extractor: javascript
