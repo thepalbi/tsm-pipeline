@@ -16,6 +16,27 @@ Original file is located at
 log = logging.getLogger(__name__)
 
 
+def _hash_tuple(k: str, x: Tuple) -> str:
+    """hash_tuple creates a consistent hash for a given evaluations results row.
+
+    :param str k: the name of the db from whom the results belong
+    :param Tuple x: the row
+    :return str: the hash
+    """        
+    return "%s#" % (k)+"#".join([
+        str(v) for v in x
+    ])
+
+def _project_name_from_hash(h: str) -> str:
+    """_project_name_from_hash gets the project name from a hashed evaluation results row
+
+    :param str h: the hash
+    :return str: the extracted project name
+    """    
+    i = h.index("#")
+    return h[:i]
+
+
 def _calculate_score_sets(
     results_folder: str,
     cleanup_base_dir="/tesis/tmp",
@@ -62,13 +83,6 @@ def _calculate_score_sets(
         df['filePathSource'] = df['filePathSource'].map(cleanup_filePath_col)
         df['filePathSink'] = df['filePathSink'].map(cleanup_filePath_col)
 
-    # utility function used for hashing each row in a consistent way, so they
-    # can be operated in sets
-    def hash_tuple(x: Tuple):
-        return "#".join([
-            str(v) for v in x
-        ])
-
     # Now, generate the a set for worse, v0 and boosted alone
     v0 = set()
     worse = set()
@@ -80,26 +94,26 @@ def _calculate_score_sets(
         return df.drop(["score", "origin", "source", "sink"], axis=1)
 
     # Calculate v0 set
-    for df in results_v0.values():
+    for k, df in results_v0.items():
         # Drop non hashed columns
         df = cleanup(df)
         # hash and add to set
-        v0 = v0 | set(df.apply(lambda x: hash_tuple(tuple(x)), axis=1))
+        v0 = v0 | set(df.apply(lambda x: _hash_tuple(k, tuple(x)), axis=1))
 
     # Calculate boosted
-    for df in results_boost.values():
+    for k, df in results_boost.items():
         # filter out boosted
         df = df[df['origin'] == 'boosted']
         df = cleanup(df)
         boosted = boosted | set(
-            df.apply(lambda x: hash_tuple(tuple(x)), axis=1))
+            df.apply(lambda x: _hash_tuple(k, tuple(x)), axis=1))
 
     # Calculate worse
-    for df in results_boost.values():
+    for k, df in results_boost.items():
         # filter out boosted
         df = df[df['origin'] == 'worse']
         df = cleanup(df)
-        worse = worse | set(df.apply(lambda x: hash_tuple(tuple(x)), axis=1))
+        worse = worse | set(df.apply(lambda x: _hash_tuple(k, tuple(x)), axis=1))
 
     return v0, worse, boosted
 
@@ -137,6 +151,9 @@ def calculate_scores(
     return precision, recall, accuracy
 
 
+from collections import defaultdict
+
+
 def calculate_scores_df(
     results_folder: str,
     cleanup_base_dir="/tmp",
@@ -145,6 +162,13 @@ def calculate_scores_df(
         results_folder, cleanup_base_dir)
 
     v0_prime = v0-worse
+
+
+    proj_to_alert_count = defaultdict(lambda: 0)
+    for alert in v0_prime:
+        proj = _project_name_from_hash(alert)
+        proj_to_alert_count[proj] += 1
+    average_tp_per_proj = sum(proj_to_alert_count.values())/len(proj_to_alert_count)
 
     alerts_to_recover = len(v0_prime)
     alerts_recovered = len(v0_prime & boosted)
@@ -158,11 +182,13 @@ def calculate_scores_df(
         accuracy,
         alerts_to_recover,
         alerts_recovered,
-        spurious_alerts
+        spurious_alerts,
+        len(proj_to_alert_count),
+        average_tp_per_proj,
     ]
 
     return pd.DataFrame([row], columns=['precision', 'recall', 'accuracy',
-                 'alerts to recover', 'alerts recovered', 'suprious alerts'])
+                 'alerts to recover (atr)', 'alerts recovered', 'suprious alerts', 'projects with atr', 'avg atr per proj'])
 
 
 def _calculate_ml_scores(v0: Set[str], boosted: Set[str]) -> Tuple[float, float, float]:
