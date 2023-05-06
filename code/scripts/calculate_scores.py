@@ -23,7 +23,7 @@ def _calculate_score_sets(
     """_calculate_score_sets calulates the result sets for an experiment
 
     :return Tuple[Set[str], Set[str], Set[str]]: v0, worse, boosted result sets
-    """    
+    """
     # Take as input results folder, and assume that there exists a `v0` and `worse` folder with the evaluation results
     v0_dir = "v0/"
     boost_dir = "worse/"
@@ -37,7 +37,8 @@ def _calculate_score_sets(
     for f in glob.glob(os.path.join(results_folder, v0_dir, "*.csv")):
         results_v0[os.path.basename(f)] = pd.read_csv(f)
 
-    log.debug("Read total %s dataframes" % (len(results_boost) + len(results_v0)))
+    log.debug("Read total %s dataframes" %
+              (len(results_boost) + len(results_v0)))
 
     # Post-processing required for results:
     # - remove the leading /tesis/tmp/*/ from the filePathSource and filePathSink columns
@@ -101,7 +102,7 @@ def _calculate_score_sets(
         worse = worse | set(df.apply(lambda x: hash_tuple(tuple(x)), axis=1))
 
     return v0, worse, boosted
-    
+
 
 def calculate_scores(
     results_folder: str,
@@ -114,8 +115,9 @@ def calculate_scores(
     :param str cleanup_base_dir: base dir to cleanup in source files from query results, defaults to "/tesis/tmp"
     :param bool use_v0_prime: whether or not to substract worse from v0 to caculate true results, defaults to True
     :return Tuple[float, float, float]: precision, recall and accuracy
-    """    
-    v0, worse, boosted = _calculate_score_sets(results_folder, cleanup_base_dir)
+    """
+    v0, worse, boosted = _calculate_score_sets(
+        results_folder, cleanup_base_dir)
 
     # Using instead of the whole set just the following sets:
     # - V0 prime, which is V0 - Worse
@@ -128,7 +130,43 @@ def calculate_scores(
     all = v0_used | boosted
 
     log.debug("Result sets sizes: Worse %d, Boosted %d, V0 %d, V0_prime %d, All %d" %
-             (len(worse), len(boosted), len(v0), len(v0_used), len(all)))
+              (len(worse), len(boosted), len(v0), len(v0_used), len(all)))
+
+    precision, recall, accuracy = _calculate_ml_scores(v0_used, boosted)
+
+    return precision, recall, accuracy
+
+
+def calculate_scores_df(
+    results_folder: str,
+    cleanup_base_dir="/tmp",
+) -> pd.DataFrame:
+    v0, worse, boosted = _calculate_score_sets(
+        results_folder, cleanup_base_dir)
+
+    v0_prime = v0-worse
+
+    alerts_to_recover = len(v0_prime)
+    alerts_recovered = len(v0_prime & boosted)
+    spurious_alerts = len(boosted-v0_prime)
+
+    precision, recall, accuracy = _calculate_ml_scores(v0_prime, boosted)
+
+    row = [
+        precision,
+        recall,
+        accuracy,
+        alerts_to_recover,
+        alerts_recovered,
+        spurious_alerts
+    ]
+
+    return pd.DataFrame([row], columns=['precision', 'recall', 'accuracy',
+                 'alerts to recover', 'alerts recovered', 'suprious alerts'])
+
+
+def _calculate_ml_scores(v0: Set[str], boosted: Set[str]) -> Tuple[float, float, float]:
+    all = v0 | boosted
 
     # Helper function to make a set iterable in a repeatable order. Used for generating
     # the item sets required by the score calculation functions in sklearn
@@ -142,7 +180,7 @@ def calculate_scores(
         for it in all_ordered
     ]
     y_true = [
-        int(it in v0_used)
+        int(it in v0)
         for it in all_ordered
     ]
 
@@ -156,6 +194,7 @@ def calculate_scores(
 
     return precision, recall, accuracy
 
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
@@ -164,13 +203,13 @@ if __name__ == "__main__":
         dest="results_dir",
         help="Directory where results are hosted. Must contain a `v0` and `worse` folder.",
         type=str
-        )
+    )
     parser.add_argument(
         "--debug",
         help="Enable debug logging",
         type=bool,
         action=argparse.BooleanOptionalAction
-        )
+    )
 
     args = parser.parse_args()
     if args.debug:
