@@ -37,17 +37,27 @@ def _project_name_from_hash(h: str) -> str:
     return h[:i]
 
 
+def hash_set_to_df(hs: Set[str]) -> pd.DataFrame:
+    rows = []
+    for h in hs:
+        rows.append(h.split("#"))
+    return pd.DataFrame(data=rows)
+
+
 def _calculate_score_sets(
     results_folder: str,
     cleanup_base_dir="/tesis/tmp",
+    boost_dir="worse",
+    v0_dir="v0",
 ) -> Tuple[Set[str], Set[str], Set[str]]:
-    """_calculate_score_sets calulates the result sets for an experiment
+    """_calculate_score_sets calculates the results sets that allow one to calculate scores.
 
-    :return Tuple[Set[str], Set[str], Set[str]]: v0, worse, boosted result sets
-    """
-    # Take as input results folder, and assume that there exists a `v0` and `worse` folder with the evaluation results
-    v0_dir = "v0/"
-    boost_dir = "worse/"
+    :param str results_folder: results folder for the experiment
+    :param str cleanup_base_dir: directory where dbs were generated on, defaults to "/tesis/tmp"
+    :param str boost_dir: dir inside results folder where boosted evaluation results are saved, defaults to "worse"
+    :param str v0_dir: dir inside results folder where v0 evaluation results are saved, defaults to "v0"
+    :return Tuple[Set[str], Set[str], Set[str]]: v0, worse, boosted sets
+    """    
 
     results_boost = {}
     results_v0 = {}
@@ -122,6 +132,8 @@ def calculate_scores(
     results_folder: str,
     cleanup_base_dir="/tesis/tmp",
     use_v0_prime=True,
+    boost_dir="worse",
+    v0_dir="v0",
 ) -> Tuple[float, float, float]:
     """calculate_scores calcultes precision, recall and accuracy for the given experiment.
 
@@ -131,7 +143,7 @@ def calculate_scores(
     :return Tuple[float, float, float]: precision, recall and accuracy
     """
     v0, worse, boosted = _calculate_score_sets(
-        results_folder, cleanup_base_dir)
+        results_folder, cleanup_base_dir, boost_dir, v0_dir)
 
     # Using instead of the whole set just the following sets:
     # - V0 prime, which is V0 - Worse
@@ -157,9 +169,11 @@ from collections import defaultdict
 def calculate_scores_df(
     results_folder: str,
     cleanup_base_dir="/tmp",
+    boost_dir="worse",
+    v0_dir="v0",
 ) -> pd.DataFrame:
     v0, worse, boosted = _calculate_score_sets(
-        results_folder, cleanup_base_dir)
+        results_folder, cleanup_base_dir, boost_dir, v0_dir)
 
     v0_prime = v0-worse
 
