@@ -34,10 +34,6 @@ class CountRepsStep(OrchestrationStep):
             (STEP_NAMES in ctx) and not self.name() in ctx[STEP_NAMES]
             
     def run(self, ctx: Context) -> Context:
-        if self.orchestrator.hasExecuted:
-            return "EXITING...."
-            return ctx
-
         # TODO: Implement --mode=combined model generation
         # TODO: Extract this as an orchestrator config?
         # TODO: Fix logging

@@ -50,7 +50,7 @@ class Orchestrator:
                 solver: str,
                 project_list: List[str], 
                 rep_counter = dict(),
-                hasExecuted: bool = False):
+                ):
         self.query_type = query_type
         self.query_name = query_name
         self.kind = kind
@@ -70,8 +70,6 @@ class Orchestrator:
             self.scores_file = scores_file
             self.combinedScore = True
         self.rep_counter = rep_counter
-        # Hack to execute only once a step 
-        self.hasExecuted = hasExecuted
 
         self.data_generator = DataGenerator(project_dir, project_name, working_dir, results_dir)
         self.logger = logging.getLogger(self.__class__.__name__)

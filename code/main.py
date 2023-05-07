@@ -211,8 +211,6 @@ if __name__ == '__main__':
         # all_projects = [projectList[0]]
         raise Exception("multiple not supported for the moment")
 
-    hasExecuted = False
-
     if parsed_arguments.solver == "gurobi":
         raise Exception("gurobi is deprecated. Use CBC instead!")
 
@@ -237,8 +235,7 @@ if __name__ == '__main__':
                             run_separate_on_multiple_projects,
                             parsed_arguments.solver,
                             projectList, 
-                            rep_counter, 
-                            hasExecuted) 
+                            rep_counter) 
 
         if parsed_arguments.command == "run":
             try:
@@ -250,7 +247,6 @@ if __name__ == '__main__':
                     orchestrator.run()
                 else:
                     orchestrator.run_step(parsed_arguments.single_step)
-                hasExecuted = True
                 # project ended successfully
                 dblogger.info("run ok")
 
