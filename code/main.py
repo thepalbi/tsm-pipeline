@@ -73,9 +73,6 @@ run_separate_on_multiple_projects = True
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--single-step", dest="single_step", type=str, default=all_steps, metavar="STEP",
-                    help="DEPRECATED. USE --steps. Runs a single step of the orchestrator named STEP")
-
 parser.add_argument("--steps", dest="steps", type=str, default=all_steps, metavar="STEPS",
                     help="Runs all orchestrator steps in the comma-separated list STEPS")
 
@@ -193,7 +190,7 @@ projectListFile = parsed_arguments.projectListFile
 
 # Given a project list, retrieve all folders where each project CodeQL database is stored.
 if parsed_arguments.projectListFile is not None:
-    projectList = create_project_list(projectListFile, project_cache)
+    project_list = create_project_list(projectListFile, project_cache)
 else:
     raise Exception("--project-dir is no longer supported, use file instead")
 
@@ -205,10 +202,7 @@ rep_counter = dict()
 
 
 if __name__ == '__main__':
-    all_projects = projectList
-
     if parsed_arguments.multiple:
-        # all_projects = [projectList[0]]
         raise Exception("multiple not supported for the moment")
 
     if parsed_arguments.solver == "gurobi":
@@ -216,17 +210,17 @@ if __name__ == '__main__':
 
     # preety print project list
     preety_project_list = ''
-    for (i,project) in enumerate(all_projects):
-        preety_project_list += '%d\t%s\n' % (i+1, project.name)
+    for (i,db_path) in enumerate(project_list):
+        preety_project_list += '%d\t%s\n' % (i+1, db_path.name)
     preety_project_list += '\n'
     log.info("Dumping project list for tracking purposes:\n%s", preety_project_list)
 
-    for project in all_projects:       
-        log.info(f"Running orchestrator-{parsed_arguments.command} on project: {project.name}")
-        dblogger = TrackingAdapter(logging.getLogger(), {'dbname': project.name})
+    for db_path in project_list:       
+        log.info(f"Running orchestrator-{parsed_arguments.command} on project: {db_path.name}")
+        dblogger = TrackingAdapter(logging.getLogger(), {'dbname': db_path.name})
         dblogger.info("running pipeline")
 
-        orchestrator = Orchestrator(project.resolved_dir, project.name, 
+        orchestrator = Orchestrator(db_path.resolved_dir, db_path.name, 
                             parsed_arguments.query_type,
                             parsed_arguments.query_name, 
                             parsed_arguments.kind, 
@@ -234,19 +228,17 @@ if __name__ == '__main__':
                             scores_file, no_flow,
                             run_separate_on_multiple_projects,
                             parsed_arguments.solver,
-                            projectList, 
+                            project_list, 
                             rep_counter) 
 
         if parsed_arguments.command == "run":
             try:
                 if parsed_arguments.steps != "":
-                    # This should be the new `--steps` argument. --single-step should be deprecated
                     steps_to_run = parsed_arguments.steps.split(",")
                     orchestrator.run_steps(steps_to_run)
-                elif parsed_arguments.single_step == all_steps:
-                    orchestrator.run()
                 else:
-                    orchestrator.run_step(parsed_arguments.single_step)
+                    log.warning("no --steps configured, running default steps")
+                    orchestrator.run()
                 # project ended successfully
                 dblogger.info("run ok")
 
@@ -255,7 +247,7 @@ if __name__ == '__main__':
                 dblogger.error("run ended because model was empty: %s", em.model_path)
 
             except Exception as err:
-                log.error(f"Error running  project: {project.name}, {err}")
+                log.error(f"Error running  project: {db_path.name}, {err}")
                 log.exception("Fatal error occured in orchestrator execution")
                 # project ended with error
                 dblogger.exception("run eneded with unhandled exception")

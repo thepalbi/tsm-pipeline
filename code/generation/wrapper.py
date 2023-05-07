@@ -62,7 +62,6 @@ class CodeQLWrapper:
     def database_analyze(self,
                          project: str,
                          query_file: str,
-                         output_file: str, 
                          search_path: str = global_config.search_path,
                          extra_options = [], 
                          output_format="csv"):
@@ -73,7 +72,6 @@ class CodeQLWrapper:
             query_file,
             f'--format={output_format}',
             f'--logdir={self._logs_directory}',
-            f'--output={output_file}',
             f'--search-path={search_path}',
             "--timeout=%s" % CODEQL_WRAPPER_TIMEOUT, 
             f'--threads=0' # 1 thread per core
@@ -83,6 +81,37 @@ class CodeQLWrapper:
 
         log.info(
             "Running 'database analyze' for project=[%s] and query_file=[%s]", project, query_file)
+        self._run_process(command_and_arguments)
+
+
+    def database_run_queries(self,
+                         db_path: str,
+                         query_file: str,
+                         search_path: str = global_config.search_path,
+                         extra_options = []):
+        """
+        database_run_queries executes the given CodeQL queries, saving the results as the raw BQRS output in the database
+        results subdirectory
+
+        :param str db_path: absolute path to the compiled database
+        :param str query_file: query file
+        :param str search_path: search path to use for CodeQL libraries, defaults to global_config.search_path
+        :param list extra_options: extra options for the CLI, defaults to []
+        """
+        command_and_arguments = [
+            self._code_ql_binary_path,
+            "database", "run-queries",
+            db_path,
+            query_file,
+            f'--search-path={search_path}',
+            "--timeout=%s" % CODEQL_WRAPPER_TIMEOUT, 
+            f'--threads=0' # 1 thread per core
+        ]
+
+        command_and_arguments = command_and_arguments + extra_options
+
+        log.info(
+            "Running 'database run-queries' for project=[%s] and query_file=[%s]", db_path, query_file)
         self._run_process(command_and_arguments)
 
     """Runs codeql analyzing the raw results of a BQRS file, formatting them in a file."""

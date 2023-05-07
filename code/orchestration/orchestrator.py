@@ -26,7 +26,7 @@ class UnknownStepException(Exception):
 class Orchestrator:
     # Do not change the order of the steps in this list, its used for populating
     # the ctx in the order they are passed between them.
-    step_templates = [
+    default_steps = [
         GenerateEntitiesStep,
         GenerateModelStep,
         CountRepsStep,
@@ -75,11 +75,11 @@ class Orchestrator:
         self.logger = logging.getLogger(self.__class__.__name__)
         # Instantiate orchestration step templates
         self.steps = []
-        for step_template in Orchestrator.step_templates:
-            self.steps.append(step_template(self))
+        for s in Orchestrator.default_steps:
+            self.steps.append(s(self))
         self.possible_steps = []
-        for possible_step in Orchestrator.possible_steps:
-            self.possible_steps.append(possible_step(self))
+        for s in Orchestrator.possible_steps:
+            self.possible_steps.append(s(self))
 
     def compute_results_dir(self, new_directory=False):
         if not self.combinedScore:
@@ -124,14 +124,14 @@ class Orchestrator:
         ctx[COMMAND_NAME] = "run"
         ctx[STEP_NAMES] = steps
 
-        todo = steps.copy()
+        pending_steps = steps.copy()
         for step in self.steps:
-            if step.name() in todo:
+            if step.name() in pending_steps:
                 self.print_step_banner(step, "run")
                 ctx = step.populate(ctx)
                 step.run(ctx)
-                todo.remove(step.name())
-                if len(todo) == 0:
+                pending_steps.remove(step.name())
+                if len(pending_steps) == 0:
                     break
             else:
                 # Make each previous step populate the ctx
@@ -148,28 +148,6 @@ class Orchestrator:
             self.print_step_banner(step, "clean")
             ctx = step.populate(ctx)
             step.clean(ctx)
-
-    """Deprecated"""
-    def run_step(self, step_name: str):
-        self.logger.info("Running SINGLE orchestration step")
-
-        ctx = self.starting_ctx()
-        ctx[SINGLE_STEP_NAME] = step_name
-        ctx[COMMAND_NAME] = "run"
-
-        for step in self.possible_steps:
-            if step.name() == step_name:
-                self.print_step_banner(step, "run")
-                ctx = step.populate(ctx)
-                step.run(ctx)
-                return
-            else:
-                # Make each previous step populate the ctx
-                self.logger.info(f"Step `{step.name()}` is populating context")
-                ctx = step.populate(ctx)
-
-        # Step was not found
-        raise UnknownStepException(step_name, [step.name() for step in self.possible_steps])
 
     def print_step_banner(self, step, command):
         separator = ">" * 5

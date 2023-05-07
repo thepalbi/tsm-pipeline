@@ -3,6 +3,7 @@ import shutil
 from glob import glob
 from generation.data import DataGenerator
 from DataParser import compute_rep_count
+import logging
 
 from optimizer.compute_scores import compute_optimized_repr_scores
 from orchestration.steps import OrchestrationStep, Context,\
@@ -13,6 +14,9 @@ from orchestration.steps import OrchestrationStep, Context,\
 from solver.config import SolverConfig
 from solver.get_constraints import ConstraintBuilder
 from solver.solve_gb import solve_constraints_combine_model
+
+
+log = logging.getLogger(__name__)
 
 
 class CountRepsStep(OrchestrationStep):
@@ -36,25 +40,20 @@ class CountRepsStep(OrchestrationStep):
     def run(self, ctx: Context) -> Context:
         # TODO: Implement --mode=combined model generation
         # TODO: Extract this as an orchestrator config?
-        # TODO: Fix logging
-        results_dir = ctx[RESULTS_DIR_KEY]
         working_dir = ctx[WORKING_DIR_KEY]
-        logs_dir = ctx[LOGS_DIR_KEY]
 
         projects_folder = os.path.join(working_dir, "data")
         projects_path = [ ps for p in self.orchestrator.project_list for ps in glob(os.path.join(projects_folder, p)) ]    
 
         projects = [os.path.basename(k) for k in projects_path]
-        self.logger.info("Collected {0} projects".format(len(projects)))
-        self.logger.info("Counting reps")
+        log.info("Collected {0} projects".format(len(projects)))
+        log.info("Counting reps")
 
-        name = self.orchestrator.project_name
-
-        for project_path in projects_path:
-            project = os.path.basename(project_path)
-            project_dir = os.path.dirname(project_path)
+        for path in projects_path:
+            project = os.path.basename(path)
+            project_dir = os.path.dirname(path)
             try:
-                self.logger.info("Analyzing project: %s", project)
+                log.info("Analyzing project: %s", project)
 
                 # hack -> refactor using populate
                 dataGenerator = DataGenerator(project_dir, project, 
@@ -73,8 +72,8 @@ class CountRepsStep(OrchestrationStep):
                 print('rep_count %d' % len(self.orchestrator.rep_counter))
             
             except Exception as e:
-                self.logger.info("There was a problem reading events!")
-                self.logger.exception(f"Ignoring fatal error running {self.name()} for {project_path}")
+                log.info("There was a problem reading events!")
+                log.exception(f"Ignoring fatal error running {self.name()} for {path}")
                 pass
         
         return ctx
@@ -101,7 +100,7 @@ class GenerateModelStep(OrchestrationStep):
 
     def clean(self, ctx: Context):
         for dir_to_remove in [ctx[CONSTRAINTS_DIR_KEY], ctx[MODELS_DIR_KEY], ctx[LOGS_DIR_KEY]]:
-            self.logger.info(f"Removing directory `{dir_to_remove}` and its contents")
+            log.info(f"Removing directory `{dir_to_remove}` and its contents")
             shutil.rmtree(dir_to_remove, onerror=self.clean_error_callback)
 
     def should_use_existing_model_dirs(self, ctx):
@@ -142,8 +141,8 @@ class GenerateModelStep(OrchestrationStep):
             os.makedirs(directory, exist_ok=True)
 
         projects = [os.path.basename(k) for k in projects_path]
-        self.logger.info("Collected {0} projects".format(len(projects)))
-        self.logger.info("Creating events and reps")
+        log.info("Collected {0} projects".format(len(projects)))
+        log.info("Creating events and reps")
 
         name = self.orchestrator.project_name
 
@@ -161,7 +160,7 @@ class GenerateModelStep(OrchestrationStep):
             project = os.path.basename(project_path)
             project_dir = os.path.dirname(project_path)
             try:
-                self.logger.info("Analyzing project: %s", project)
+                log.info("Analyzing project: %s", project)
 
                 # hack -> refactor using populate
                 if not self.orchestrator.run_single:
@@ -184,8 +183,8 @@ class GenerateModelStep(OrchestrationStep):
                 constraint_builder.readAllKnown(project, config.query_name, config.query_type,
                                                 config.use_all_sanitizers, ctx)
             except Exception as e:
-                self.logger.info("There was a problem reading events!")
-                self.logger.exception()
+                log.info("There was a problem reading events!")
+                log.exception()
                 raise
         # if we run multiple projects we allow some filtering
         if not self.orchestrator.run_single:
@@ -197,10 +196,10 @@ class GenerateModelStep(OrchestrationStep):
         # initiate all variables
         constraint_builder.createVariables(ctx)
 
-        self.logger.info("Adding constraints")
+        log.info("Adding constraints")
         for project_path in projects_path:
             project = os.path.basename(project_path)
-            self.logger.info(">>>>>>>>>>>>>Executing project %s" % project)
+            log.info(">>>>>>>>>>>>>Executing project %s" % project)
             # hack -> refactor using populate
             if not self.orchestrator.run_single:
                 self.orchestrator.project_name = project
@@ -246,7 +245,7 @@ class OptimizeStep(OrchestrationStep):
         # TODO: Share this in ctx
         ctx[RESULTS_DIR_KEY] = self.orchestrator.compute_results_dir(True)
         if not os.path.exists(ctx[RESULTS_DIR_KEY]):
-            self.logger.info("Creating dir %s" % ctx[RESULTS_DIR_KEY])
+            log.info("Creating dir %s" % ctx[RESULTS_DIR_KEY])
             os.makedirs(ctx[RESULTS_DIR_KEY])
         else:
             # file can only exist if we are running for multiple projects 

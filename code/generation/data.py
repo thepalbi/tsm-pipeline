@@ -16,6 +16,8 @@ SUPPORTED_QUERY_TYPES = ["NoSql", "Sql", "Xss", "Sel", "Path"]
 # Using for all codeql stuff a hard 5 minute timeout, that if elapsed, will kill the process
 CODEQL_PROCESS_TIMEOUT = 5 * 60
 
+log = logging.getLogger(__name__)
+
 class GenerateEntitiesStep(OrchestrationStep):
     def populate(self, ctx: Context) -> Context:
         (ctx[SOURCE_ENTITIES],
@@ -51,11 +53,9 @@ class DataGenerator:
             project_dir (str): the relative directory to projects CodeQL database
             project_name (str): the project slug (usually the folder name of the project's database)
         """
-        self.project_dir = project_dir
-        self.project_name = project_name
+        self.compiled_db_dir = project_dir
+        self.db_name = project_name
         self.codeql = CodeQLWrapper(process_timeout=CODEQL_PROCESS_TIMEOUT)
-        # noinspection PyInterpreter
-        self.logger = logging.getLogger(self.__class__.__name__)
         self.working_dir = working_dir
         self.results_dir = results_dir
         self.generated_data_dir = self._get_generated_data_dir()
@@ -73,9 +73,9 @@ class DataGenerator:
 
     def _get_generated_data_dir(self):
         generated_data_dir = os.path.join(
-            global_config.results_directory, f"{self.working_dir}/data/{self.project_name}/")
+            global_config.results_directory, f"{self.working_dir}/data/{self.db_name}/")
         if not os.path.isdir(generated_data_dir):
-            self.logger.warn(
+            log.warn(
                 "Creating directory for generated data at %s", generated_data_dir)
             os.makedirs(generated_data_dir)
         return generated_data_dir
@@ -103,15 +103,21 @@ class DataGenerator:
         
 
     def _get_tsm_bqrs_file(self, filename: str) -> str:
-        return os.path.join(global_config.results_directory, self.project_dir, "results", "tsm-js", "tsm", filename)
+        """
+        _get_tsm_bqrs_file pre-pends the bqrs results folder for the given filename.
+
+        :param str filename: bqrs filename
+        :return str: the absolute path for the given filename
+        """
+        return os.path.join(self.compiled_db_dir, "results", "tsm-js", "tsm", filename)
 
     def generate_scores(self, query_type: str, combinedScore: bool, kind = "snk") -> Tuple[str, ...]:
         # Run metrics-snk query
 
         metrics_file = "metrics_{0}_{1}".format(kind, query_type)
-        self.logger.info("Generating events scores.")
+        log.info("Generating events scores.")
         self.codeql.database_query(
-            self.project_dir,
+            self.compiled_db_dir,
             self._get_tsm_query_file(query_type, metrics_file + ".ql"))
 
         # Get results BQRS file
@@ -121,12 +127,12 @@ class DataGenerator:
             subfix = "-combined"
 
         tsm_worse_scores_file = os.path.join(
-            self.generated_data_dir, f"{self.project_name}-tsmworse-ind-avg{subfix}-{kind}.prop.csv")
+            self.generated_data_dir, f"{self.db_name}-tsmworse-ind-avg{subfix}-{kind}.prop.csv")
         tsm_worse_filtered_file = os.path.join(
-            self.generated_data_dir, f"{self.project_name}-tsmworse-filtered-avg{subfix}-{kind}.prop.csv")
+            self.generated_data_dir, f"{self.db_name}-tsmworse-filtered-avg{subfix}-{kind}.prop.csv")
 
         prediction_scores_file = os.path.join(
-            self.generated_data_dir, f"{self.project_name}-prediction-{subfix}-{kind}.prop.csv")
+            self.generated_data_dir, f"{self.db_name}-prediction-{subfix}-{kind}.prop.csv")
 
         # Extract result scores
         self.codeql.bqrs_decode(
@@ -167,10 +173,9 @@ class DataGenerator:
             propgraph_path = self._get_tsm_query_file(query_type, f"PropagationGraph-{query_type}.ql")
 
             # For Progapation graphs we use current version of CodeQl Libraries  
-            self.codeql.database_analyze(
-                self.project_dir,
+            self.codeql.database_run_queries(
+                self.compiled_db_dir,
                 propgraph_path,
-                f"{self.logs_folder}/js-results.csv",
                 global_config.search_path,
                 [f"--external=knownSource={ctx[SOURCE_ENTITIES]}",
                 f"--external=knownSink={ctx[SINK_ENTITIES]}",
@@ -178,10 +183,10 @@ class DataGenerator:
                 )
 
         except Exception as e:
-            self.logger.info("Error Analyzing PropagationGraph.ql")
+            log.info("Error Analyzing PropagationGraph.ql")
             raise(e)
 
-        self.logger.info("Generating propagation graph data")
+        log.info("Generating propagation graph data")
         bqrs_propgraph = self._get_tsm_bqrs_file_for_entity("PropagationGraph", query_type)
         # data/1046224544_fontend_19c10c3/1046224544_fontend_19c10c3-src-san.prop.csv
         
@@ -216,18 +221,18 @@ class DataGenerator:
             raise Exception(
                 "{0} is not a supported query type. Currently supports {1}".format(query_type, SUPPORTED_QUERY_TYPES))
         sources_output_file = os.path.join(
-            self.generated_data_dir, f"{self.project_name}-sources-{query_type}.prop.csv")
+            self.generated_data_dir, f"{self.db_name}-sources-{query_type}.prop.csv")
         sinks_output_file = os.path.join(
-            self.generated_data_dir, f"{self.project_name}-sinks-{query_type}.prop.csv")
+            self.generated_data_dir, f"{self.db_name}-sinks-{query_type}.prop.csv")
         sanitizers_output_file = os.path.join(
-            self.generated_data_dir, f"{self.project_name}-sanitizers-{query_type}.prop.csv")
+            self.generated_data_dir, f"{self.db_name}-sanitizers-{query_type}.prop.csv")
 
         src_san_output_file = os.path.join(
-            self.generated_data_dir, f"{self.project_name}-src-san-small.prop.csv")
+            self.generated_data_dir, f"{self.db_name}-src-san-small.prop.csv")
         san_snk_output_file = os.path.join(
-            self.generated_data_dir, f"{self.project_name}-san-snk-small.prop.csv")
+            self.generated_data_dir, f"{self.db_name}-san-snk-small.prop.csv")
         repr_mapping_output_file = os.path.join(
-            self.generated_data_dir, f"{self.project_name}-eventToConcatRep-small.prop.csv")
+            self.generated_data_dir, f"{self.db_name}-eventToConcatRep-small.prop.csv")
 
         return (
             sources_output_file,
@@ -242,7 +247,7 @@ class DataGenerator:
                             force_query: bool = True,
                             search_path:str = global_config.search_path):
         """Runs the query for a given entity, and extracts the results into a csv file."""
-        self.logger.info(
+        log.info(
             "Generating %s data in file=[%s]", entity_type, output_file)
         query_path = self._get_tsm_query_file_for_entity(
                 entity_type,
@@ -254,10 +259,9 @@ class DataGenerator:
             os.remove(output_file)
 
         if not os.path.exists(bqrs_file) or force_query: 
-            self.codeql.database_analyze(
-                self.project_dir,
+            self.codeql.database_run_queries(
+                self.compiled_db_dir,
                 query_path,
-                f"{self.logs_folder}/js-results.csv",
                 search_path)
 
         self.codeql.bqrs_decode(
