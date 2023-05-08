@@ -24,14 +24,21 @@ class UnknownStepException(Exception):
 
 
 class Orchestrator:
+    """
+     Orchestrator manages the whole training pipeline for a db. The idea is that
+     it works one project/db/code repository at a time, hence, it's disposable.
+    """
+
     # Do not change the order of the steps in this list, its used for populating
     # the ctx in the order they are passed between them.
+
     default_steps = [
         GenerateEntitiesStep,
         GenerateModelStep,
         CountRepsStep,
         OptimizeStep,
     ]
+
     possible_steps = [
         GenerateEntitiesStep,
         GenerateModelStep,
@@ -81,28 +88,14 @@ class Orchestrator:
         for s in Orchestrator.possible_steps:
             self.possible_steps.append(s(self))
 
-    def compute_results_dir(self, new_directory=False):
+    def compute_results_dir(self) -> str:
+        """
+        compute_results_dir computes the result directory db the orchestrator is processing
+
+        :return str: the directory where to write results for the db being processed
+        """
         if not self.combinedScore:
-            name = self.project_name
-            if not self.run_single:
-                name = "multiple"
-
-            patternToSearch = os.path.join(self.results_dir, name)+ "/{0}-*".format(self.query_name)
-            results_candidates = glob.glob(patternToSearch)
-            print(f'result candidates = {results_candidates}')
-            if len(results_candidates)>0 and not new_directory:
-                results_candidates.sort()
-                results_folder = results_candidates[-1]
-                print("Result candidates exist")
-            else:
-                timestamp = str(int(time.mktime(datetime.datetime.now().timetuple())))
-                optimizer_run_name = f"{self.query_name}-{timestamp}"
-                results_folder = os.path.join(self.results_dir, name, optimizer_run_name)
-                print("Results candidates do not exist")
-                print(f'(given results folder = {self.results_dir}')
-
-            print(f'results folder = {results_folder}')
-            return results_folder
+            return os.path.join(self.results_dir, self.project_name)
         else:
             return self.results_dir
 

@@ -3,11 +3,13 @@ from Event import Event
 from FlowRelation import FlowRelation
 import multiprocessing
 import traceback as tb
-import re
 from typing import List
+import logging
+
+log = logging.getLogger(__name__)
 
 def compute_rep_count(file_loc, rep_count=None):
-    print("Reading events from: ", file_loc)
+    log.info("Reading events from: %s", file_loc)
     df=pd.read_csv(file_loc)
     for rep in list(df["repr"]):
         reps = rep.strip().split("::")
@@ -16,7 +18,7 @@ def compute_rep_count(file_loc, rep_count=None):
 
 
 def readEvents(file_loc, events=None, unique_reps=None, rep_count=None, ctx=dict()):
-    print("Reading events from: ", file_loc)
+    log.info("Reading events from: %s", file_loc)
     df=pd.read_csv(file_loc)
 
     # create events
@@ -30,22 +32,22 @@ def readEvents(file_loc, events=None, unique_reps=None, rep_count=None, ctx=dict
             rep_count[k] = rep_count.get(k, 0) + 1
 
     new_reps=cur_reps.difference(set(events.keys()))
-    print("New events: %d" % len(new_reps))
-    print("Size rep_count: %d" % len(rep_count.keys()))
+    log.info("New events: %d", len(new_reps))
+    log.info("Size rep_count: %d", len(rep_count.keys()))
     for rep in new_reps:
         event_obj = Event(rep, reps=rep.strip().split("::"))
         events[rep] = event_obj
     new_unique_reps = [r.strip().split("::") for r in new_reps]
     # Flattens the new_unique_reps, and makes a diff
     new_unique_reps = set([i for g in new_unique_reps for i in g]).difference(set(unique_reps.keys()))
-    print("New Unique reps: %d" % len(new_unique_reps))
-    print(list(new_unique_reps)[:5])
+    log.info("New Unique reps: %d", len(new_unique_reps))
+    log.info(list(new_unique_reps)[:5])
     i = len(list(unique_reps.keys()))
     for k in sorted(new_unique_reps):
         unique_reps[k] = i
         i += 1
 
-    print("Total events: %d" % len(events.keys()))
+    log.info("Total events: %d", len(events.keys()))
     return events
 
 
@@ -96,9 +98,9 @@ def readFlowsAndReps(file_loc:str, events) -> List[FlowRelation]:
     df=pd.read_csv(file_loc)
     flows = []
     error_ids = []
-    print("Starting flows")
+    log.info("Starting flows")
     df.apply(lambda x: f(events, x, flows), axis=1)
-    print("Done flows")
+    log.info("Done flows")
     return flows
 
 def readPairs(file_loc:str, events):
@@ -107,16 +109,16 @@ def readPairs(file_loc:str, events):
 
 
 def readKnown(file_loc:str, suffix:str, query) -> List[str]:
-    print("Reading known from: ", file_loc)
-    print("Query: ", query)
+    log.info("Reading known from: %s", file_loc)
+    log.info("Query: %s", query)
 
     df=pd.read_csv(file_loc)
-    print("Unique {0} locations: {1}, reps: {2} ".format(suffix,len(list(set(df["URL for nd"]))), len(list(set(df["repr"])))))
+    log.info("Unique {0} locations: {1}, reps: {2} ".format(suffix,len(list(set(df["URL for nd"]))), len(list(set(df["repr"])))))
 
     if query is None:
         return list(set(df["repr"]))
     else:
-        print("Unique Query {0} locations: {1} ".format(suffix, len(list(set(df[df["q"] == query]["repr"])))))
+        log.info("Unique Query {0} locations: {1} ".format(suffix, len(list(set(df[df["q"] == query]["repr"])))))
         return list(set(df[df["q"] == query]["repr"]))
 
 
@@ -135,9 +137,3 @@ def readClass(file_loc:str):
         d.append(df.loc[ind]["q"])
         eventclass[df.loc[ind]["URL for pnd"]] = d
     return eventclass
-
-if __name__ == '__main__':
-    flows, events, reps=readFlowsAndReps('data/eclipse_orion/eclipse_orion-triple-id.prop.csv')
-    print(len(flows))
-    print(len(events))
-    print(len(reps))

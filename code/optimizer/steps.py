@@ -13,7 +13,7 @@ from orchestration.steps import OrchestrationStep, Context,\
 
 from solver.config import SolverConfig
 from solver.get_constraints import ConstraintBuilder
-from solver.solve_gb import solve_constraints_combine_model
+from solver.solve import solve_constraints_combine_model
 
 
 log = logging.getLogger(__name__)
@@ -182,9 +182,8 @@ class GenerateModelStep(OrchestrationStep):
                 constraint_builder.readEventsAndReps(project, ctx)
                 constraint_builder.readAllKnown(project, config.query_name, config.query_type,
                                                 config.use_all_sanitizers, ctx)
-            except Exception as e:
-                log.info("There was a problem reading events!")
-                log.exception()
+            except Exception:
+                log.exception("There was a problem reading events!")
                 raise
         # if we run multiple projects we allow some filtering
         if not self.orchestrator.run_single:
@@ -243,7 +242,7 @@ class OptimizeStep(OrchestrationStep):
     def run(self, ctx: Context) -> Context:
         # TODO: Extract this and share between steps. Maybe add some context passing between steps
         # TODO: Share this in ctx
-        ctx[RESULTS_DIR_KEY] = self.orchestrator.compute_results_dir(True)
+        ctx[RESULTS_DIR_KEY] = self.orchestrator.compute_results_dir()
         if not os.path.exists(ctx[RESULTS_DIR_KEY]):
             log.info("Creating dir %s" % ctx[RESULTS_DIR_KEY])
             os.makedirs(ctx[RESULTS_DIR_KEY])
