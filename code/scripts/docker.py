@@ -168,7 +168,6 @@ def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs
         **settings.docker_kwargs
     )
     log.info("running at container %s. Use `docker logs %s --tail 10 --follow` to follow progress", container.id, container.id)
-    print("running at container %s. Use `docker logs %s --tail 10 --follow` to follow progress" % (container.id, container.id))
     if block:
         container.wait()
     elif tail_logs:
@@ -185,16 +184,28 @@ def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs
         return
 
     log.info("running combine scores")
+    run_combine_scores(settings)
+
+def run_combine_scores(settings: ExperimentSettings):
+    """
+    run_combine_scores executes the combine scores post process for the given ExperimentSettings.
+
+    :param ExperimentSettings settings: the settings
+    """
     combine_scores(
-        query=query.name,
         results_dir=settings.results_dir,
         multiple=False,
         out_file=os.path.join(settings.results_dir, "averaged-results.txt"),
         raw_out_file=os.path.join(settings.results_dir, "averaged-results.csv"),
     )
 
+def read_dbs_dataset(path: str) -> List[str]:
+    """
+    read_dbs_dataset reads a file-based dataset into a list
 
-def read_dbs_dataset(path):
+    :param str path: the dataset file path
+    :return List[str]: the read dataset into a list of DB keys
+    """
     dbs = []
     with open(path, "r") as f:
         for l in f.readlines():

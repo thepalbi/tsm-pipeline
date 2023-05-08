@@ -9,54 +9,46 @@ from collections import defaultdict
 from typing import Dict, List, Optional
 
 
+log = logging.getLogger(__name__)
+
+
 # Create a new defaultdict, specialized on lists
 def list_default_dict() -> Dict[str, List]:
     return defaultdict(list)
 
 
-def combine_scores(query: str,
-                   results_dir: str,
+def combine_scores(results_dir: str,
                    multiple: bool,
                    out_file: str,
                    raw_out_file: Optional[str]):
     if multiple:
         files = glob.glob(os.path.join(results_dir) +
-                          "/multiple/{0}-*/reprScores.txt".format(query))
+                          "/multiple/reprScores.txt")
     else:
         # Filter by query type, selecting all timestampted result files
-        g = os.path.join(results_dir) + "/*/{0}-*/reprScores.txt".format(query)
-        print("g: {0}".format(g))
+        g = os.path.join(results_dir) + "/*/reprScores.txt"
+        log.info("globbing folder: {0}".format(g))
         files = glob.glob(g)
         files = list(filter(lambda p: os.path.join(
             results_dir, "multiple") not in p, files))
-    last_files = list()
-    projectsFiles = list_default_dict()
 
-    # Divide results file per project
-    for file in files:
-        project = os.path.basename(os.path.dirname(os.path.dirname(file)))
-        projectsFiles[project].append(file)
+    log.info("working on %d reprScores files", len(files))
 
-    # For each project, select the last produced file
-    for project in projectsFiles.keys():
-        projectsFiles[project].sort(key=os.path.getmtime)
-        last_files.append(projectsFiles[project][-1])
-
-    # Work on last files for each project
-    files = last_files
-    files.sort(key=os.path.getmtime)
     n = 0
     src_dict = list_default_dict()
     snk_dict = list_default_dict()
     san_dict = list_default_dict()
     for reprScoreFile in files:
         if r'results\combined' not in reprScoreFile:
+            # count files
             n += 1
             with open(reprScoreFile, "r") as f:
                 for reprScopeLine in f.readlines():
                     # From the project line, parse the repr, taint object type and score
                     repr = re.findall("repr = \"([^\"]+)\"", reprScopeLine)[0]
+                    # t is the type of node, either snk, src or san
                     t = re.findall("t = \"([^\"]+)\"", reprScopeLine)[0]
+                    # results is the score
                     res = float(re.findall("result = ([0-9.]+)", reprScopeLine)[0])
 
                     # Add up for each repr, the scores found
@@ -131,5 +123,5 @@ if __name__ == '__main__':
 
     # TODO: Add some feature to just combine scores from certain projects dbs. If not, it might take ones from another run
     # because of using the glob feature
-    combine_scores(query_name, results_dir,
+    combine_scores(results_dir,
                    parsed_arguments.multiple, out_file, raw_out_file)
