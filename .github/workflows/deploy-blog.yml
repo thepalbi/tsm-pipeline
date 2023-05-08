@@ -17,6 +17,7 @@ jobs:
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
+        working-directory: docs/reports/tesis-blog
         with:
           project: "tesisdepalbi"
-          entrypoint: "docs/reports/tesis-blog/main.tsx"
+          entrypoint: main.tsx
