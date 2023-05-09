@@ -1,12 +1,16 @@
 {
 	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "lib-worse/codeql"
-		}
-	],
+        {
+            "path": "."
+        },
+        {
+            "path": "lib-worse/codeql"
+        },
+        {
+            "name": "[750172f source archive]",
+            "uri": "codeql-zip-archive://0-71/home/pablo/dbcache/2.5.2/bitpay/bitcore-wallet-service/750172f/src.zip"
+        }
+    ],
 	"settings": {
 		"codeQL.cli.executablePath": "/home/pablo/clis/codeqlcli-v2.13.1/codeql"
 	}

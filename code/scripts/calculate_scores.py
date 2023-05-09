@@ -1,3 +1,4 @@
+from collections import defaultdict
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from typing import Iterable, Set, Tuple
 import pandas as pd
@@ -22,17 +23,18 @@ def _hash_tuple(k: str, x: Tuple) -> str:
     :param str k: the name of the db from whom the results belong
     :param Tuple x: the row
     :return str: the hash
-    """        
+    """
     return "%s#" % (k)+"#".join([
         str(v) for v in x
     ])
+
 
 def _project_name_from_hash(h: str) -> str:
     """_project_name_from_hash gets the project name from a hashed evaluation results row
 
     :param str h: the hash
     :return str: the extracted project name
-    """    
+    """
     i = h.index("#")
     return h[:i]
 
@@ -46,21 +48,27 @@ def hash_set_to_df(hs: Set[str]) -> pd.DataFrame:
 
 def _calculate_score_sets(
     results_folder: str,
-    cleanup_base_dir="/tesis/tmp",
-    boost_dir="worse",
-    v0_dir="v0",
+    cleanup_base_dir: str,
+    worse_dir: str,
+    boost_dir: str,
+    v0_dir: str,
 ) -> Tuple[Set[str], Set[str], Set[str]]:
     """_calculate_score_sets calculates the results sets that allow one to calculate scores.
 
     :param str results_folder: results folder for the experiment
     :param str cleanup_base_dir: directory where dbs were generated on, defaults to "/tesis/tmp"
-    :param str boost_dir: dir inside results folder where boosted evaluation results are saved, defaults to "worse"
+    :param str boost_dir: dir inside results folder where worse evaluation results are saved, defaults to "worse"
+    :param str boost_dir: dir inside results folder where boosted evaluation results are saved, defaults to "boosted"
     :param str v0_dir: dir inside results folder where v0 evaluation results are saved, defaults to "v0"
     :return Tuple[Set[str], Set[str], Set[str]]: v0, worse, boosted sets
-    """    
+    """
 
+    results_worse = {}
     results_boost = {}
     results_v0 = {}
+
+    for f in glob.glob(os.path.join(results_folder, worse_dir, "*.csv")):
+        results_worse[os.path.basename(f)] = pd.read_csv(f)
 
     for f in glob.glob(os.path.join(results_folder, boost_dir, "*.csv")):
         results_boost[os.path.basename(f)] = pd.read_csv(f)
@@ -69,12 +77,11 @@ def _calculate_score_sets(
         results_v0[os.path.basename(f)] = pd.read_csv(f)
 
     log.debug("Read total %s dataframes" %
-              (len(results_boost) + len(results_v0)))
+              (len(results_worse)+len(results_boost) + len(results_v0)))
 
     # Post-processing required for results:
     # - remove the leading /tesis/tmp/*/ from the filePathSource and filePathSink columns
     # - drop score
-    # - drop the origin worse results
 
     # Post-processing results
     # Clean filePath* columns
@@ -84,6 +91,11 @@ def _calculate_score_sets(
         return re.sub(leading_replace_pat, "", value)
 
     # This bit below will cleanup the /tesis/tmp/[a-zA-Z0-9]+ bit of the path column in the results
+    for df in results_worse.values():
+        # Cleanup filePath* columns
+        df['filePathSource'] = df['filePathSource'].map(cleanup_filePath_col)
+        df['filePathSink'] = df['filePathSink'].map(cleanup_filePath_col)
+
     for df in results_boost.values():
         # Cleanup filePath* columns
         df['filePathSource'] = df['filePathSource'].map(cleanup_filePath_col)
@@ -113,26 +125,27 @@ def _calculate_score_sets(
     # Calculate boosted
     for k, df in results_boost.items():
         # filter out boosted
-        df = df[df['origin'] == 'boosted']
         df = cleanup(df)
         boosted = boosted | set(
             df.apply(lambda x: _hash_tuple(k, tuple(x)), axis=1))
 
     # Calculate worse
-    for k, df in results_boost.items():
+    for k, df in results_worse.items():
         # filter out boosted
-        df = df[df['origin'] == 'worse']
         df = cleanup(df)
-        worse = worse | set(df.apply(lambda x: _hash_tuple(k, tuple(x)), axis=1))
+        worse = worse | set(
+            df.apply(lambda x: _hash_tuple(k, tuple(x)), axis=1))
 
-    return v0, worse, boosted
+    # now since worse and boosted run in separate queries, I have to substract worse from boosted since they might have intersection
+    return v0, worse, boosted-worse
 
 
 def calculate_scores(
     results_folder: str,
     cleanup_base_dir="/tesis/tmp",
     use_v0_prime=True,
-    boost_dir="worse",
+    worse_dir="worse",
+    boost_dir="boosted",
     v0_dir="v0",
 ) -> Tuple[float, float, float]:
     """calculate_scores calcultes precision, recall and accuracy for the given experiment.
@@ -143,7 +156,7 @@ def calculate_scores(
     :return Tuple[float, float, float]: precision, recall and accuracy
     """
     v0, worse, boosted = _calculate_score_sets(
-        results_folder, cleanup_base_dir, boost_dir, v0_dir)
+        results_folder, cleanup_base_dir, worse_dir, boost_dir, v0_dir)
 
     # Using instead of the whole set just the following sets:
     # - V0 prime, which is V0 - Worse
@@ -163,26 +176,24 @@ def calculate_scores(
     return precision, recall, accuracy
 
 
-from collections import defaultdict
-
-
 def calculate_scores_df(
     results_folder: str,
     cleanup_base_dir="/tmp",
-    boost_dir="worse",
+    worse_dir="worse",
+    boost_dir="boosted",
     v0_dir="v0",
 ) -> pd.DataFrame:
     v0, worse, boosted = _calculate_score_sets(
-        results_folder, cleanup_base_dir, boost_dir, v0_dir)
+        results_folder, cleanup_base_dir, worse_dir, boost_dir, v0_dir)
 
     v0_prime = v0-worse
-
 
     proj_to_alert_count = defaultdict(lambda: 0)
     for alert in v0_prime:
         proj = _project_name_from_hash(alert)
         proj_to_alert_count[proj] += 1
-    average_tp_per_proj = sum(proj_to_alert_count.values())/len(proj_to_alert_count)
+    average_tp_per_proj = sum(
+        proj_to_alert_count.values())/len(proj_to_alert_count)
 
     alerts_to_recover = len(v0_prime)
     alerts_recovered = len(v0_prime & boosted)
@@ -202,7 +213,7 @@ def calculate_scores_df(
     ]
 
     return pd.DataFrame([row], columns=['precision', 'recall', 'accuracy',
-                 'alerts to recover (atr)', 'alerts recovered', 'suprious alerts', 'projects with atr', 'avg atr per proj'])
+                                        'alerts to recover (atr)', 'alerts recovered', 'suprious alerts', 'projects with atr', 'avg atr per proj'])
 
 
 def _calculate_ml_scores(v0: Set[str], boosted: Set[str]) -> Tuple[float, float, float]:

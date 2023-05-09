@@ -10,6 +10,8 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class EvaluationQueryInfo:
+    worse_search_path: str
+    worse_query_file: str
     boosted_search_path: str
     boosted_query_file: str
     v0_search_path: str
@@ -18,8 +20,10 @@ class EvaluationQueryInfo:
 
 QUERY_INFOS = {
     "nosql": EvaluationQueryInfo(
+        worse_search_path="/home/pablo/tesis/tsm-pipeline/lib-worse/codeql/javascript/ql:/home/pablo/.codeql/packages/codeql/javascript-upgrades/0.0.3",
+        worse_query_file="/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/NosqlInjectionWorseTSM.ql",
         boosted_search_path="/home/pablo/tesis/tsm-pipeline/lib-worse/codeql/javascript/ql:/home/pablo/.codeql/packages/codeql/javascript-upgrades/0.0.3",
-        boosted_query_file="/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/NosqlInjectionWorseTSM.ql",
+        boosted_query_file="/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/NosqlInjectionBoostedTSM.ql",
         v0_search_path="/home/pablo/codeqlv0/javascript/ql/lib",
         v0_query_file="/home/pablo/tesis/tsm-pipeline/tsm-evaluation/tsm-evaluation/src/NoSqlEvaluation.ql",
     )
@@ -85,6 +89,24 @@ def train_and_evaluate(
     evaluate_query_info = QUERY_INFOS[query_type]
 
     worse_settings = EvaluationSettings(
+        search_path=evaluate_query_info.worse_search_path,
+        cli_version=EVALUATE_CLI_VERSION,
+        db_cli_version=DB_CLI_VERSION,
+        query_file=evaluate_query_info.worse_query_file,
+        **defaults_evalute,
+    )
+
+    if not "evaluate_worse" in skip:
+        log.info("Running worse evaluation")
+        evaluate(
+            settings=worse_settings,
+            output_dir=path_join(results_dir, 'worse'),
+            dbs=test,
+        )
+    else:
+        log.warning("skipping worse evaluation")
+
+    boosted_settings = EvaluationSettings(
         search_path=evaluate_query_info.boosted_search_path,
         cli_version=EVALUATE_CLI_VERSION,
         db_cli_version=DB_CLI_VERSION,
@@ -93,12 +115,11 @@ def train_and_evaluate(
         **defaults_evalute,
     )
 
-
     if not "evaluate_boosted" in skip:
         log.info("Running boosted evaluation")
         evaluate(
-            settings=worse_settings,
-            output_dir=path_join(results_dir, 'worse'),
+            settings=boosted_settings,
+            output_dir=path_join(results_dir, 'boosted'),
             dbs=test,
         )
     else:
