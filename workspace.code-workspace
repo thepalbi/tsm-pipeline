@@ -8,6 +8,10 @@
         }
     ],
 	"settings": {
-		"codeQL.cli.executablePath": "/home/pablo/clis/codeqlcli-v2.13.1/codeql"
+        "codeQL.cli.executablePath": "/home/pablo/clis/codeqlcli-v2.13.1/codeql",
+        "[python]": {
+            "editor.defaultFormatter": "ms-python.autopep8"
+        },
+        "python.formatting.provider": "none"
 	}
 }
