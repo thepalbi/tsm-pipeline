@@ -36,3 +36,11 @@ test:
 
 test-quick:
 	@python -m unittest tests/test_main.py -k="*test_smoke_training_run_path"
+
+# checkings
+typecheck:
+	@mypy main.py
+
+# todo: how to make this lint all files?
+lint:
+	@pycodestyle --show-source main.py
