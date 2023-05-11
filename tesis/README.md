@@ -1,49 +1,6 @@
-## Environment setup
-- [Install NodeJS](https://nodejs.org/es/download/current/)
-- Install Python, virutal env, configure it, and install pip `requirements.txt` file:
-```bash
-cd code
-sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt-get install python3.10 python3.10-venv build-essential
-sudo apt install nodejs
-python3.10 -m venv env
+## Installation
 
-# Customize activate script
-cat <<EOF >> env/bin/activate
-export CODEQL_CLIS_ROOT=<codeql clis dir>
-export TSM_TMP=<tmp folder to use>
-EOF
-
-# Activate venv
-source env/bin/activate
-# Install pip dependencies
-pip install -r requirements.txt
-```
-- Install CBC solver: ``
-```
-# Linux
-sudo apt-get install coinor-cbc
-
-# MacOS
-brew tap coin-or-tools/coinor
-brew install coin-or-tools/coinor/cbc
-```
-
-## Installing a CLI
-
-1. Configure the CLIs dir, which should be set in the `$CODEQL_CLIS_ROOT` env var
-2. Download the required version from https://github.com/github/codeql-cli-binaries/releases/
-3. Unzip the downloaded file with the following format: `$CODEQL_CLIS_ROOT/codeqlcli-v<semver version>`
-
-Right now, we are using the following versions:
-- Worse: [v2.5.2](https://github.com/github/codeql-cli-binaries/releases/tag/v2.5.2)
-- V0: [v2.10.5](https://github.com/github/codeql-cli-binaries/releases/tag/v2.10.5)
-
-## Instaling the CodeQL libraris
-
-First, to install **lib-worse** we are using the [`a1c38b78a9`](https://github.com/github/codeql/commit/a1c38b78a9) commit, and needs to be cloned into `lib-worse/codeql`.
-
-After, for running the v0 evaluation, in the latest trials the [`3165babc887c1c1127f7f028493380ceca004b2e`](https://github.com/github/codeql/commit/3165babc887c1c1127f7f028493380ceca004b2e) commit of CodeQL was being used. Using the same one.
+See [installation](../docs/installation.md)
 
 ## Downdloading a db
 The expected format for database keys is:
@@ -73,7 +30,9 @@ Add a configuration file under `code/scripts/config.sh`, with the following cont
 # Directory where the tsm-pipelien QL sources are located
 export QL_LIB_DIR=/home/pablo/tesis/tsm-pipeline/ql
 # Lib worse CodeQL javascript library
-export QL_LIB_WORSE_DIR=/home/pablo/tesis/tsm-pipeline/lib-worse/codeql/javascript/ql/src
+export QL_LIB_WORSE_DIR=/home/pablo/tesis/tsm-pipeline/lib-worse/codeql/javascript/ql/lib
+# dependency lib of worse
+export QL_JAVASCRIPT_UPGRADES=/home/pablo/.codeql/packages/codeql/javascript-upgrades/0.0.3
 # tmp
 export TMP_DIR=/tmp
 # database cache root directory
@@ -81,7 +40,7 @@ export CACHE_DBS_DIR=/home/pablo/dbcache
 # Root dir for the CodeQL clis directory
 export CODEQL_CLIS_ROOT=/home/pablo/clis
 # Directory where the CodeQL CLI binary is located
-export CLI_DIR=/home/pablo/clis/codeqlcli-v2.5.2
+export CLI_DIR=/home/pablo/clis/codeqlcli-v2.13.1
 ```
 
 ## Running notes
