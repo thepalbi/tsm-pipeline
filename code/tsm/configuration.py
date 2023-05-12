@@ -27,3 +27,10 @@ class TSMConfigParser(configparser.ConfigParser):
 
     def get_for_querytype(self, type: str, key: str):
         return self.get(self.QUERY_TYPE_SECION_PREFIX + type, key)
+
+    def check(self) -> bool:
+        for sect in self.sections():
+            for key in self[sect]:
+                if self.get(sect, key) == "":
+                    return False
+        return True

@@ -10,16 +10,6 @@ from dataclasses import dataclass
 from tsm.configuration import TSMConfigParser
 
 
-@dataclass(frozen=True)
-class EvaluationQueryInfo:
-    worse_search_path: str
-    worse_query_file: str
-    boosted_search_path: str
-    boosted_query_file: str
-    v0_search_path: str
-    v0_query_file: str
-
-
 log = logging.getLogger(__name__)
 
 
@@ -35,6 +25,7 @@ def train_and_evaluate(
     """
     train_and_evaluate runs the whole training and evaluation pipeline
 
+    :param TSMConfigParser config: _description_
     :param str results_dir: _description_
     :param List[str] train: _description_
     :param List[str] test: _description_
@@ -67,9 +58,9 @@ def train_and_evaluate(
     external_predicate_file = path_join(results_dir, 'averaged-results.csv')
 
     worse_settings = EvaluationSettings(
-        search_path=config.get("worse_evaluation:search_path"),
-        cli_version=config.get("worse_evaluation:cli_version"),
-        db_cli_version=config.get("global:db_cli_version"),
+        search_path=config.get("worse_evaluation", "search_path"),
+        cli_version=config.get("worse_evaluation", "cli_version"),
+        db_cli_version=config.get("global", "db_cli_version"),
         query_file=config.get_for_querytype(query_type, "worse_query_file"),
         cache_root=config.get("global", "db_cache_dir"),
     )
@@ -85,9 +76,9 @@ def train_and_evaluate(
         log.warning("skipping worse evaluation")
 
     boosted_settings = EvaluationSettings(
-        search_path=config.get("boosted_evaluation:search_path"),
-        cli_version=config.get("boosted_evaluation:cli_version"),
-        db_cli_version=config.get("global:db_cli_version"),
+        search_path=config.get("boosted_evaluation", "search_path"),
+        cli_version=config.get("boosted_evaluation", "cli_version"),
+        db_cli_version=config.get("global", "db_cli_version"),
         query_file=config.get_for_querytype(query_type, "boosted_query_file"),
         cache_root=config.get("global", "db_cache_dir"),
         external_predicate_file=external_predicate_file,
@@ -104,9 +95,9 @@ def train_and_evaluate(
         log.warning("skipping boosted evaluation")
 
     v0_settings = EvaluationSettings(
-        search_path=config.get("v0_evaluation:search_path"),
-        cli_version=config.get("v0_evaluation:cli_version"),
-        db_cli_version=config.get("global:db_cli_version"),
+        search_path=config.get("v0_evaluation", "search_path"),
+        cli_version=config.get("v0_evaluation", "cli_version"),
+        db_cli_version=config.get("global", "db_cli_version"),
         query_file=config.get_for_querytype(query_type, "v0_query_file"),
         cache_root=config.get("global", "db_cache_dir"),
     )
