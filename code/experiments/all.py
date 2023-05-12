@@ -1,5 +1,5 @@
 from scripts.docker import run_tsm, TrainConfiguration, read_dbs_dataset, run_combine_scores
-from scripts.evaluate import evaluate, EvaluationSettings
+from scripts.evaluate import evaluate, EvaluationSettings, PerformanceSettings
 from os.path import join as path_join
 from typing import List, Optional
 from scripts.calculate_scores import calculate_scores_df
@@ -53,6 +53,12 @@ def train_and_evaluate(
         run_tsm(docker_client, train_settings, block=True)
     else:
         log.warning("skipping train")
+
+    performance = PerformanceSettings(
+        parallelism=config.getint("performance", "parallelism"),
+        codeql_threads=config.getint("performance", "codeql_threads"),
+        codeql_memory=config.getint("performance", "codeql_memory"),
+    )
 
     # evaluation
     external_predicate_file = path_join(results_dir, 'averaged-results.csv')

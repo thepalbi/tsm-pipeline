@@ -22,6 +22,13 @@ def create_dir(dir: str):
 
 
 @dataclasses.dataclass
+class PerformanceSettings:
+    parallelism: int = 4
+    codeql_memory: int = 4000
+    codeql_threads: int = 2
+
+
+@dataclasses.dataclass
 class EvaluationSettings:
     search_path: str
     query_file: str
@@ -29,6 +36,8 @@ class EvaluationSettings:
     db_cli_version: str
     cache_root: str
     external_predicate_file: Optional[str] = None
+    performance = PerformanceSettings()
+
 
 @dataclasses.dataclass
 class Evaluator:
@@ -46,19 +55,23 @@ class Evaluator:
         """
         owner, name, sha = self.parsed_key.gh_user, self.parsed_key.gh_repo, self.parsed_key.gh_commit_hash
         log.info("Evaluating %s - %s" % (owner, name))
-        bqrs_out = path.join(self.output_dir, "%s_%s_%s.bqrs" % (owner, name, sha))
-        csv_out = path.join(self.output_dir, "%s_%s_%s.csv" % (owner, name, sha))
+        bqrs_out = path.join(self.output_dir, "%s_%s_%s.bqrs" %
+                             (owner, name, sha))
+        csv_out = path.join(self.output_dir, "%s_%s_%s.csv" %
+                            (owner, name, sha))
         external_preds = {}
         if self.settings.external_predicate_file != None:
             external_preds = {
                 "getReprScore": self.settings.external_predicate_file
             }
         self.client.query_run(self.db, self.settings.search_path, bqrs_out,
-                             self.settings.query_file, external_predicates=external_preds)
+                              self.settings.query_file, external_predicates=external_preds)
         self.client.bqrs_decode(bqrs_out, "#select", csv_out)
+
 
 def do_evalute(e: Evaluator):
     e.evalute()
+
 
 def evaluate(
     settings: EvaluationSettings,
@@ -73,8 +86,8 @@ def evaluate(
 
     # Configure codeql query run execution with 2 threads, and 6GB ram
     cli_client = CLIClient(version=settings.cli_version, query_run_args={
-        "--threads": "2",
-        "--ram": "4000",
+        "--threads": settings.performance.codeql_threads,
+        "--ram": settings.performance.codeql_memory,
     })
     cache = DatabasesCache(settings.cache_root, settings.db_cli_version)
 
@@ -103,7 +116,7 @@ def evaluate(
             pk,
         ) for (pk, db) in dbs_from_cache
     ]
-    with Pool(processes=4) as pool:
+    with Pool(processes=settings.performance.parallelism) as pool:
         pool.map(do_evalute, evaluators)
 
 

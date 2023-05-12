@@ -25,3 +25,7 @@ class TestTSM(unittest.TestCase):
                          "/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/NosqlInjectionWorseTSM.ql")
         self.assertEqual(parser.get_for_querytype("nosql", "boosted_query_file"),
                          "/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/NosqlInjectionBoostedTSM.ql")
+
+        self.assertEqual(parser.getint("performance", "parallelism"), 4)
+        self.assertEqual(parser.getint("performance", "codeql_memory"), 4000)
+        self.assertEqual(parser.getint("performance", "codeql_threads"), 4)
