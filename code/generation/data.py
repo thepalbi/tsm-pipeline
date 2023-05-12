@@ -7,7 +7,6 @@ from orchestration.steps import SOURCE_ENTITIES, SINK_ENTITIES, SANITIZER_ENTITI
     SRC_SAN_TUPLES_ENTITIES, SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES
 from orchestration import global_config
 from .wrapper import CodeQLWrapper
-from orchestration import global_config
 
 SOURCES = SINKS = SANITIZERS = "Known"
 
@@ -17,6 +16,7 @@ SUPPORTED_QUERY_TYPES = ["NoSql", "Sql", "Xss", "Sel", "Path"]
 CODEQL_PROCESS_TIMEOUT = 5 * 60
 
 log = logging.getLogger(__name__)
+
 
 class GenerateEntitiesStep(OrchestrationStep):
     def populate(self, ctx: Context) -> Context:
@@ -66,7 +66,6 @@ class DataGenerator:
             os.mkdir(logs_folder)
 
         self.logs_folder = logs_folder
-    
 
     def get_generated_data_dir(self):
         return self._get_generated_data_dir()
@@ -89,18 +88,17 @@ class DataGenerator:
         :param str query_type: query type
         :param str filename: filename
         :return str aboluste path to the query
-        """        
+        """
         if query_type is None:
             return os.path.join(global_config.sources_root, "tsm", filename)
-        else: 
+        else:
             return os.path.join(global_config.sources_root, "tsm", query_type, filename)
 
     def _get_tsm_bqrs_file_for_entity(self, queried_entity: str, query_type: str) -> str:
-        # Add query_type as prefix folder since database analyze 
+        # Add query_type as prefix folder since database analyze
         # reads the ql file from query_type/file.ql and generates the same route
-        # this will change if we replace database analyze with database query   
-        return self._get_tsm_bqrs_file( f"{query_type}/{queried_entity}-{query_type}.bqrs")
-        
+        # this will change if we replace database analyze with database query
+        return self._get_tsm_bqrs_file(f"{query_type}/{queried_entity}-{query_type}.bqrs")
 
     def _get_tsm_bqrs_file(self, filename: str) -> str:
         """
@@ -111,7 +109,7 @@ class DataGenerator:
         """
         return os.path.join(self.compiled_db_dir, "results", "tsm-js", "tsm", filename)
 
-    def generate_scores(self, query_type: str, combinedScore: bool, kind = "snk") -> Tuple[str, ...]:
+    def generate_scores(self, query_type: str, combinedScore: bool, kind="snk") -> Tuple[str, ...]:
         # Run metrics-snk query
 
         metrics_file = "metrics_{0}_{1}".format(kind, query_type)
@@ -152,7 +150,7 @@ class DataGenerator:
             raise Exception(
                 "{0} is not a supported query type. Currently supports {1}".format(query_type, SUPPORTED_QUERY_TYPES))
 
-        # For KnownSource  we use current version of CodeQl Libraries  
+        # For KnownSource  we use current version of CodeQl Libraries
         # sources
         self._generate_for_entity(
             query_type, SOURCES, f"source{query_type}Classes", ctx[SOURCE_ENTITIES], True,
@@ -165,35 +163,37 @@ class DataGenerator:
         self._generate_for_entity(
             query_type, SANITIZERS, f"sanitizer{query_type}Classes", ctx[SANITIZER_ENTITIES], False,
             global_config.search_path)
-        
+
         # running propagation graph queries
-        # we use the csv files of known sources/sinks/sanitizers 
+        # we use the csv files of known sources/sinks/sanitizers
         # to feed the corresponding predicates in the PG query
         try:
-            propgraph_path = self._get_tsm_query_file(query_type, f"PropagationGraph-{query_type}.ql")
+            propgraph_path = self._get_tsm_query_file(
+                query_type, f"PropagationGraph-{query_type}.ql")
 
-            # For Progapation graphs we use current version of CodeQl Libraries  
+            # For Progapation graphs we use current version of CodeQl Libraries
             self.codeql.database_run_queries(
                 self.compiled_db_dir,
                 propgraph_path,
                 global_config.search_path,
                 [f"--external=knownSource={ctx[SOURCE_ENTITIES]}",
-                f"--external=knownSink={ctx[SINK_ENTITIES]}",
-                f"--external=knownSanitizer={ctx[SANITIZER_ENTITIES]}"]
-                )
+                 f"--external=knownSink={ctx[SINK_ENTITIES]}",
+                 f"--external=knownSanitizer={ctx[SANITIZER_ENTITIES]}"]
+            )
 
         except Exception as e:
             log.info("Error Analyzing PropagationGraph.ql")
-            raise(e)
+            raise (e)
 
         log.info("Generating propagation graph data")
-        bqrs_propgraph = self._get_tsm_bqrs_file_for_entity("PropagationGraph", query_type)
+        bqrs_propgraph = self._get_tsm_bqrs_file_for_entity(
+            "PropagationGraph", query_type)
         # data/1046224544_fontend_19c10c3/1046224544_fontend_19c10c3-src-san.prop.csv
-        
+
         # We remove the entities to make sure we use updated versions
         if os.path.exists(ctx[SRC_SAN_TUPLES_ENTITIES]):
             os.remove(ctx[SRC_SAN_TUPLES_ENTITIES])
-        if os.path.exists(ctx[SAN_SNK_TUPLES_ENTITIES]): 
+        if os.path.exists(ctx[SAN_SNK_TUPLES_ENTITIES]):
             os.remove(ctx[SAN_SNK_TUPLES_ENTITIES])
         if os.path.exists(ctx[REPR_MAP_ENTITIES]):
             os.remove(ctx[REPR_MAP_ENTITIES])
@@ -243,22 +243,22 @@ class DataGenerator:
             repr_mapping_output_file
         )
 
-    def _generate_for_entity(self, query_type: str, entity_type: str, result_set: str, output_file: str, 
-                            force_query: bool = True,
-                            search_path:str = global_config.search_path):
+    def _generate_for_entity(self, query_type: str, entity_type: str, result_set: str, output_file: str,
+                             force_query: bool = True,
+                             search_path: str = global_config.search_path):
         """Runs the query for a given entity, and extracts the results into a csv file."""
         log.info(
             "Generating %s data in file=[%s]", entity_type, output_file)
         query_path = self._get_tsm_query_file_for_entity(
-                entity_type,
-                query_type)
+            entity_type,
+            query_type)
         bqrs_file = self._get_tsm_bqrs_file_for_entity(entity_type, query_type)
-        
+
         # We remove the entity to make sure is using a new one
         if os.path.exists(output_file):
             os.remove(output_file)
 
-        if not os.path.exists(bqrs_file) or force_query: 
+        if not os.path.exists(bqrs_file) or force_query:
             self.codeql.database_run_queries(
                 self.compiled_db_dir,
                 query_path,

@@ -1,4 +1,6 @@
 import json
+import os
+from scripts.evaluate import PerformanceSettings
 
 CODEQL_SOURCES_ROOT_KEY = "codeQLSourcesRoot"
 CODEQL_EXECUTABLE_KEY = "codeQLExecutable"
@@ -6,6 +8,7 @@ WORKING_DIRECTORY_KEY = "workingDirectory"
 RESULTS_DIRECTORY_KEY = "resultsDirectory"
 SEARCH_WORSE_LIB_PATH_KEY = "searchPath"
 LOGS_DIRECTORY_KEY = "logsDirectory"
+
 
 class Configuration:
     def __init__(self, config_file_path="config.json"):
@@ -35,7 +38,7 @@ class Configuration:
         If it's more than one item they should be `:` concatenated.
 
         :return str: the search path to be used.
-        """        
+        """
         return self.config[SEARCH_WORSE_LIB_PATH_KEY]
 
     @property
@@ -48,8 +51,20 @@ class Configuration:
         to compile the dbs used during training.
 
         :return str: the db version to use in the cache
-        """        
+        """
         return self.config["compiledDBsVersion"]
+
+    @property
+    def performance(self) -> PerformanceSettings:
+        parallelism = int(os.getenv("PERF_PARALLELISM", "4"))
+        codeql_threads = int(os.getenv("PERF_CODEQL_THREADS", "2"))
+        codeql_memory = int(os.getenv("PERF_CODEQL_MEMORY", "2000"))
+
+        return PerformanceSettings(
+            parallelism=parallelism,
+            codeql_memory=codeql_memory,
+            codeql_threads=codeql_threads,
+        )
 
     def __getattr__(self, item):
         return self.config[item]
