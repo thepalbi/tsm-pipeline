@@ -2,10 +2,16 @@ import unittest
 from tsm.configuration import TSMConfigParser
 from pathlib import Path
 
+
 THIS_DIR = Path(__file__).parent
 
 
 class TestTSM(unittest.TestCase):
+    def test_all_interpolations(self):
+        parser = TSMConfigParser()
+        parser.read(THIS_DIR / "sample.cfg")
+        self.assertTrue(parser.check())
+
     def test_config(self):
         parser = TSMConfigParser()
         parser.read(THIS_DIR / "sample.cfg")

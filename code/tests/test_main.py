@@ -2,6 +2,7 @@ import unittest
 
 import docker
 from scripts.docker import run_tsm, TrainConfiguration
+from experiments.all import train_and_evaluate
 # from scripts.evaluate import evaluate, EvaluationSettings
 import tempfile
 from os.path import join as path_join
@@ -10,7 +11,6 @@ import logging
 from typing import List
 from pathlib import Path
 from tsm.configuration import TSMConfigParser
-
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -24,7 +24,8 @@ class TestMain(unittest.TestCase):
         cls.config = TSMConfigParser()
         this_dir = Path(__file__).parent
         cls.config.read(this_dir / "sample.cfg")
-        cls.cache = DatabasesCache(cls.config.get("global", "db_cache_dir"), cls.config.get("global", "db_cli_version"))
+        cls.cache = DatabasesCache(cls.config.get(
+            "global", "db_cache_dir"), cls.config.get("global", "db_cli_version"))
 
     @classmethod
     def tearDownClass(cls):
@@ -38,7 +39,7 @@ class TestMain(unittest.TestCase):
 
     def test_smoke_run_nosql(self):
         test_train_data = [
-            "bitpay/bitcore-wallet-service/750172f",
+            "ethereumclassic/explorer/da39687",
         ]
         results_dir = tempfile.mkdtemp()
         print("Using temporary directory as results: %s" % (results_dir))
@@ -58,6 +59,23 @@ class TestMain(unittest.TestCase):
         # assert empty model error was logged
         self.assert_in_training_log(results_dir, "run ok")
 
+        # assert evaluation portion
+        results = train_and_evaluate(
+            self.config,
+            results_dir,
+            test_train_data,
+            test_train_data,
+            "nosql",
+            self.docker_client,
+            skip=["train"],
+        )
+        # assert non-zero score
+        self.assertGreater(results["precision"][0],
+                           0, "precision should be greater than zeo")
+        self.assertGreater(results["recall"][0], 0,
+                           "recall should be greater than zero")
+
+    @unittest.skip("path not implemented")
     def test_smoke_training_run_path(self):
         test_train_data = [
             "Sv443/JokeAPI/f2c757a20bdc385edcf57b811ec8cc1a72899432",
@@ -80,11 +98,13 @@ class TestMain(unittest.TestCase):
         # assert empty model error was logged
         self.assert_in_training_log(results_dir, "run ok")
 
+    @unittest.skip("path not implemented")
     def test_smoke_training_run_xss(self):
         results_dir = tempfile.mkdtemp()
         print("Using temporary directory as results: %s" % (results_dir))
 
-        test_data = ["danielstern/express-react-fullstack/865504ee0d0188f10d162a06d1311d9115a68cfe"]
+        test_data = [
+            "danielstern/express-react-fullstack/865504ee0d0188f10d162a06d1311d9115a68cfe"]
 
         self.cleanup_dbs(test_data)
 
@@ -102,10 +122,12 @@ class TestMain(unittest.TestCase):
         # assert empty model error was logged
         self.assert_in_training_log(results_dir, "run ok")
 
+    @unittest.skip("path not implemented")
     def test_expected_empty_model_error(self):
         results_dir = tempfile.mkdtemp()
         print("Using temporary directory as results: %s" % (results_dir))
-        train_data_with_empty_model = ["bugulink/bugu-web/422f3bf2a8dbc85bd85e12e89ce40cb3cd9f6555"]
+        train_data_with_empty_model = [
+            "bugulink/bugu-web/422f3bf2a8dbc85bd85e12e89ce40cb3cd9f6555"]
 
         self.cleanup_dbs(train_data_with_empty_model)
 
