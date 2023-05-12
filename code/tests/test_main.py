@@ -1,20 +1,16 @@
 import unittest
 
 import docker
-from scripts.docker import run_tsm, ExperimentSettings
+from scripts.docker import run_tsm, TrainConfiguration
 # from scripts.evaluate import evaluate, EvaluationSettings
 import tempfile
 from os.path import join as path_join
 from database.cache import DatabasesCache
 import logging
 from typing import List
+from pathlib import Path
+from tsm.configuration import TSMConfigParser
 
-defaults = {
-    "bash_config_path": "/home/pablo/tesis/tsm-pipeline/code/scripts/config.sh",
-}
-defaults_evalute = {
-    "cache_root": "/home/pablo/dbcache",
-}
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -25,7 +21,10 @@ class TestMain(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.docker_client = docker.from_env()
-        cls.cache = DatabasesCache(defaults_evalute["cache_root"], "2.5.2")
+        cls.config = TSMConfigParser()
+        this_dir = Path(__file__).parent
+        cls.config.read(this_dir / "sample.cfg")
+        cls.cache = DatabasesCache(cls.config.get("global", "db_cache_dir"), cls.config.get("global", "db_cli_version"))
 
     @classmethod
     def tearDownClass(cls):
@@ -37,6 +36,28 @@ class TestMain(unittest.TestCase):
             if cleaned_up:
                 log.info("cleaned up results for db: %s", db)
 
+    def test_smoke_run_nosql(self):
+        test_train_data = [
+            "bitpay/bitcore-wallet-service/750172f",
+        ]
+        results_dir = tempfile.mkdtemp()
+        print("Using temporary directory as results: %s" % (results_dir))
+
+        self.cleanup_dbs(test_train_data)
+
+        # training
+        train_settings = TrainConfiguration(
+            config=self.config,
+            query_type="nosql",
+            project_list=test_train_data,
+            results_dir=results_dir,
+        )
+
+        run_tsm(self.docker_client, train_settings, tail_logs=True, debug=True)
+
+        # assert empty model error was logged
+        self.assert_in_training_log(results_dir, "run ok")
+
     def test_smoke_training_run_path(self):
         test_train_data = [
             "Sv443/JokeAPI/f2c757a20bdc385edcf57b811ec8cc1a72899432",
@@ -47,12 +68,11 @@ class TestMain(unittest.TestCase):
         self.cleanup_dbs(test_train_data)
 
         # training
-        train_settings = ExperimentSettings(
-            name="smoke_training_run",
+        train_settings = TrainConfiguration(
+            config=self.config,
             query_type="path",
             project_list=test_train_data,
             results_dir=results_dir,
-            **defaults
         )
 
         run_tsm(self.docker_client, train_settings, tail_logs=True, debug=True)
@@ -70,12 +90,11 @@ class TestMain(unittest.TestCase):
 
         # training
 
-        train_settings = ExperimentSettings(
-            name="smoke_training_run",
+        train_settings = TrainConfiguration(
+            config=self.config,
             query_type="path",
             project_list=test_data,
             results_dir=results_dir,
-            **defaults
         )
 
         run_tsm(self.docker_client, train_settings, tail_logs=True)
@@ -91,12 +110,11 @@ class TestMain(unittest.TestCase):
         self.cleanup_dbs(train_data_with_empty_model)
 
         # training
-        train_settings = ExperimentSettings(
-            name="smoke_training_run",
+        train_settings = TrainConfiguration(
+            config=self.config,
             query_type="path",
             project_list=train_data_with_empty_model,
             results_dir=results_dir,
-            **defaults
         )
 
         run_tsm(self.docker_client, train_settings, tail_logs=True)

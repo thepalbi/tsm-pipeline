@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 import os
 import logging
 from .files import db_list_to_file
+from tsm.configuration import TSMConfigParser
+import tempfile
 
 from misc.combinescores import combine_scores
 
@@ -63,42 +65,30 @@ MOUNTED_LIST_FILE = '/data/list.txt'
 
 # cq stands for CodeQL
 @dataclass()
-class ExperimentSettings:
-    name: str
-    bash_config_path: str
-    results_dir: str
+class TrainConfiguration:
+    config: TSMConfigParser
     query_type: str
-    project_list_file: Optional[str] = None
-    project_list: Optional[List[str]] = None
-    tmp_dir: str = field(init=False)
-    cq_wrapper_timeout: int = 600
+    results_dir: str
+    project_list: List[str]
 
     # after init
+    project_list_file: str = field(init=False)
+    tmp_dir: str = field(init=False)
     docker_mounts: List[Mount] = field(init=False)
     docker_env: Dict[str, str] = field(init=False)
 
     def __post_init__(self):
-        with open(self.bash_config_path, 'r') as f:
-            cfg = parse_bash_config(f.read())
-            self.tmp_dir = cfg["TMP_DIR"]
-
         # handle if project was supplied as list
         if self.project_list is not None:
-            if self.project_list_file is not None:
-                # both cannot be set
-                raise Exception("cannot configure projects as list and file")
-            
-            self.project_list_file = db_list_to_file(self.project_list, self.tmp_dir)
-        
-        if self.project_list_file is None:
-            raise Exception("either project_list or project_list_file need to be configures")
+            self.project_list_file = db_list_to_file(self.project_list, tempfile.gettempdir())
 
         self.docker_mounts, self.docker_env = mounts_and_envs(
-            config=cfg,
+            config=self.config,
             project_list_file=self.project_list_file,
             results_dir=self.results_dir,
-            cq_wrapper_timeout=self.cq_wrapper_timeout,
         )
+
+        self.tmp_dir = self.config.get("global", "tmp_dir")
 
     @property
     def docker_kwargs(self) -> Dict[str, Any]:
@@ -108,30 +98,30 @@ class ExperimentSettings:
         }
 
 
-def mounts_and_envs(config: Dict[str, str], project_list_file: str, results_dir: str, cq_wrapper_timeout=600) -> Tuple[List[Mount], Dict[str, str]]:
+def mounts_and_envs(config: TSMConfigParser, project_list_file: str, results_dir: str) -> Tuple[List[Mount], Dict[str, str]]:
     mounts = [
         # basic mounts retrieved from the bash config
-        Mount(source=config["CLI_DIR"], target="/cli", type='bind'),
-        Mount(source=config["QL_LIB_DIR"], target="/ql", type='bind'),
-        Mount(source=config["QL_LIB_WORSE_DIR"],
+        Mount(source=config.get("global","training_cli_dir"), target="/cli", type='bind'),
+        Mount(source=config.get("global", "lib_tsm"), target="/ql", type='bind'),
+        Mount(source=config.get("global", "lib_worse"),
               target="/worse_lib", type='bind'),
-        Mount(source=config["TMP_DIR"], target="/bigtmp", type='bind'),
+        Mount(source=config.get("global", "tmp_dir"), target="/bigtmp", type='bind'),
         Mount(source=results_dir, target="/results", type='bind'),
-        Mount(source=config["CACHE_DBS_DIR"], target="/dbs", type='bind'),
+        Mount(source=config.get("global", "db_cache_dir"), target="/dbs", type='bind'),
         # codeql package cache
-        Mount(source=config["QL_JAVASCRIPT_UPGRADES"], target="/js_upgrades_lib", type='bind'),
+        Mount(source=config.get("global", "javascript_upgrades"), target="/js_upgrades_lib", type='bind'),
         # additional mounts
         Mount(source=project_list_file, target=MOUNTED_LIST_FILE,
               read_only=True, type='bind'),
     ]
     envs = {
-        "CODEQL_CLIS_ROOT": config['CODEQL_CLIS_ROOT'],
-        "CODEQL_WRAPPER_TIMEOUT": cq_wrapper_timeout,
+        "CODEQL_CLIS_ROOT": config.get("global", "codeql_clis_dir"),
+        "CODEQL_WRAPPER_TIMEOUT": config.get("global", "codeql_timeout"),
     }
     return mounts, envs
 
 
-def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs=False, block=False, debug=False):
+def run_tsm(client: docker.DockerClient, settings: TrainConfiguration, tail_logs=False, block=False, debug=False):
     # prerequisites
     # create results and logs folder if necessary
     def create_dir(dir: str):
@@ -186,7 +176,7 @@ def run_tsm(client: docker.DockerClient, settings: ExperimentSettings, tail_logs
     log.info("running combine scores")
     run_combine_scores(settings)
 
-def run_combine_scores(settings: ExperimentSettings):
+def run_combine_scores(settings: TrainConfiguration):
     """
     run_combine_scores executes the combine scores post process for the given ExperimentSettings.
 
@@ -211,18 +201,3 @@ def read_dbs_dataset(path: str) -> List[str]:
         for l in f.readlines():
             dbs.append(l.rstrip())
     return dbs
-
-
-if __name__ == "__main__":
-    client = docker.from_env()
-
-    with open('/tesis/repos/tsm-pipeline/code/scripts/config.sh', 'r') as f:
-        config = parse_bash_config(f.read())
-
-    mounts, env = mounts_and_envs(
-        config=config,
-        project_list_file='/tesis/repos/tsm-pipeline/experiments/tesis/tainted_path/test_4.txt',
-        results_dir='/tmp',
-    )
-
-    run_tsm(client, mounts, env)
