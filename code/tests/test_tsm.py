@@ -13,7 +13,9 @@ class TestTSM(unittest.TestCase):
         self.assertEqual(parser.get("global", "tmp_dir"), "/tmp")
         self.assertEqual(parser.get(
             "boosted_evaluation", "cli_version"), "2.13.1")
-        self.assertEqual(parser.get("boosted_evaluation", "query_file"),
-                         "/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/NosqlInjectionBoostedTSM.ql")
 
-        self.assertEqual(parser.configured_query_types(), ["nosql"])
+        self.assertEqual(parser.configured_querytypes(), ["nosql"])
+        self.assertEqual(parser.get_for_querytype("nosql", "worse_query_file"),
+                         "/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/NosqlInjectionWorseTSM.ql")
+        self.assertEqual(parser.get_for_querytype("nosql", "boosted_query_file"),
+                         "/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/NosqlInjectionBoostedTSM.ql")

@@ -18,9 +18,12 @@ class TSMConfigParser(configparser.ConfigParser):
         # use extended interpolation
         super().__init__(self, interpolation=configparser.ExtendedInterpolation())
 
-    def configured_query_types(self) -> List[str]:
+    def configured_querytypes(self) -> List[str]:
         return [
             section.replace(self.QUERY_TYPE_SECION_PREFIX, '', 1)
             for section in self.sections()
             if section.startswith(self.QUERY_TYPE_SECION_PREFIX)
         ]
+
+    def get_for_querytype(self, type: str, key: str):
+        return self.get(self.QUERY_TYPE_SECION_PREFIX + type, key)
