@@ -1,7 +1,7 @@
 import unittest
 
 import docker
-from scripts.docker import run_tsm, ExperimentSettings
+from scripts.docker import run_tsm, TrainConfiguration
 # from scripts.evaluate import evaluate, EvaluationSettings
 import tempfile
 from os.path import join as path_join
@@ -47,7 +47,7 @@ class TestMain(unittest.TestCase):
         self.cleanup_dbs(test_train_data)
 
         # training
-        train_settings = ExperimentSettings(
+        train_settings = TrainConfiguration(
             name="smoke_training_run",
             query_type="path",
             project_list=test_train_data,
@@ -70,7 +70,7 @@ class TestMain(unittest.TestCase):
 
         # training
 
-        train_settings = ExperimentSettings(
+        train_settings = TrainConfiguration(
             name="smoke_training_run",
             query_type="path",
             project_list=test_data,
@@ -91,7 +91,7 @@ class TestMain(unittest.TestCase):
         self.cleanup_dbs(train_data_with_empty_model)
 
         # training
-        train_settings = ExperimentSettings(
+        train_settings = TrainConfiguration(
             name="smoke_training_run",
             query_type="path",
             project_list=train_data_with_empty_model,
