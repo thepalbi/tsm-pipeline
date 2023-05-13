@@ -69,6 +69,8 @@ class TestMain(unittest.TestCase):
             self.docker_client,
             skip=["train"],
         )
+        # print results
+        print(results)
         # assert non-zero score
         self.assertGreater(results["precision"][0],
                            0, "precision should be greater than zeo")

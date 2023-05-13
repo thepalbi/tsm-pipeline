@@ -22,9 +22,9 @@ class TestTSM(unittest.TestCase):
 
         self.assertEqual(parser.configured_querytypes(), ["nosql"])
         self.assertEqual(parser.get_for_querytype("nosql", "worse_query_file"),
-                         "/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/NosqlInjectionWorseTSM.ql")
+                         "/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/nosql/NosqlInjectionWorseTSM.ql")
         self.assertEqual(parser.get_for_querytype("nosql", "boosted_query_file"),
-                         "/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/NosqlInjectionBoostedTSM.ql")
+                         "/home/pablo/tesis/tsm-pipeline/tsm-atm-pipeline/src/tsm/evaluation/nosql/NosqlInjectionBoostedTSM.ql")
 
         self.assertEqual(parser.getint("performance", "parallelism"), 4)
         self.assertEqual(parser.getint("performance", "codeql_memory"), 4000)

@@ -5,6 +5,10 @@
         },
         {
             "path": "lib-worse/codeql"
+        },
+        {
+            "name": "[da39687 source archive]",
+            "uri": "codeql-zip-archive://0-66/home/pablo/dbcache/2.5.2/ethereumclassic/explorer/da39687/src.zip"
         }
     ],
 	"settings": {

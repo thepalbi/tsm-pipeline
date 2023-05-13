@@ -1,6 +1,6 @@
 import javascript
-import tsm.evaluation.NosqlInjectionWorseTSMCustomizations
-import tsm.nosql.NosqlInjectionTSMConfig
+import tsm.evaluation.nosql.NosqlInjectionWorseTSMCustomizations
+import tsm.nosql.NosqlInjectionWorseConfig
 import tsm.TaintSpecificationMining
 
 from
@@ -8,13 +8,13 @@ from
   int startLineSink, int endLineSink, int startColumnSink, int endColumnSink, string filePathSource,
   int startLineSource, int endLineSource, int startColumnSource, int endColumnSource, float score
 where
-  cfg.hasFlow(source, sink) and origin = "boosted"
-  and
+  cfg.hasFlow(source, sink) and origin = "worse"
+   and
   sink.hasLocationInfo(filePathSink, startLineSink, startColumnSink, endLineSink, endColumnSink) and
   source
       .hasLocationInfo(filePathSource, startLineSource, startColumnSource, endLineSource,
         endColumnSource) and
-  TSM::getScoreForFlow(source, sink) = score
+  -1 = score
 select source, startLineSource, startColumnSource, endLineSource, endColumnSource, filePathSource,
   sink, startLineSink, startColumnSink, endLineSink, endColumnSink, filePathSink, score, origin order by
     score desc, startLineSource, startColumnSource, endLineSource, endColumnSource, filePathSource,

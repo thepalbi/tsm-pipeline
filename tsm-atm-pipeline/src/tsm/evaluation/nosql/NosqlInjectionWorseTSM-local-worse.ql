@@ -1,5 +1,5 @@
 import javascript
-import tsm.evaluation.NosqlInjectionWorseTSMCustomizations
+import tsm.evaluation.nosql.NosqlInjectionWorseTSMCustomizations
 import tsm.nosql.NosqlInjectionTSMConfig
 import tsm.TaintSpecificationMining
 
