@@ -1,6 +1,6 @@
 import json
 import os
-from scripts.evaluate import PerformanceSettings
+from tsm.configuration import PerformanceConfiguration
 
 CODEQL_SOURCES_ROOT_KEY = "codeQLSourcesRoot"
 CODEQL_EXECUTABLE_KEY = "codeQLExecutable"
@@ -55,12 +55,12 @@ class Configuration:
         return self.config["compiledDBsVersion"]
 
     @property
-    def performance(self) -> PerformanceSettings:
+    def performance(self) -> PerformanceConfiguration:
         parallelism = int(os.getenv("PERF_PARALLELISM", "4"))
         codeql_threads = int(os.getenv("PERF_CODEQL_THREADS", "2"))
         codeql_memory = int(os.getenv("PERF_CODEQL_MEMORY", "2000"))
 
-        return PerformanceSettings(
+        return PerformanceConfiguration(
             parallelism=parallelism,
             codeql_memory=codeql_memory,
             codeql_threads=codeql_threads,

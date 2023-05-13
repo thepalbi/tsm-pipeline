@@ -2,7 +2,15 @@
 # all configs have a higher order of precedence to easily override others
 
 import configparser
-from typing import List
+import dataclasses
+from typing import List, Optional
+
+
+@dataclasses.dataclass
+class PerformanceConfiguration:
+    parallelism: int = 4
+    codeql_memory: int = 4000
+    codeql_threads: int = 2
 
 
 class TSMConfigParser(configparser.ConfigParser):
@@ -11,6 +19,7 @@ class TSMConfigParser(configparser.ConfigParser):
     for example.
     """
     QUERY_TYPE_SECION_PREFIX = "query_type_"
+    PERFORMANCE_PREFIX = "performance_"
 
     # for now use the default ConfigParser implementation
 
@@ -27,6 +36,22 @@ class TSMConfigParser(configparser.ConfigParser):
 
     def get_for_querytype(self, type: str, key: str):
         return self.get(self.QUERY_TYPE_SECION_PREFIX + type, key)
+
+    def get_performance(self, stage: Optional[str] = None) -> PerformanceConfiguration:
+        selected_section = "performance"
+        if stage is not None:
+            for sect in self.sections():
+                if sect == self.PERFORMANCE_PREFIX + stage:
+                    selected_section = sect
+
+        def get_or_fallback(s, k):
+            return self.getint(s, k, fallback=self.getint("performance", k))
+        perf = PerformanceConfiguration(
+            parallelism=get_or_fallback(selected_section, "parallelism"),
+            codeql_memory=get_or_fallback(selected_section, "codeql_memory"),
+            codeql_threads=get_or_fallback(selected_section, "codeql_threads"),
+        )
+        return perf
 
     def check(self) -> bool:
         for sect in self.sections():

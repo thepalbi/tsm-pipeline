@@ -8,6 +8,7 @@ from database.cache import DatabasesCache, Parsedkey
 from multiprocessing import Pool
 import dataclasses
 import logging
+from tsm.configuration import PerformanceConfiguration
 
 
 log = logging.getLogger(__name__)
@@ -22,13 +23,6 @@ def create_dir(dir: str):
 
 
 @dataclasses.dataclass
-class PerformanceSettings:
-    parallelism: int = 4
-    codeql_memory: int = 4000
-    codeql_threads: int = 2
-
-
-@dataclasses.dataclass
 class EvaluationSettings:
     search_path: str
     query_file: str
@@ -36,7 +30,7 @@ class EvaluationSettings:
     db_cli_version: str
     cache_root: str
     external_predicate_file: Optional[str] = None
-    performance = PerformanceSettings()
+    performance = PerformanceConfiguration()
 
 
 @dataclasses.dataclass

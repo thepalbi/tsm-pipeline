@@ -1,5 +1,5 @@
 from scripts.docker import run_tsm, TrainConfiguration, read_dbs_dataset, run_combine_scores
-from scripts.evaluate import evaluate, EvaluationSettings, PerformanceSettings
+from scripts.evaluate import evaluate, EvaluationSettings
 from os.path import join as path_join
 from typing import List, Optional
 from scripts.calculate_scores import calculate_scores_df
@@ -7,7 +7,7 @@ import pandas as pd
 import docker
 import logging
 from dataclasses import dataclass
-from tsm.configuration import TSMConfigParser
+from tsm.configuration import TSMConfigParser, PerformanceConfiguration
 
 
 log = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ def train_and_evaluate(
     else:
         log.warning("skipping train")
 
-    performance = PerformanceSettings(
+    performance = PerformanceConfiguration(
         parallelism=config.getint("performance", "parallelism"),
         codeql_threads=config.getint("performance", "codeql_threads"),
         codeql_memory=config.getint("performance", "codeql_memory"),

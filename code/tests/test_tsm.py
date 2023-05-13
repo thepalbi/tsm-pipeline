@@ -29,3 +29,9 @@ class TestTSM(unittest.TestCase):
         self.assertEqual(parser.getint("performance", "parallelism"), 4)
         self.assertEqual(parser.getint("performance", "codeql_memory"), 4000)
         self.assertEqual(parser.getint("performance", "codeql_threads"), 4)
+
+        training_perf = parser.get_performance("training")
+        self.assertEqual(training_perf.parallelism, 4,
+                         "parallelism should inherit from performance section")
+        self.assertEqual(training_perf.codeql_memory, 8000)
+        self.assertEqual(training_perf.codeql_threads, 8)
