@@ -35,3 +35,6 @@ class TestTSM(unittest.TestCase):
                          "parallelism should inherit from performance section")
         self.assertEqual(training_perf.codeql_memory, 8000)
         self.assertEqual(training_perf.codeql_threads, 8)
+
+        self.assertEqual(parser.get_performance().codeql_memory, 4000,
+                         "get_performance with no section should be the global performance section")

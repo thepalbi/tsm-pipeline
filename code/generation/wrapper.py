@@ -33,8 +33,10 @@ class CodeQLWrapper:
 
             self._logs_directory = wrapper_logs_directory
             self._process_timeout = process_timeout
-            self._additinal_args = [
-                "--threads=%s" % ()
+            # additional args are applied to every query related command
+            self._queries_additional_args = [
+                "--threads=%s" % (global_config.performance.codeql_threads),
+                "--ram=%s" % (global_config.performance.codeql_memory),
             ]
         except KeyError:
             raise Exception(
@@ -55,11 +57,10 @@ class CodeQLWrapper:
             query_file,
             f"--database={project}",
             f"--output={output_file}",
-            "--threads=-1",
             "--timeout=%s" % CODEQL_WRAPPER_TIMEOUT,
             f"--search-path={search_path}",
             "--additional-packs=/qlpackcache"
-        ]
+        ] + self._queries_additional_args
         log.info(
             "Running 'query run' for project=[%s] and query_file=[%s]", project, query_file)
         self._run_process(command_and_arguments)
@@ -81,8 +82,7 @@ class CodeQLWrapper:
             f'--logdir={self._logs_directory}',
             f'--search-path={search_path}',
             "--timeout=%s" % CODEQL_WRAPPER_TIMEOUT,
-            f'--threads=0'  # 1 thread per core
-        ]
+        ] + self._queries_additional_args
 
         command_and_arguments = command_and_arguments + extra_options
 
@@ -111,8 +111,7 @@ class CodeQLWrapper:
             query_file,
             f'--search-path={search_path}',
             "--timeout=%s" % CODEQL_WRAPPER_TIMEOUT,
-            f'--threads=0'  # 1 thread per core
-        ]
+        ] + self._queries_additional_args
 
         command_and_arguments = command_and_arguments + extra_options
 

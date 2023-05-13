@@ -23,19 +23,19 @@ def create_dir(dir: str):
 
 
 @dataclasses.dataclass
-class EvaluationSettings:
+class EvaluationConfiguration:
     search_path: str
     query_file: str
     cli_version: str
     db_cli_version: str
     cache_root: str
+    performance: PerformanceConfiguration = PerformanceConfiguration()
     external_predicate_file: Optional[str] = None
-    performance = PerformanceConfiguration()
 
 
 @dataclasses.dataclass
 class Evaluator:
-    settings: EvaluationSettings
+    settings: EvaluationConfiguration
     output_dir: str
     client: CLIClient
     db: str
@@ -68,7 +68,7 @@ def do_evalute(e: Evaluator):
 
 
 def evaluate(
-    settings: EvaluationSettings,
+    settings: EvaluationConfiguration,
     output_dir: str,
     dbs_path: Optional[str] = None,
     dbs: Optional[List[str]] = None,
@@ -167,7 +167,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     if pa.sources == 'worse':
-        settings = EvaluationSettings(
+        settings = EvaluationConfiguration(
             search_path=path.join(root_dir, 'lib-worse/codeql'),
             query_file=path.join(
                 root_dir, 'tsm-atm-pipeline/src/tsm/evaluation/TaintedPathWorseTSM.ql'),
@@ -175,7 +175,7 @@ if __name__ == "__main__":
             external_predicate_file=pa.boost_results,
         )
     else:
-        settings = EvaluationSettings(
+        settings = EvaluationConfiguration(
             search_path='/tesis/v0/javascript/ql/lib',
             query_file='tsm-evaluation/tsm-evaluation/src/PathEvaluation.ql',
             cli_version='2.10.5',

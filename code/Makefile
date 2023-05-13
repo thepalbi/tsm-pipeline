@@ -32,7 +32,7 @@ docker-tsm-main:
 	docker tag $(IMAGE_PREFIX)/tsm-main $(IMAGE_PREFIX)/tsm-main:$(IMAGE_TAG)
 
 test:
-	@python -m unittest tests/test_main.py
+	@python -m unittest tests/test_*.py
 
 test-quick:
 	@python -m unittest tests/test_main.py -k="*test_smoke_training_run_path"

@@ -38,6 +38,11 @@ class TSMConfigParser(configparser.ConfigParser):
         return self.get(self.QUERY_TYPE_SECION_PREFIX + type, key)
 
     def get_performance(self, stage: Optional[str] = None) -> PerformanceConfiguration:
+        """get the corresponding performance section in the config
+
+        :param Optional[str] stage: the performance section to look for, or the use the general one if None, defaults to None
+        :return PerformanceConfiguration: the mixin-ed performance configuration
+        """
         selected_section = "performance"
         if stage is not None:
             for sect in self.sections():

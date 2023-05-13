@@ -1,5 +1,5 @@
 from scripts.docker import run_tsm, TrainConfiguration, read_dbs_dataset, run_combine_scores
-from scripts.evaluate import evaluate, EvaluationSettings
+from scripts.evaluate import evaluate, EvaluationConfiguration
 from os.path import join as path_join
 from typing import List, Optional
 from scripts.calculate_scores import calculate_scores_df
@@ -7,7 +7,7 @@ import pandas as pd
 import docker
 import logging
 from dataclasses import dataclass
-from tsm.configuration import TSMConfigParser, PerformanceConfiguration
+from tsm.configuration import TSMConfigParser
 
 
 log = logging.getLogger(__name__)
@@ -54,21 +54,19 @@ def train_and_evaluate(
     else:
         log.warning("skipping train")
 
-    performance = PerformanceConfiguration(
-        parallelism=config.getint("performance", "parallelism"),
-        codeql_threads=config.getint("performance", "codeql_threads"),
-        codeql_memory=config.getint("performance", "codeql_memory"),
-    )
+    # use global performance section
+    performance = config.get_performance()
 
     # evaluation
     external_predicate_file = path_join(results_dir, 'averaged-results.csv')
 
-    worse_settings = EvaluationSettings(
+    worse_settings = EvaluationConfiguration(
         search_path=config.get("worse_evaluation", "search_path"),
         cli_version=config.get("worse_evaluation", "cli_version"),
         db_cli_version=config.get("global", "db_cli_version"),
         query_file=config.get_for_querytype(query_type, "worse_query_file"),
         cache_root=config.get("global", "db_cache_dir"),
+        performance=performance,
     )
 
     if not "evaluate_worse" in skip:
@@ -81,13 +79,14 @@ def train_and_evaluate(
     else:
         log.warning("skipping worse evaluation")
 
-    boosted_settings = EvaluationSettings(
+    boosted_settings = EvaluationConfiguration(
         search_path=config.get("boosted_evaluation", "search_path"),
         cli_version=config.get("boosted_evaluation", "cli_version"),
         db_cli_version=config.get("global", "db_cli_version"),
         query_file=config.get_for_querytype(query_type, "boosted_query_file"),
         cache_root=config.get("global", "db_cache_dir"),
         external_predicate_file=external_predicate_file,
+        performance=performance,
     )
 
     if not "evaluate_boosted" in skip:
@@ -100,12 +99,13 @@ def train_and_evaluate(
     else:
         log.warning("skipping boosted evaluation")
 
-    v0_settings = EvaluationSettings(
+    v0_settings = EvaluationConfiguration(
         search_path=config.get("v0_evaluation", "search_path"),
         cli_version=config.get("v0_evaluation", "cli_version"),
         db_cli_version=config.get("global", "db_cli_version"),
         query_file=config.get_for_querytype(query_type, "v0_query_file"),
         cache_root=config.get("global", "db_cache_dir"),
+        performance=performance,
     )
 
     if not "evaluate_v0" in skip:

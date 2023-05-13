@@ -125,12 +125,14 @@ def mounts_and_envs(config: TSMConfigParser, project_list_file: str, results_dir
         Mount(source=project_list_file, target=MOUNTED_LIST_FILE,
               read_only=True, type='bind'),
     ]
+    # training performance could be overriden, get those settings and prefer them
+    training_performance = config.get_performance("training")
     envs = {
         "CODEQL_CLIS_ROOT": config.get("global", "codeql_clis_dir"),
         "CODEQL_WRAPPER_TIMEOUT": config.get("global", "codeql_timeout"),
-        "PERF_PARALLELISM": config.get("performance", "parallelism"),
-        "PERF_CODEQL_THREADS": config.get("performance", "codeql_threads"),
-        "PERF_CODEQL_MEMORY": config.get("performance", "codeql_memory"),
+        "PERF_PARALLELISM": training_performance.parallelism,
+        "PERF_CODEQL_THREADS": training_performance.codeql_threads,
+        "PERF_CODEQL_MEMORY": training_performance.codeql_memory,
     }
     return mounts, envs
 
