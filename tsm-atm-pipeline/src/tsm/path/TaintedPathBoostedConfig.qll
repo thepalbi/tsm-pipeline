@@ -14,7 +14,7 @@ module TSMConfig {
    * A taint-tracking configuration for reasoning about tainted-path vulnerabilities.
    */
   class Configuration extends DataFlow::Configuration {
-    Configuration() { this = "TaintedPathTSMConfiguration" }
+    Configuration() { this = "TaintedPathBoostedConfiguration" }
 
     override predicate isSource(DataFlow::Node source) { source instanceof TSM::CandidateSource }
 

@@ -1,6 +1,6 @@
 import javascript
-import tsm.path.TaintedPathTSMConfig
-import tsm.evaluation.TaintedPathWorseTSMCustomizations
+import tsm.path.TaintedPathWorseConfig
+import tsm.evaluation.path.TaintedPathWorseTSMCustomizations
 import tsm.TaintSpecificationMining
 
 // For the predicate we use for post-mostern analysis

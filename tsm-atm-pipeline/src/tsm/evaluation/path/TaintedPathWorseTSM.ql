@@ -1,27 +1,22 @@
 import javascript
 // Import known source, sink and sanitizer definitions, in other words, the worse libraries
-import tsm.evaluation.TaintedPathWorseTSMCustomizations
+import tsm.evaluation.path.TaintedPathWorseTSMCustomizations
 // import the DataFlow::Configuration customized for this evaluation
-import tsm.path.TaintedPathTSMConfig
+import tsm.path.TaintedPathWorseConfig
 import tsm.TaintSpecificationMining
 
 from
-  DataFlow::Configuration cfg, string origin, DataFlow::Node source, DataFlow::Node sink,
-  string filePathSink, int startLineSink, int endLineSink, int startColumnSink, int endColumnSink,
-  string filePathSource, int startLineSource, int endLineSource, int startColumnSource,
-  int endColumnSource, float score
+  DataFlow::Configuration cfg, string origin, DataFlow::Node source, DataFlow::Node sink, string filePathSink,
+  int startLineSink, int endLineSink, int startColumnSink, int endColumnSink, string filePathSource,
+  int startLineSource, int endLineSource, int startColumnSource, int endColumnSource, float score
 where
-  cfg.hasFlow(source, sink) and
-  (
-    not TSM::isFlowLikelyInBaseQuery(source, sink) and origin = "boosted"
-    or
-    origin = "worse"
-  ) and
+  cfg.hasFlow(source, sink) and origin = "worse"
+   and
   sink.hasLocationInfo(filePathSink, startLineSink, startColumnSink, endLineSink, endColumnSink) and
   source
       .hasLocationInfo(filePathSource, startLineSource, startColumnSource, endLineSource,
         endColumnSource) and
-  TSM::getScoreForFlow(source, sink) = score
+  -1 = score
 select source, startLineSource, startColumnSource, endLineSource, endColumnSource, filePathSource,
   sink, startLineSink, startColumnSink, endLineSink, endColumnSink, filePathSink, score, origin order by
     score desc, startLineSource, startColumnSource, endLineSource, endColumnSource, filePathSource,
