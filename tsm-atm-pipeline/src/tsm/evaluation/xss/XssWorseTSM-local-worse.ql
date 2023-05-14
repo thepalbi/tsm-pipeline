@@ -1,6 +1,6 @@
 import javascript
-import tsm.evaluation.XssWorseTSMCustomizations
-import tsm.xss.DomBasedXssTSMConfig
+import tsm.evaluation.xss.XssWorseTSMCustomizations
+import tsm.xss.DomBasedXssWorseConfig
 import tsm.TaintSpecificationMining
 // For the predicate we use for post-mostern analysis
 private import semmle.javascript.security.dataflow.DomBasedXss 

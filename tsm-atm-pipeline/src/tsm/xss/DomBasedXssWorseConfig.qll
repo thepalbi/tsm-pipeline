@@ -5,6 +5,7 @@
 import javascript
 import semmle.javascript.security.TaintedObject
 import tsm.TaintSpecificationMining
+private import tsm.xss.Config
 
 module TSMConfig {
   private import semmle.javascript.security.dataflow.DomBasedXss::DomBasedXss as DomBasedXssWorse
@@ -12,25 +13,25 @@ module TSMConfig {
   /**
    * A taint-tracking configuration for reasoning about tainted-path vulnerabilities.
    */
-  class Configuration extends TaintTracking::Configuration {
-    Configuration() { this = "DomBasedXssTSMConfiguration" }
+  class Configuration extends EsbenaDomBasedXSSConfiguration {
+    Configuration() { this = "DomBasedXssWorseConfiguration" }
 
-    override predicate isSource(DataFlow::Node source) { source instanceof TSM::CandidateSource }
+    override predicate isSource(DataFlow::Node source) { source instanceof TSM::KnownSource }
 
     override predicate isSource(DataFlow::Node source, DataFlow::FlowLabel lbl) {
-      source instanceof TSM::CandidateSource
+      source instanceof TSM::KnownSource
     }
 
-    override predicate isSink(DataFlow::Node sink) { sink instanceof TSM::CandidateSink }
+    override predicate isSink(DataFlow::Node sink) { sink instanceof TSM::KnownSink }
 
     override predicate isSink(DataFlow::Node sink, DataFlow::FlowLabel lbl) {
-      sink instanceof TSM::CandidateSink
+      sink instanceof TSM::KnownSink
     }
 
     override predicate isSanitizer(DataFlow::Node sanitizer) {
       super.isSanitizer(sanitizer)
       or
-      sanitizer instanceof TSM::CandidateSanitizer
+      sanitizer instanceof TSM::KnownSanitizer
     }
 
     override predicate isSanitizerGuard(TaintTracking::SanitizerGuardNode guard) {
