@@ -192,8 +192,12 @@ def calculate_scores_df(
     for alert in v0_prime:
         proj = _project_name_from_hash(alert)
         proj_to_alert_count[proj] += 1
-    average_tp_per_proj = sum(
-        proj_to_alert_count.values())/len(proj_to_alert_count)
+
+    average_tp_per_proj = 0
+    # default to zero if no alerts were found
+    if len(proj_to_alert_count) > 0:
+        average_tp_per_proj = sum(
+            proj_to_alert_count.values())/len(proj_to_alert_count)
 
     alerts_to_recover = len(v0_prime)
     alerts_recovered = len(v0_prime & boosted)

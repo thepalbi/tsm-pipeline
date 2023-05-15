@@ -34,6 +34,7 @@ QUERY_TYPES: Dict[str, QueryNameAndType] = {
         type='Sql',
         name='SqlInjectionWorse',
     ),
+    # todo(pablo): what's this? delete please
     'sel': QueryNameAndType(
         type='Sel',
         name='SeldonWorse',
