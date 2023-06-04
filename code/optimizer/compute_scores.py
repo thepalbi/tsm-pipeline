@@ -16,6 +16,14 @@ def compute_optimized_repr_scores(config: SolverConfig, ctx):
 
 
 def do_compute_optimized_repr_scores(trainingsize, config: SolverConfig, ctx):
+    """
+    do_compute_optimized_repr_scores translate the infer process results into both a query file
+    and a csv for later usage by the evaluation pipeline.
+
+    :param _type_ trainingsize: _description_
+    :param SolverConfig config: _description_
+    :param _type_ ctx: _description_
+    """
     lambda_const = config.lambda_const
     trials = config.trials
 

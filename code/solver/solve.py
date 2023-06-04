@@ -9,6 +9,13 @@ log = logging.getLogger(__name__)
 
 
 def solve_constraints_combine_model(config: SolverConfig, ctx):
+    """
+    solve_constraints_combine_model brings together each piece of the linear model build in the `generate_model`
+    step into the file format expected by the solver.
+
+    :param SolverConfig config: _description_
+    :param _type_ ctx: _description_
+    """
     constraintsdir = ctx[CONSTRAINTS_DIR_KEY]
     modelfile_path = os.path.join(ctx[MODELS_DIR_KEY], f"optimization_model_{config.known_samples_ratio}_{1}.lp")
     # write minimization objective
