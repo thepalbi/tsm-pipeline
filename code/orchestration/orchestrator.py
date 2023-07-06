@@ -5,13 +5,14 @@ from generation.data import DataGenerator, GenerateEntitiesStep
 from results.steps import GenerateScoresStep, GenerateTSMQueryStep
 from optimizer import GenerateModelStep, OptimizeStep, CountRepsStep
 
-from orchestration.steps import Context,  RESULTS_DIR_KEY, WORKING_DIR_KEY, SINGLE_STEP_NAME, COMMAND_NAME, STEP_NAMES
+from orchestration.steps import Context,  RESULTS_DIR_KEY, WORKING_DIR_KEY, SINGLE_STEP_NAME, COMMAND_NAME, STEP_NAMES, DB_LOGGER
 
 import time
 import datetime
 
-import os 
+import os
 import glob
+
 
 class UnknownStepException(Exception):
     def __init__(self, step_name: str, available_steps: List[str]):
@@ -48,16 +49,17 @@ class Orchestrator:
         GenerateTSMQueryStep
     ]
 
-    def __init__(self, project_dir: str, project_name: str, 
-                query_type: str, query_name: str, kind: str,  
-                working_dir: str, results_dir: str, 
-                scores_file: str, 
-                no_flow: bool,
-                run_separate_on_multiple_projects: bool,
-                solver: str,
-                project_list: List[str], 
-                rep_counter = dict(),
-                ):
+    def __init__(self, project_dir: str, project_name: str,
+                 query_type: str, query_name: str, kind: str,
+                 working_dir: str, results_dir: str,
+                 scores_file: str,
+                 no_flow: bool,
+                 run_separate_on_multiple_projects: bool,
+                 solver: str,
+                 project_list: List[str],
+                 dblogger: logging.LoggerAdapter,
+                 rep_counter=dict(),
+                 ):
         self.query_type = query_type
         self.query_name = query_name
         self.kind = kind
@@ -70,7 +72,7 @@ class Orchestrator:
         self.run_single = run_separate_on_multiple_projects
         self.solver = solver
         self.scores_file = scores_file
-        if scores_file == None: 
+        if scores_file == None:
             self.combinedScore = False
             self.scores_file = "reprScores.txt"
         else:
@@ -78,8 +80,10 @@ class Orchestrator:
             self.combinedScore = True
         self.rep_counter = rep_counter
 
-        self.data_generator = DataGenerator(project_dir, project_name, working_dir, results_dir)
+        self.data_generator = DataGenerator(
+            project_dir, project_name, working_dir, results_dir)
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.dblogger = dblogger
         # Instantiate orchestration step templates
         self.steps = []
         for s in Orchestrator.default_steps:
@@ -104,14 +108,15 @@ class Orchestrator:
 
         ctx = self.starting_ctx()
         ctx[COMMAND_NAME] = "run"
-        
+
         for step in self.steps:
             self.print_step_banner(step, "run")
             ctx = step.populate(ctx)
             ctx = step.run(ctx)
 
     def run_steps(self, steps: List[str]):
-        self.logger.info(f"Running orchestration-run steps: {', '.join(steps)}")
+        self.logger.info(
+            f"Running orchestration-run steps: {', '.join(steps)}")
 
         ctx = self.starting_ctx()
         ctx[COMMAND_NAME] = "run"
@@ -122,7 +127,9 @@ class Orchestrator:
             if step.name() in pending_steps:
                 self.print_step_banner(step, "run")
                 ctx = step.populate(ctx)
+                self.dblogger.info("running step=%s", step.name())
                 step.run(ctx)
+                self.dblogger.info("finished running step=%s", step.name())
                 pending_steps.remove(step.name())
                 if len(pending_steps) == 0:
                     break
@@ -144,11 +151,12 @@ class Orchestrator:
 
     def print_step_banner(self, step, command):
         separator = ">" * 5
-        self.logger.info("%s Running orchestration-%s step: %s %s", separator, command, step.name(), separator)
+        self.logger.info("%s Running orchestration-%s step: %s %s",
+                         separator, command, step.name(), separator)
 
     def starting_ctx(self) -> Context:
         ctx = dict()
         ctx[RESULTS_DIR_KEY] = self.compute_results_dir()
         ctx[WORKING_DIR_KEY] = self.working_dir
+        ctx[DB_LOGGER] = self.dblogger
         return ctx
- 
