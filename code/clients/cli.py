@@ -59,18 +59,19 @@ class CLIClient:
     def bqrs_decode(self,
                     bqrs: str,
                     result_set: Optional[str],
-                    output: str,
-                    format: str = "csv"):
+                    output: Optional[str] = None,
+                    format: str = "csv") -> str:
         query_cmd = [
             '%s bqrs decode' % (self._cli_path),
             '--result-set=%s' % (result_set) if result_set != None else '',
             '--format %s' % (format),
-            '--output=%s' % (output),
+            '--output=%s' % (output) if output != None else '',
             bqrs
         ]
 
         try:
-            run_process(query_cmd, cwd=self._cwd)
+            completed_proc = run_process(query_cmd, cwd=self._cwd)
+            return str(completed_proc.stdout)
         except RunProcessError as err:
             raise CLIError("Failed to decode bqrs: %s" % (err.stderr))
 
