@@ -9,7 +9,7 @@ from optimizer.compute_scores import compute_optimized_repr_scores
 from orchestration.steps import OrchestrationStep, Context,\
     CONSTRAINTS_DIR_KEY, MODELS_DIR_KEY, RESULTS_DIR_KEY, WORKING_DIR_KEY, LOGS_DIR_KEY, \
     SOURCE_ENTITIES, SANITIZER_ENTITIES,  SINK_ENTITIES, SRC_SAN_TUPLES_ENTITIES, SAN_SNK_TUPLES_ENTITIES, REPR_MAP_ENTITIES, \
-    SINGLE_STEP_NAME, COMMAND_NAME, STEP_NAMES
+    SINGLE_STEP_NAME, COMMAND_NAME, STEP_NAMES, DB_LOGGER
 
 from solver.config import SolverConfig
 from solver.get_constraints import ConstraintBuilder
@@ -200,6 +200,7 @@ class GenerateModelStep(OrchestrationStep):
                 log.exception("There was a problem reading events!")
                 raise
         # if we run multiple projects we allow some filtering
+        # this whole block is not running due to the blacklist step disabled
         if not self.orchestrator.run_single:
             # remove events with no min reps
             constraint_builder.removeRareEvents()
@@ -207,6 +208,7 @@ class GenerateModelStep(OrchestrationStep):
             if len(self.orchestrator.rep_counter) > 0:
                 constraint_builder.removeRareEvents(
                     self.orchestrator.rep_counter)
+
         # initiate all variables
         constraint_builder.createVariables(ctx)
 
@@ -252,17 +254,16 @@ class GenerateModelStep(OrchestrationStep):
                 len(m[k]) for k in m.keys()
             ])
 
+        db_logger: logging.LoggerAdapter = ctx[DB_LOGGER]
         # hard-coding this to the base results dir, since the results_dir key uses a suffix with the project name
         # write model metrics to results folder
-        with open(os.path.join("/results", "metrics.txt"), "a") as f:
-            f.write(
-                f"model_variables_count={len(constraint_builder.variables)}\n")
-            f.write(
-                f"model_known_source_count={count_known_for_project_indexed_map(constraint_builder.known_sources)}\n")
-            f.write(
-                f"model_known_sanitizer_count={count_known_for_project_indexed_map(constraint_builder.known_sanitizers)}\n")
-            f.write(
-                f"model_known_sink_count={count_known_for_project_indexed_map(constraint_builder.known_sinks)}\n")
+        model_infos = [
+            f"model_variables_count={len(constraint_builder.variables)}",
+            f"model_known_source_count={count_known_for_project_indexed_map(constraint_builder.known_sources)}",
+            f"model_known_sanitizer_count={count_known_for_project_indexed_map(constraint_builder.known_sanitizers)}",
+            f"model_known_sink_count={count_known_for_project_indexed_map(constraint_builder.known_sinks)}",
+        ]
+        db_logger.info("model info: %s", " ".join(model_infos))
 
         return ctx
 
