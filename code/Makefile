@@ -35,7 +35,7 @@ test:
 	@python -m unittest tests/test_*.py
 
 test-quick:
-	@python -m unittest tests/test_main.py -k="*test_smoke_training_run_path"
+	@python -m unittest tests/test_main.py -k="*test_smoke_run_nosql"
 
 # checkings
 check: typecheck lint
