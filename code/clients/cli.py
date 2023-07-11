@@ -9,6 +9,10 @@ class CLIError(Exception):
         super().__init__(message)
 
 
+class DatabaseLockedError(Exception):
+    pass
+
+
 class CLIClient:
     def __init__(self,
                  exec_path: Optional[str] = None,
@@ -54,6 +58,8 @@ class CLIClient:
         try:
             run_process(query_cmd, cwd=self._cwd)
         except RunProcessError as err:
+            if "the cache directory is already locked by another running process." in err.stderr:
+                raise DatabaseLockedError()
             raise CLIError("Failed to run query: %s" % (err.stderr))
 
     def bqrs_decode(self,

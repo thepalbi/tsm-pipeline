@@ -1,7 +1,7 @@
 import argparse
 from utils.process import run_process
-from os import path, mkdir
-from clients.cli import CLIClient
+from os import path, mkdir, remove
+from clients.cli import CLIClient, DatabaseLockedError
 import sys
 from typing import Tuple, Optional, List
 from database.cache import DatabasesCache, Parsedkey
@@ -12,6 +12,8 @@ from tsm.configuration import PerformanceConfiguration
 
 
 log = logging.getLogger(__name__)
+logging_format = "[%(levelname)s\t%(asctime)s] %(name)s\t%(message)s"
+logging.basicConfig(level=logging.INFO, format=logging_format)
 
 
 def create_dir(dir: str):
@@ -58,9 +60,31 @@ class Evaluator:
             external_preds = {
                 "getReprScore": self.settings.external_predicate_file
             }
-        self.client.query_run(self.db, self.settings.search_path, bqrs_out,
-                              self.settings.query_file, external_predicates=external_preds)
+
+        def _query():
+            self.client.query_run(self.db, self.settings.search_path, bqrs_out,
+                                  self.settings.query_file, external_predicates=external_preds)
+        try:
+            _query()
+        except DatabaseLockedError:
+            log.warning("database %s was locked. retrying", self.db)
+            # if the database is locked, try to delete lock and then re-try run query
+            remove(path.join(self.db, "db-javascript/default/cache/.lock"))
+            # re-try query
+            try:
+                _query()
+            except:
+                # do not fail on database failure, just log
+                log.exception("database %s failed. continuing", self.db)
+                return
+        except:
+            # do not fail on database failure, just log
+            log.exception("database %s failed. continuing", self.db)
+            return
+
+        # finally if all went right bqrs decode
         self.client.bqrs_decode(bqrs_out, "#select", csv_out)
+        log.info("database %s ok", self.db)
 
 
 def do_evalute(e: Evaluator):
@@ -73,6 +97,7 @@ def evaluate(
     dbs_path: Optional[str] = None,
     dbs: Optional[List[str]] = None,
 ):
+
     if dbs is None and dbs_path is None:
         raise Exception('dbs_path and dbs cannot be None')
 
@@ -110,8 +135,27 @@ def evaluate(
             pk,
         ) for (pk, db) in dbs_from_cache
     ]
-    with Pool(processes=settings.performance.parallelism) as pool:
-        pool.map(do_evalute, evaluators)
+
+    # configure logging
+    # handler used to track when databases start being processed, etc
+    # the idea is that this handler will have a filter just looking for
+    # enriched loglines with a dbname=name pre-prended to the actual message
+
+    # TODO: add indicator that we are in v0 worse ord boosted
+
+    tracking_handler = logging.FileHandler(
+        path.join(output_dir, "log.txt"), encoding='utf-8', delay=True)
+    tracking_handler.setLevel(logging.INFO)
+    # re-use the same formattes as above
+    tracking_handler.setFormatter(logging.Formatter(logging_format))
+    logging.getLogger().addHandler(tracking_handler)
+
+    try:
+        with Pool(processes=settings.performance.parallelism) as pool:
+            pool.map(do_evalute, evaluators)
+    finally:
+        # remove handler so we are not adding one on top of the other
+        logging.getLogger().removeHandler(tracking_handler)
 
 
 def extract_db_info(db: str) -> Tuple[str, str, str]:
