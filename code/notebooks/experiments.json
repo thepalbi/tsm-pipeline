@@ -1,0 +1,48 @@
+{
+  "experiments": [
+    {
+      "name": "nosql_200",
+      "comment": "Corrida de evaluacion para publicar resultados. Usando parametros por default.",
+      "input_data": {
+        "size": 200,
+        "k_fold": 5
+      },
+      "type": "nosql",
+      "results_file": "./nosql_200_results.csv",
+      "parameters": {
+        "MinScoreSink": 0.1,
+        "MaxReprDepth": 4
+      }
+    },
+    {
+      "name": "nosql_200_minreprscore0p5",
+      "comment": "Corrida aumentando el MinSinkScore. Esto debería causar que se descarte specs inferidas con score bajo, y buscamos mejorar la precision. Recall deberia verse afectado.",
+      "results_comment": "Tanto precision y recall dieron mal. Viendo un distribution plot de los scores, se ve que despues de .5 el percentil restante es bajisimo.",
+      "input_data": {
+        "size": 200,
+        "k_fold": 5
+      },
+      "type": "nosql",
+      "results_file": "./nosql_200_minreprscore0p5_results.csv",
+      "parameters": {
+        "MinScoreSink": 0.5,
+        "MaxReprDepth": 4
+      }
+    },
+    {
+      "name": "nosql_200_minreprscore0p2",
+      "comment": "Corrida aumentando el MinSinkScore a 0.2. Esto debería causar que se descarte specs inferidas con score bajo, y buscamos mejorar la precision. Recall deberia verse afectado.",
+      "results_comment": "Igual que con MinScoreSink .1. Las specs inferidas que tenian menor score no deben ni tener ocurrencias.",
+      "input_data": {
+        "size": 200,
+        "k_fold": 5
+      },
+      "type": "nosql",
+      "results_file": "./nosql_200_minreprscore0p2_results.csv",
+      "parameters": {
+        "MinScoreSink": 0.2,
+        "MaxReprDepth": 4
+      }
+    }
+  ]
+}
