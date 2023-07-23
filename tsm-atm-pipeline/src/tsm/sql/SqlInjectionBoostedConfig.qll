@@ -7,11 +7,14 @@ import semmle.javascript.security.TaintedObject
 import tsm.TaintSpecificationMining
 
 module TSMConfig {
+  // Renames SqlInjection as SqlInjectionWorse, assuming SqlInjection comes from a configWorse
+  private import semmle.javascript.security.dataflow.SqlInjection::SqlInjection as SqlInjectionWorse
+
   /**
    * A taint-tracking configuration for reasoning about tainted-path vulnerabilities.
    */
-  class Configuration extends TaintTracking::Configuration {
-    Configuration() { this = "SqlInjectionTSMConfiguration" }
+  class Configuration extends DataFlow::Configuration {
+    Configuration() { this = "SqlInjectionBoostedConfiguration" }
 
     override predicate isSource(DataFlow::Node source) { source instanceof TSM::CandidateSource }
 
@@ -25,14 +28,10 @@ module TSMConfig {
       sink instanceof TSM::CandidateSink
     }
 
-    override predicate isSanitizer(DataFlow::Node sanitizer) {
-      sanitizer instanceof TSM::CandidateSanitizer
-    }
+    override predicate isBarrier(DataFlow::Node node) { node instanceof TSM::CandidateSanitizer }
 
-    override predicate isAdditionalFlowStep(
-      DataFlow::Node src, DataFlow::Node trg, DataFlow::FlowLabel inlbl, DataFlow::FlowLabel outlbl
-    ) {
-      super.isAdditionalFlowStep(src, trg, inlbl, outlbl)
+    override predicate isBarrierGuard(DataFlow::BarrierGuardNode guard) {
+      guard instanceof TSM::CandidateSanitizer
     }
   }
 }
