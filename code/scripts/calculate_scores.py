@@ -1,3 +1,4 @@
+from typing import Tuple
 from collections import defaultdict
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from typing import Iterable, Set, Tuple
@@ -248,6 +249,45 @@ def _calculate_ml_scores(v0: Set[str], boosted: Set[str]) -> Tuple[float, float,
     accuracy = accuracy_score(y_true, y_pred)
 
     return precision, recall, accuracy
+
+
+def _predictions_info(path) -> Tuple[int]:
+    df = pd.read_csv(path, names=["repr", "role", "score"])
+    return df[df.role == "snk"].shape[0]
+
+
+def calculate_many_scores(dirs) -> pd.DataFrame:
+    collected_results = []
+    for resdir in dirs:
+        df = calculate_scores_df(resdir, cleanup_base_dir="tmp")
+        sinks_predicted = _predictions_info(
+            os.path.join(resdir, "averaged-results.csv"))
+        df["predicted sinks"] = [sinks_predicted]
+        collected_results.append(df)
+
+    concated_results = pd.concat(collected_results)
+    concated_results = pd.concat(
+        [concated_results, concated_results.apply(['mean'])])
+    concated_results['name'] = [
+        f'fold {i}' for i in range(len(dirs))] + ['mean']
+
+    # renames
+    concated_results = concated_results.rename({
+        "alerts to recover (atr)": "atr",
+        "alerts recovered": "recovered",
+        "suprious alerts": "spurious",
+        "projects with atr": "progwithatr",
+        "avg atr per proj": "avgatr",
+        "predicted sinks": "predsinks"
+    }, axis=1).astype({
+        "atr": "int",
+        "recovered": "int",
+        "spurious": "int",
+        "progwithatr": "int",
+        "predsinks": "int"
+    })
+
+    return concated_results
 
 
 if __name__ == "__main__":
